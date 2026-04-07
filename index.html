@@ -269,6 +269,72 @@
     margin-top: 8px; margin-bottom: 3px;
     font-family: 'Cambria', Georgia, serif;
   }
+
+  /* ── EXPERIENCE COPY ZONE ── */
+  .exp-copy-zone {
+    max-width: 860px;
+    margin: 18px auto 0;
+    padding: 0 24px;
+    display: none;
+  }
+  .exp-copy-zone.visible { display: block; }
+  .exp-copy-label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .exp-copy-label::before, .exp-copy-label::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+  .exp-copy-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  .exp-copy-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 20px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    position: relative;
+  }
+  .exp-copy-btn:hover {
+    background: var(--accent-light);
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(44,74,124,0.15);
+  }
+  .exp-copy-btn.copied {
+    background: rgba(34,197,94,0.08);
+    border-color: rgba(34,197,94,0.5);
+    color: #16a34a !important;
+  }
+  .copied-toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(10px);
+    background: #1a1a1a; color: white;
+    padding: 10px 20px; border-radius: 10px;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    opacity: 0; transition: all 0.25s; pointer-events: none; z-index: 9999;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .copied-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
@@ -301,6 +367,15 @@
     ✦ Generate Resume Preview
   </button>
 </div>
+
+<!-- EXPERIENCE COPY ZONE -->
+<div class="exp-copy-zone" id="exp-copy-zone">
+  <div class="exp-copy-label">Copy Experience Bullets for Workday</div>
+  <div class="exp-copy-buttons" id="exp-copy-buttons"></div>
+</div>
+
+<!-- TOAST -->
+<div class="copied-toast" id="copied-toast">✓ Copied to clipboard!</div>
 
 <!-- DIVIDER -->
 <div class="divider"><span>Resume Preview</span></div>
@@ -355,6 +430,110 @@ function detectSections() {
   chips.innerHTML = tags.map(t =>
     `<span class="tag-pill ${t.found ? 'found' : 'missing'}">${t.found ? '✓' : '○'} ${t.label}</span>`
   ).join('');
+  buildExpCopyButtons(experience);
+}
+
+// ── EXPERIENCE COPY BUTTONS ──
+function parseCompanies(experienceRaw) {
+  if (!experienceRaw) return [];
+  const lines = experienceRaw.split('\n');
+  const companies = [];
+  let current = null;
+
+  lines.forEach(line => {
+    const t = line.trim();
+    if (!t) return;
+
+    if (t.includes('|') && !/^[-•*◦]/.test(t) && !/^key achievements/i.test(t)) {
+      if (current) companies.push(current);
+      const parts = t.split('|').map(p => p.trim());
+      const name = parts[0];
+      const role = parts.length >= 4 ? parts[2] : (parts.length === 3 ? parts[1] : parts[1] || '');
+      current = { name, role, bullets: [], achievements: [], inAchievements: false };
+    } else if (current) {
+      if (/^key achievements[:\s]*/i.test(t)) {
+        current.inAchievements = true;
+      } else if (/^[-•*◦1-9]/.test(t)) {
+        const clean = t.replace(/^[-•*◦]\s*/, '').replace(/^\d+\.\s*/, '');
+        if (current.inAchievements) {
+          current.achievements.push(clean);
+        } else {
+          current.bullets.push(clean);
+        }
+      }
+    }
+  });
+
+  if (current) companies.push(current);
+  return companies;
+}
+
+function buildExpCopyButtons(experienceRaw) {
+  const zone = document.getElementById('exp-copy-zone');
+  const container = document.getElementById('exp-copy-buttons');
+  const companies = parseCompanies(experienceRaw);
+
+  if (!companies.length) {
+    zone.classList.remove('visible');
+    return;
+  }
+
+  zone.classList.add('visible');
+
+  container.innerHTML = companies.map((c, i) => {
+    const initials = c.name.split(/\s+/).map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const bulletCount = c.bullets.length + c.achievements.length;
+    return `<button class="exp-copy-btn" onclick="copyCompanyExp(${i})" id="exp-btn-${i}">${escHtml(c.name)} exp</button>`;
+  }).join('');
+
+  window._parsedCompanies = companies;
+}
+
+function copyCompanyExp(idx) {
+  const companies = window._parsedCompanies;
+  if (!companies || !companies[idx]) return;
+  const c = companies[idx];
+
+  let text = '';
+  c.bullets.forEach(b => { text += `• ${b}\n`; });
+  if (c.achievements.length) {
+    text += `\nKey Achievements\n`;
+    c.achievements.forEach(a => { text += `• ${a}\n`; });
+  }
+  text = text.trim();
+
+  const doFeedback = () => {
+    const btn = document.getElementById(`exp-btn-${idx}`);
+    btn.classList.add('copied');
+    const origText = btn.textContent;
+    btn.textContent = 'Copied! ✓';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = origText;
+    }, 2200);
+    const toast = document.getElementById('copied-toast');
+    toast.textContent = `✓ ${c.name} bullets copied to clipboard!`;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(doFeedback).catch(() => {
+      fallbackCopy(text); doFeedback();
+    });
+  } else {
+    fallbackCopy(text); doFeedback();
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
 }
 
 // ── PREVIEW BUILDER ──
@@ -368,6 +547,7 @@ function updatePreview() {
   }
 
   const { summary, skills, experience } = parseContent(raw);
+  buildExpCopyButtons(experience);
   let html = '';
 
   // ── Header
