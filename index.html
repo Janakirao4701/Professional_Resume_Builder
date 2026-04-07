@@ -164,6 +164,22 @@
     letter-spacing: 0.3px;
   }
   .gen-btn:hover { background: #1e3560; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(44,74,124,0.25); }
+  .clear-btn {
+    margin-top: 10px;
+    width: 100%;
+    background: transparent;
+    color: var(--ink-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 9px;
+    border-radius: 10px;
+    border: 1.5px solid var(--border);
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .clear-btn:hover { background: rgba(239,68,68,0.06); border-color: rgba(239,68,68,0.4); color: #dc2626; }
 
   /* ── DIVIDER ── */
   .divider {
@@ -366,6 +382,10 @@
   <button class="gen-btn" onclick="updatePreview()">
     ✦ Generate Resume Preview
   </button>
+  <button class="clear-btn" onclick="clearResume()">
+    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+    Clear
+  </button>
 </div>
 
 <!-- EXPERIENCE COPY ZONE -->
@@ -416,6 +436,14 @@ function parseContent(raw) {
   const experienceRx= /\[(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]([\s\S]*?)(?=\[|$)/i;
   const get = (rx) => { const m = raw.match(rx); return m ? m[1].trim() : ''; };
   return { summary: get(summaryRx), skills: get(skillsRx), experience: get(experienceRx) };
+}
+
+function clearResume() {
+  document.getElementById('resume-text').value = '';
+  document.getElementById('chips').innerHTML = '';
+  document.getElementById('resume-mockup').innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Paste your resume content above to see a live preview here</p></div>';
+  document.getElementById('exp-copy-zone').classList.remove('visible');
+  window._parsedCompanies = [];
 }
 
 function detectSections() {
