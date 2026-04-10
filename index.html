@@ -484,8 +484,8 @@ function parseCompanies(experienceRaw) {
     } else if (current) {
       if (/^key achievements[:\s]*/i.test(t)) {
         current.inAchievements = true;
-      } else if (/^[-•*◦1-9]/.test(t)) {
-        const clean = t.replace(/^[-•*◦]\s*/, '').replace(/^\d+\.\s*/, '');
+      } else if (/^[-–—•*◦▪›→⁃]\s/.test(t)) {
+        const clean = t.replace(/^[-–—•*◦▪›→⁃]\s*/, '');
         if (current.inAchievements) {
           current.achievements.push(clean);
         } else {
@@ -617,8 +617,8 @@ function updatePreview() {
       const t = line.trim();
       if (/^key achievements[:\s]*/i.test(t)) {
         html += `<div class="mock-achievement-head">Key Achievements</div>`;
-      } else if (/^[-•*◦]/.test(t)) {
-        html += `<div class="mock-bullet">${escHtml(t.replace(/^[-•*◦]\s*/,''))}</div>`;
+      } else if (/^[-–—•*◦▪›→⁃]\s/.test(t)) {
+        html += `<div class="mock-bullet">${escHtml(t.replace(/^[-–—•*◦▪›→⁃]\s*/,''))}</div>`;
       } else if (t.includes('|')) {
         const parts = t.split('|').map(p => p.trim());
         // parts: company | location | role | date  OR  company | role | date
@@ -23779,7 +23779,7 @@ document.getElementById('dl-btn').onclick = async () => {
     btn.innerHTML = '⏳ Generating...';
 
     const { Document, Packer, Paragraph, TextRun, ExternalHyperlink,
-            AlignmentType, BorderStyle, LevelFormat, TabStopType } = docx;
+            AlignmentType, BorderStyle, TabStopType } = docx;
 
     const P = PROFILE;
 
@@ -23793,9 +23793,9 @@ document.getElementById('dl-btn').onclick = async () => {
 
     function bullet(text) {
       return new Paragraph({
-        numbering: { reference: 'bullets', level: 0 },
         spacing: { before: 20, after: 20 },
-        children: [new TextRun({ text, font: 'Cambria', size: 21, color: '222222' })]
+        indent: { left: 480, hanging: 360 },
+        children: [new TextRun({ text: '•\t' + text, font: 'Cambria', size: 21, color: '222222' })]
       });
     }
 
@@ -23825,7 +23825,7 @@ document.getElementById('dl-btn').onclick = async () => {
         if (/^key achievements[:\s]*/i.test(t)) {
           return new Paragraph({ spacing:{before:100,after:30}, children:[new TextRun({text:"Key Achievements", bold:true, italics:true, font:"Cambria", size:20, color:"444444"})] });
         }
-        if (/^[-•*◦]/.test(t)) return bullet(t.replace(/^[-•*◦]\s*/,''));
+        if (/^[-–—•*◦▪›→⁃]\s/.test(t)) return bullet(t.replace(/^[-–—•*◦▪›→⁃]\s*/,''));
         if (t.includes('|')) {
           const parts = t.split('|').map(p=>p.trim());
           const rows = [];
@@ -23900,7 +23900,6 @@ document.getElementById('dl-btn').onclick = async () => {
     }));
 
     const doc = new Document({
-      numbering: { config:[{ reference:'bullets', levels:[{ level:0, format:LevelFormat.BULLET, text:'•', alignment:AlignmentType.LEFT, style:{ paragraph:{ indent:{ left:480, hanging:360 } } } }] }] },
       styles: { default: { document: { run:{ font:'Cambria', size:21 } } } },
       sections:[{
         properties:{ page:{ size:{width:12240,height:15840}, margin:{top:720,right:720,bottom:720,left:720} } },
