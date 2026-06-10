@@ -163,6 +163,7 @@ let PROFILES = { ...HARDCODED_PROFILES };
 let DEFAULT_TEXTS = { ...HARDCODED_TEXTS };
 
 let activeCandidate = 'pravallika';
+let editingKey = null;
 
 function getActiveProfile() {
   return PROFILES[activeCandidate];
@@ -208,14 +209,15 @@ function switchCandidate(key) {
   document.getElementById('candidate-select').value = key;
   document.getElementById('resume-text').value = DEFAULT_TEXTS[key].trim();
   
-  // Show/hide delete button based on whether it is a custom profile
+  // Show/hide edit and delete buttons based on whether it is a custom profile
   const deleteBtn = document.getElementById('delete-profile-btn');
+  const editBtn = document.getElementById('edit-profile-btn');
+  const isCustom = !HARDCODED_PROFILES[key];
   if (deleteBtn) {
-    if (!HARDCODED_PROFILES[key]) {
-      deleteBtn.style.display = 'flex';
-    } else {
-      deleteBtn.style.display = 'none';
-    }
+    deleteBtn.style.display = isCustom ? 'flex' : 'none';
+  }
+  if (editBtn) {
+    editBtn.style.display = isCustom ? 'flex' : 'none';
   }
 
   detectSectionsAndCompanies();
@@ -242,7 +244,51 @@ function repopulateSelector() {
 
 // ── MODAL DIALOG HANDLERS ──
 function openProfileModal() {
+  editingKey = null;
+  const modalTitle = document.getElementById('modal-title');
+  const submitBtn = document.getElementById('modal-submit-btn');
+  if (modalTitle) modalTitle.textContent = "Create New Candidate Profile";
+  if (submitBtn) submitBtn.textContent = "Save Profile";
+  
   document.getElementById('profile-form').reset();
+  document.getElementById('profile-modal').classList.add('active');
+}
+
+function openEditProfileModal() {
+  if (HARDCODED_PROFILES[activeCandidate]) {
+    alert("You cannot edit default system profiles.");
+    return;
+  }
+  
+  editingKey = activeCandidate;
+  const modalTitle = document.getElementById('modal-title');
+  const submitBtn = document.getElementById('modal-submit-btn');
+  if (modalTitle) modalTitle.textContent = "Edit Candidate Profile";
+  if (submitBtn) submitBtn.textContent = "Update Profile";
+  
+  const p = PROFILES[editingKey];
+  document.getElementById('prof-name').value = p.name || '';
+  document.getElementById('prof-subtitle').value = p.subtitle || '';
+  document.getElementById('prof-email').value = p.email || '';
+  document.getElementById('prof-phone').value = p.phone || '';
+  document.getElementById('prof-location').value = p.location || '';
+  document.getElementById('prof-linkedin').value = p.linkedin || '';
+  
+  const edu1 = p.education && p.education[0] ? p.education[0] : {};
+  document.getElementById('prof-edu1-degree').value = edu1.degree || '';
+  document.getElementById('prof-edu1-dates').value = edu1.dates || '';
+  document.getElementById('prof-edu1-school').value = edu1.school || '';
+  document.getElementById('prof-edu1-location').value = edu1.location || '';
+  
+  const edu2 = p.education && p.education[1] ? p.education[1] : {};
+  document.getElementById('prof-edu2-degree').value = edu2.degree || '';
+  document.getElementById('prof-edu2-dates').value = edu2.dates || '';
+  document.getElementById('prof-edu2-school').value = edu2.school || '';
+  document.getElementById('prof-edu2-location').value = edu2.location || '';
+  
+  document.getElementById('prof-certs').value = (p.certs || []).join(', ');
+  document.getElementById('prof-resume-text').value = DEFAULT_TEXTS[editingKey] || '';
+  
   document.getElementById('profile-modal').classList.add('active');
 }
 
@@ -285,9 +331,12 @@ function saveNewProfile() {
     education.push({ degree: edu2_degree, dates: edu2_dates, school: edu2_school, location: edu2_location });
   }
   
-  const newKey = 'custom_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now();
+  let keyToUse = editingKey;
+  if (!keyToUse) {
+    keyToUse = 'custom_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now();
+  }
   
-  PROFILES[newKey] = {
+  PROFILES[keyToUse] = {
     name,
     subtitle,
     email,
@@ -298,11 +347,11 @@ function saveNewProfile() {
     certs
   };
   
-  DEFAULT_TEXTS[newKey] = resumeText;
+  DEFAULT_TEXTS[keyToUse] = resumeText;
   
   saveCustomProfiles();
   repopulateSelector();
-  switchCandidate(newKey);
+  switchCandidate(keyToUse);
   closeProfileModal();
 }
 
