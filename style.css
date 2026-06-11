@@ -915,6 +915,27 @@ header {
   }
 }
 
+@media (max-width: 480px) {
+  .app-title {
+    font-size: 18px;
+  }
+  #candidate-select {
+    max-width: 140px;
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  .logo-area {
+    gap: 6px;
+  }
+  .btn-icon-add, .btn-icon-edit, .btn-icon-delete {
+    height: 30px;
+    width: 30px;
+  }
+  .action-buttons {
+    gap: 8px;
+  }
+}
+
 /* ── PRINT MEDIA STYLING (VERIFIED AND UNCHANGED) ── */
 @media print {
   header, .input-zone, .divider { 
