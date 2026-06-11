@@ -513,6 +513,7 @@ header {
   width: 8.5in;
   margin: 0 auto;
   position: relative;
+  flex-shrink: 0;
 }
 
 .preview-page {
