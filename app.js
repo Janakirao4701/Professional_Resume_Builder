@@ -19,6 +19,28 @@ function loadCustomProfiles() {
         DEFAULT_TEXTS[key] = parsed[key].text;
       });
     }
+    
+    // Pre-populate a default candidate profile if empty to prevent a blank workspace on first load
+    if (Object.keys(PROFILES).length === 0) {
+      const defaultKey = 'custom_hardhik_rao_chidura';
+      PROFILES[defaultKey] = {
+        name: "Hardhik Rao Chidura",
+        subtitle: "PLC Controls & Automation | HMI/SCADA Engineer",
+        email: "hardhikraochidura@gmail.com",
+        phone: "+1 (845) 484-9588",
+        location: "Wyoming, USA",
+        linkedin: "linkedin.com/in/hardhik-rao-chidura",
+        education: [
+          { degree: "Master of Science in Computer Engineering", dates: "09/2022 - 05/2024", school: "University of Houston", location: "Houston, TX" },
+          { degree: "Bachelor of Technology", dates: "06/2018 - 05/2022", school: "SRK Institute of Technology", location: "Andhra Pradesh, India" }
+        ],
+        certs: ["AWS Certified Developer", "PMP"]
+      };
+      
+      DEFAULT_TEXTS[defaultKey] = `[PROFESSIONAL SUMMARY]\nControls Engineer with 4+ years of experience in PLC programming, HMI/SCADA development, commissioning, and industrial automation. Expertise in Allen-Bradley, Siemens, and Delta control systems, with hands-on experience in FactoryTalk View, Ignition Perspective, WinCC, OPC UA, and Modbus TCP/IP. Skilled in FAT/SAT, industrial networking, Python automation, and control system integration. Proven ability to improve system reliability, reduce downtime, and support manufacturing operations across automotive, defense, and industrial environments.\n\n[TECHNICAL SKILLS]\n- PLC & Industrial Controls: Allen-Bradley Logix 5000, CompactLogix, Studio 5000, Siemens S7-1200/1500, Siemens TIA Portal, Delta DVP Series, WPLSoft, Beckhoff TwinCAT, IEC 61131-3 (Ladder Logic, Structured Text, Function Block Diagram).\n- HMI & SCADA: FactoryTalk View, Siemens WinCC, AVEVA InTouch, Indusoft Web Studio, Ignition Vision, Ignition Perspective, Alarm Management, Historian Integration, Dashboard Development.\n- Vision & Inspection Systems: Cognex D905, Cognex ViDi Suite, Keyence Vision Systems, Keyence Barcode Scanners, OCR Validation, VIN Verification, Conveyor Inspection Systems.\n- Industrial Communication: OPC UA, Modbus TCP/IP, Ethernet/IP, TCP/IP, DeviceNet, Profibus, CAN Bus, PLC-HMI Integration, SCADA Networking.\n- Programming & Databases: Python, C#, SQL, OSIsoft PI System, Historian Integration, Data Logging, Automation Scripting, Operational Reporting.\n- Electrical Design & Commissioning: AutoCAD Electrical, Electrical Panel Testing, Wiring Diagrams, I/O Validation, FAT, SAT, CAT, System-Level Troubleshooting, Onsite Commissioning.\n- Compliance & Cybersecurity: SIL, IEC 61131-3, OSHA Standards, NERC CIP, 21 CFR Part 11, GAMP 5, ServiceNow Change Management.\n- Other: Material Handling Systems, Automotive Fixture Automation, Defense Systems Integration, Switchgear & Power Distribution Systems, Industrial Engineering Automation, Process Optimization, Industrial Networking.\n\n[PROFESSIONAL EXPERIENCE]\nBW Design Group, USA | 04/2025 - Present | HMI/SCADA Engineer | Wyoming, USA\n- Engineered FactoryTalk View and Ignition Perspective HMIs integrated with Allen-Bradley PLCs, improving production visibility and operator efficiency by 15%.\n- Configured Siemens TIA Portal, Beckhoff TwinCAT, and Studio 5000 PLC logic for robotic manufacturing and automated assembly systems.\n- Implemented Cognex D905 OCR validation for VIN inspection systems, improving traceability and reducing manual verification efforts.\n- Migrated legacy SCADA applications to AVEVA InTouch and Indusoft Web Studio, improving alarm management and system maintainability.\n- Optimized OPC UA, TCP/IP, and Modbus networks connecting PLCs and SCADA systems, improving communication reliability.\n- Established NERC-CIP compliant security controls and ServiceNow workflows, strengthening industrial cybersecurity compliance.\n- Developed Ignition Perspective dashboards with centralized alarms, increasing manufacturing system uptime by 17%.\n- Reduced barcode validation failures by 79% through Cognex vision optimization and PLC-based verification logic.\n- Accelerated FAT, SAT, and commissioning activities by 26% using standardized HMI templates and PLC modules.\n- Created reusable PLC function blocks and programming templates, reducing development effort by 30%.\n- Partnered with engineering and operations teams to resolve production issues, reducing downtime and improving overall equipment effectiveness (OEE).`;
+      
+      saveCustomProfiles();
+    }
   } catch (e) {
     console.error("Failed to load custom profiles", e);
   }
@@ -242,22 +264,18 @@ function deleteActiveProfile() {
   }
 }
 
-// Active profile proxy (replaces static PROFILE references)
+// Active profile proxy (replaces static PROFILE references) with safe null-object fallbacks
 const PROFILE_PROXY = new Proxy({}, {
   get(target, prop) {
     const active = getActiveProfile();
-    if (!active) return undefined;
     
-    if (prop === 'education') return active.education || [];
-    if (prop === 'certs') return active.certs || [];
-    if (prop === 'linkedin') return active.linkedin || '';
-    if (prop === 'location') return active.location || '';
-    if (prop === 'phone') return active.phone || '';
-    if (prop === 'email') return active.email || '';
-    if (prop === 'name') return active.name || '';
-    if (prop === 'subtitle') return active.subtitle || '';
+    // Ensure arrays are returned for list properties even if profile is null or properties are missing
+    if (prop === 'education') return active ? (active.education || []) : [];
+    if (prop === 'certs') return active ? (active.certs || []) : [];
     
-    return active[prop];
+    // Return empty string fallback for any text property to prevent undefined property access crashes (e.g. replace() calls)
+    const val = active ? active[prop] : '';
+    return val || '';
   }
 });
 
