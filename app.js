@@ -954,6 +954,61 @@ document.getElementById('dl-btn').onclick = async () => {
   btn.innerHTML = '<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l4-4m-4 4l-4-4"/></svg> Download DOCX';
 };
 
+// ── EXPORT / IMPORT BACKUPS ──
+function exportBackup() {
+  const customData = localStorage.getItem('custom_resume_profiles');
+  if (!customData || customData === '{}') {
+    alert("No custom candidate profiles exist to backup.");
+    return;
+  }
+  
+  const blob = new Blob([customData], { type: 'application/json' });
+  saveAs(blob, 'resume_builder_profiles_backup.json');
+}
+
+function importBackup(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      
+      if (typeof parsed !== 'object' || parsed === null) {
+        throw new Error("Invalid backup format");
+      }
+      
+      let importCount = 0;
+      Object.keys(parsed).forEach(key => {
+        if (parsed[key] && parsed[key].profile && parsed[key].text) {
+          PROFILES[key] = parsed[key].profile;
+          DEFAULT_TEXTS[key] = parsed[key].text;
+          importCount++;
+        }
+      });
+
+      if (importCount === 0) {
+        throw new Error("No valid candidate profiles found in the backup file");
+      }
+
+      saveCustomProfiles();
+      repopulateSelector();
+      
+      const importedKeys = Object.keys(parsed).filter(k => parsed[k] && parsed[k].profile);
+      if (importedKeys.length > 0) {
+        switchCandidate(importedKeys[0]);
+      }
+      
+      alert(`Successfully imported ${importCount} candidate profile(s) from backup!`);
+    } catch(err) {
+      alert("Failed to import backup: " + err.message);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
 // Populate company copy buttons and preview on load
 window.addEventListener('DOMContentLoaded', () => {
   loadCustomProfiles();
