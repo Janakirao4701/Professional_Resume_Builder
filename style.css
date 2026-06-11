@@ -372,6 +372,7 @@ header {
   .app-workspace .preview-outer-shell {
     display: flex !important;
     height: 100% !important;
+    min-height: 0 !important;
   }
 }
 
