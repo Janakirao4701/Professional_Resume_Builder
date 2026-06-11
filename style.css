@@ -445,7 +445,7 @@ header {
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 60vh; /* Primary focus area: occupies ~60-70% of viewport */
+  height: 70vh; /* Primary focus area: occupies ~70% of viewport */
 }
 
 #resume-text {
@@ -1261,12 +1261,21 @@ header {
     padding: 24px;
     overflow-y: auto;
     height: 100%;
+    display: flex;
+    flex-direction: column;
   }
 
   .preview-pane {
     padding: var(--space-10) var(--space-6);
     overflow-y: auto;
     height: 100%;
+  }
+
+  .input-zone {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
   }
 
   .textarea-wrap {
