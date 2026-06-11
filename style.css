@@ -106,15 +106,20 @@ a:focus:not(:focus-visible) {
 header {
   background: var(--app-surface);
   padding: 14px 32px;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 24px;
   position: sticky;
   top: 0;
   z-index: 200;
   border-bottom: 1px solid var(--app-border);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .logo-area {
@@ -1029,6 +1034,10 @@ header {
     grid-template-rows: auto auto auto !important;
     padding: 0 !important;
     gap: 0 !important;
+  }
+
+  .header-left {
+    display: contents;
   }
 
   .logo-area {
