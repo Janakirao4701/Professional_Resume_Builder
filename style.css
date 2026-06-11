@@ -950,6 +950,69 @@ header {
   display: none;
 }
 
+/* LaTeX (Jake's) Template: Centered name, horizontal line headings, compact spacing */
+.template-latex .mock-header {
+  text-align: center;
+}
+.template-latex .mock-name {
+  font-size: calc(var(--mock-font-title) * 1.35);
+  font-weight: bold;
+  font-variant: small-caps;
+  color: #000000;
+  text-align: center;
+  letter-spacing: 0.5px;
+  margin-bottom: 2pt;
+  margin-top: 2pt;
+}
+.template-latex .mock-subtitle {
+  display: none; /* Latex resume doesn't have subtitle */
+}
+.template-latex .mock-contact {
+  font-size: calc(var(--mock-font-sub) * 0.88);
+  color: #000000;
+  text-align: center;
+  margin-bottom: 8pt;
+  line-height: 1.25;
+}
+.template-latex .mock-section-head {
+  font-size: calc(var(--mock-font-sub) * 1.05);
+  font-weight: bold;
+  font-variant: small-caps;
+  color: #000000;
+  margin: 12pt 0 4pt 0;
+  text-align: left;
+  border-bottom: 0.75pt solid #000000;
+  padding-bottom: 1pt;
+}
+.template-latex .mock-page-border {
+  display: none;
+}
+.template-latex .mock-bullet {
+  font-size: var(--mock-font-base);
+  padding-left: 10pt !important;
+  margin-top: 2pt;
+  margin-bottom: 2pt;
+  line-height: 1.2;
+}
+.template-latex .mock-bullet::before {
+  content: "•";
+  font-size: 7pt;
+  left: 2pt;
+  top: 1px;
+}
+.template-latex .mock-exp-header,
+.template-latex .mock-edu-row {
+  margin-top: 6pt;
+  margin-bottom: 1pt;
+  font-size: var(--mock-font-base);
+}
+.template-latex .mock-exp-role,
+.template-latex .mock-edu-school {
+  font-style: italic;
+  font-size: var(--mock-font-base);
+  margin-bottom: 2pt;
+}
+
 /* Common Mockup Classes (read variables) */
 .mock-contact a {
   color: var(--primary-accent);
@@ -1626,7 +1689,8 @@ header {
     display: block !important;
   }
   #resume-mockup.template-modern .mock-page-border,
-  #resume-mockup.template-minimalist .mock-page-border {
+  #resume-mockup.template-minimalist .mock-page-border,
+  #resume-mockup.template-latex .mock-page-border {
     display: none !important;
   }
 
