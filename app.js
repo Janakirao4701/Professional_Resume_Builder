@@ -300,6 +300,7 @@ function adjustPreviewScale() {
   
   mockup.style.transform = 'none';
   mockup.style.transformOrigin = 'top center';
+  mockup.style.margin = '0 auto';
   wrap.style.width = 'auto';
   wrap.style.height = 'auto';
   
@@ -311,6 +312,7 @@ function adjustPreviewScale() {
     const scale = paneWidth / mockupWidth;
     mockup.style.transform = `scale(${scale})`;
     mockup.style.transformOrigin = 'top left';
+    mockup.style.margin = '0';
     
     // Resize the layout wrapper container to match the scaled mockup size
     wrap.style.width = `${mockupWidth * scale}px`;
@@ -318,6 +320,7 @@ function adjustPreviewScale() {
   } else {
     mockup.style.transform = 'none';
     mockup.style.transformOrigin = 'top center';
+    mockup.style.margin = '0 auto';
     wrap.style.width = 'auto';
     wrap.style.height = 'auto';
   }
