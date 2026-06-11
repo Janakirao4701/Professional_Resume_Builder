@@ -304,7 +304,10 @@ function adjustPreviewScale() {
   wrap.style.width = 'auto';
   wrap.style.height = 'auto';
   
-  const paneWidth = pane.clientWidth - 48; // Leave breathing room (24px padding on each side)
+  const style = window.getComputedStyle(pane);
+  const paddingLeft = parseFloat(style.paddingLeft) || 0;
+  const paddingRight = parseFloat(style.paddingRight) || 0;
+  const paneWidth = pane.clientWidth - paddingLeft - paddingRight;
   const mockupWidth = mockup.offsetWidth;
   const mockupHeight = mockup.offsetHeight;
   
@@ -944,24 +947,14 @@ function switchWorkspaceTab(tabName) {
     workspace.className = `app-workspace view-${tabName}`;
   }
   
+  // Save active tab state to localStorage for persistence on reload
+  localStorage.setItem('workspace_tab', tabName);
+  
   // Regenerate preview and scale it when switching to a visible preview layout
   if (tabName === 'preview' || tabName === 'split') {
     updatePreview();
   }
 }
-
-function syncResponsiveTabs() {
-  const width = window.innerWidth;
-  const workspace = document.querySelector('.app-workspace');
-  if (!workspace) return;
-  
-  if (width < 1024) {
-    if (workspaceTab === 'split') {
-      switchWorkspaceTab('editor');
-    }
-  }
-}
-window.addEventListener('resize', syncResponsiveTabs);
 
 // Populate company copy buttons and preview on load
 window.addEventListener('DOMContentLoaded', () => {
@@ -977,11 +970,16 @@ window.addEventListener('DOMContentLoaded', () => {
     resizeObserver.observe(pane);
   }
   
-  // Initialize tab view based on window size
-  if (window.innerWidth < 1024) {
-    switchWorkspaceTab('editor');
+  // Initialize tab view: restore saved state from localStorage or default based on screen size
+  const savedTab = localStorage.getItem('workspace_tab');
+  if (savedTab) {
+    switchWorkspaceTab(savedTab);
   } else {
-    switchWorkspaceTab('split');
+    if (window.innerWidth < 1024) {
+      switchWorkspaceTab('editor');
+    } else {
+      switchWorkspaceTab('split');
+    }
   }
   
   const keys = Object.keys(PROFILES);
