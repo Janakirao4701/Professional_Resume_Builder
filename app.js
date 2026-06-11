@@ -573,7 +573,6 @@ function copyCompanyExp(index) {
   }, 2000);
 }
 
-// -- PDF DOWNLOAD VIA BROWSER PRINT --
 document.getElementById('pdf-btn').onclick = () => {
   if (!activeCandidate) {
     alert('Please select or create a candidate profile first!');
@@ -585,19 +584,10 @@ document.getElementById('pdf-btn').onclick = () => {
     return;
   }
   
-  // If preview panel is hidden (e.g. active tab is editor), temporarily switch to preview tab to force layout & pagination, print, and switch back.
-  const originalTab = workspaceTab;
-  if (originalTab === 'editor') {
-    switchWorkspaceTab('preview');
-  }
-  
-  // A slight delay to ensure UI updates and pagination calculations complete before printing
+  // A slight delay to ensure UI updates complete before printing
   setTimeout(() => {
     window.print();
-    if (originalTab === 'editor') {
-      switchWorkspaceTab('editor');
-    }
-  }, 300);
+  }, 100);
 };
 
 // Also parse companies// Also parse companies when user types/pastes manually in textarea
@@ -929,33 +919,6 @@ function importBackup(input) {
   reader.readAsText(file);
 }
 
-let workspaceTab = 'split';
-
-function switchWorkspaceTab(tabName) {
-  workspaceTab = tabName;
-  
-  // Update active button state and ARIA properties
-  document.querySelectorAll('.workspace-tabs .tab-btn').forEach(btn => {
-    const isActive = btn.getAttribute('data-tab') === tabName;
-    btn.classList.toggle('active', isActive);
-    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
-  });
-  
-  // Update layout class on workspace
-  const workspace = document.querySelector('.app-workspace');
-  if (workspace) {
-    workspace.className = `app-workspace view-${tabName}`;
-  }
-  
-  // Save active tab state to localStorage for persistence on reload
-  localStorage.setItem('workspace_tab', tabName);
-  
-  // Regenerate preview and scale it when switching to a visible preview layout
-  if (tabName === 'preview' || tabName === 'split') {
-    updatePreview();
-  }
-}
-
 // Populate company copy buttons and preview on load
 window.addEventListener('DOMContentLoaded', () => {
   loadCustomProfiles();
@@ -968,18 +931,6 @@ window.addEventListener('DOMContentLoaded', () => {
       adjustPreviewScale();
     });
     resizeObserver.observe(pane);
-  }
-  
-  // Initialize tab view: restore saved state from localStorage or default based on screen size
-  const savedTab = localStorage.getItem('workspace_tab');
-  if (savedTab) {
-    switchWorkspaceTab(savedTab);
-  } else {
-    if (window.innerWidth < 1024) {
-      switchWorkspaceTab('editor');
-    } else {
-      switchWorkspaceTab('split');
-    }
   }
   
   const keys = Object.keys(PROFILES);
