@@ -1,172 +1,11 @@
-// Candidates Data
-const HARDCODED_PROFILES = {
-  pravallika: {
-  name:     'Pravallika Boyapati',
-  subtitle: 'Controls Engineer',
-  email:    'pravallikab1279@gmail.com',
-  phone:    '+1 (469) 213-0772',
-  location: 'Dallas, USA',
-  linkedin: 'linkedin.com/in/pravallika17',
-  education: [
-    { degree: 'Master of Science in Computer Engineering', dates: '06/2021 – 05/2023', school: 'University of Houston-Clear Lake', location: 'Houston, TX' },
-    { degree: 'Bachelor of Technology in Computer Science and Engineering', dates: '06/2016 – 05/2020', school: 'SRK Institute of Technology (JNTUK)', location: 'Andhra Pradesh, India' }
-  ],
-  certs: []
-},
-  hardhik: {
-  name:     'Hardhik Rao Chidura',
-  title:    'PLC Controls & Automation Engineer',
-  subtitle: 'PLC Controls & Automation | HMI/SCADA Engineer',
-  email:    'hardhikraochidura@gmail.com',
-  phone:    '+1 (845) 484-9588',
-  location: 'Wyoming, USA',
-  openTo:   'Open to: On-site / Hybrid / Remote',
-  linkedin: 'linkedin.com/in/hardhik-rao-chidura-9882a9248',
-  education: [
-    { degree: 'Master of Science in Information Systems', dates: '08/2022 - 05/2024', school: 'Marist University', location: 'New York, USA' },
-    { degree: 'Bachelor of Science in Computer Science and Engineering', dates: '07/2017 - 04/2020', school: 'Nishitha Degree College', location: 'India' }
-  ],
-  certs: []
-},
-  mounika: {
-  name:     'Mounika Yella',
-  title:    'Controls Engineer',
-  subtitle: 'Controls Engineer',
-  email:    'mounikayella1798@gmail.com',
-  phone:    '+1 (469) 269-0429',
-  location: 'Dallas, USA',
-  openTo:   'Open to: On-site / Hybrid / Remote',
-  linkedin: 'linkedin.com/in/mounika-yella',
-  education: [
-    { degree: 'Master of Science in Computer Engineering', dates: '05/2021 – 06/2023', school: 'University of Houston-Clear Lake', location: 'Houston, TX' },
-    { degree: 'Bachelor of Technology in Computer Science and Engineering', dates: '06/2016 – 05/2020', school: 'SRK Institute of Technology (JNTUK)', location: 'Andhra Pradesh, India' }
-  ],
-  certs: []
-}
-};
+let PROFILES = {};
+let DEFAULT_TEXTS = {};
 
-const HARDCODED_TEXTS = {
-  pravallika: `[PROFESSIONAL SUMMARY]
-Controls Engineer with 4+ years of experience designing, programming, commissioning, and supporting PLC-based automation systems across manufacturing, oil & gas, and automotive industries. Expertise in Siemens and Allen-Bradley PLCs, HMI/SCADA development, robotics integration, industrial networking, and commissioning. Proven track record improving system reliability, reducing downtime, and delivering successful FAT/SAT and startup activities for complex automation projects.
-
-[TECHNICAL SKILLS]
-PLC Programming & Industrial Controls: Siemens S7-1200/1500 (TIA Portal, Step 7), Allen-Bradley ControlLogix/CompactLogix (RSLogix 5000, Studio 5000), Mitsubishi GX Works, Ladder Logic, Structured Text, Function Block Diagram.
-HMI & SCADA & Industrial Monitoring : Siemens WinCC (Flexible, Advanced), FactoryTalk View SE, Wonderware InTouch, Ignition SCADA, real-time dashboard development, alarm management, historian logging and data reporting.
-Robotics & Vision: FANUC (ROBOGUIDE, teach pendant), ABB RobotStudio, Kawasaki programming, Cognex D905 vision camera, Keyence vision systems, OCR validation, barcode readers, vision-guided pick & place automation.
-Industrial Communication & Networks : PROFINET, EtherNet/IP, Modbus TCP/RTU, OPC UA, troubleshooting network connectivity issues, device configuration, communication latency optimization.
-Programming & Analytics: Python, SQL, C/C++, Data Analysis, Historian Reporting, Industrial Data Logging, Predictive Maintenance, Git, MATLAB/Simulink.
-Motion Control & Drives: Variable Frequency Drives (VFDs), servo drive commissioning, pneumatic/hydraulic systems, closed-loop motion control, machine tending logic, material handling sequencing, process synchronization.
-Data & IIoT: AWS IoT Core, Azure IoT Hub, MQTT, OPC UA, Data Logging & Analytics, PTC ThingWorx, Ignition Perspective.
-Testing, Commissioning & Standards: Factory Acceptance Testing (FAT), Site Acceptance Testing (SAT), I/O checkout, loop testing, safety interlocks validation, IEC 61131-3, NFPA 70 electrical standards, OSHA compliance, on-site troubleshooting.
-
-[PROFESSIONAL EXPERIENCE]
-Saulsbury Industries | USA | PLC Controls Engineer | 09/2024 – Present
-- Designed, programmed, and commissioned Siemens S7-1500 and Allen-Bradley ControlLogix PLC systems supporting automated material handling and conveyor operations, improving line throughput by 18%.
-- Developed operator-centric WinCC HMI applications with real-time diagnostics, alarm management, and production dashboards, reducing fault response time by 40%.
-- Integrated FANUC robotics and Cognex vision inspection systems with PLC-controlled manufacturing processes, improving quality validation and reducing manual inspection effort.
-- Configured and optimized industrial communication networks including PROFINET, EtherNet/IP, and OPC UA for reliable data exchange across PLCs, drives, HMIs, and field devices.
-- Executed FAT, SAT, I/O validation, loop checks, and commissioning activities for large-scale automation projects, achieving successful startup with zero critical deficiencies.
-- Created reusable PLC function block libraries and standardized programming templates, reducing future project development effort by 30%.
-- Partnered with electrical, mechanical, and operations teams to troubleshoot production issues, minimize downtime, and improve overall equipment effectiveness (OEE).
-
-Targa Resources | USA | Controls Automation Engineer | 04/2023 – 08/2024
-- Maintained and optimized PLC-based control systems for flow control, pressure regulation, and valve sequencing across midstream oil & gas operations, improving process reliability.
-- Developed Ignition SCADA dashboards, alarm rationalization strategies, and historian reports, reducing alarm fatigue by 34% and improving operator response.
-- Analyzed process and alarm history data using SQL and historian tools to identify recurring issues and implement targeted control logic improvements.
-- Troubleshot EtherNet/IP, Modbus TCP/IP, and OPC UA communication networks, restoring system availability above 98% across distributed facilities.
-- Supported commissioning, startup, FAT, and SAT activities for multiple automation upgrades, ensuring safe and successful deployment of control systems.
-- Collaborated with operations, maintenance, and engineering teams to optimize control strategies, improve equipment reliability, and support predictive maintenance initiatives.
-
-MEL Systems | India | Embedded Controls Engineer | 12/2019 – 07/2021
-- Developed real-time control software in C/C++ for automotive control systems, achieving sensor-to-actuator response times below 10ms and improving system performance.
-- Designed and executed validation and functional testing procedures for safety-critical control systems, contributing to successful first-pass compliance certification.
-- Integrated CAN bus communication protocols and resolved timing-related issues, improving system reliability and reducing intermittent communication failures.
-- Optimized control software memory utilization and processing efficiency, reducing boot time by 33% and improving CPU performance by 22%.
-- Collaborated with cross-functional hardware and software teams to troubleshoot system-level issues, accelerating root-cause analysis and product release timelines.
-- Established Git-based version control and code review processes, reducing integration defects by 40% and improving development quality across projects.`,
-  hardhik: `[PROFESSIONAL SUMMARY]
-Controls Engineer with 4+ years of experience in PLC programming, HMI/SCADA development, commissioning, and industrial automation. Expertise in Allen-Bradley, Siemens, and Delta control systems, with hands-on experience in FactoryTalk View, Ignition Perspective, WinCC, OPC UA, and Modbus TCP/IP. Skilled in FAT/SAT, industrial networking, Python automation, and control system integration. Proven ability to improve system reliability, reduce downtime, and support manufacturing operations across automotive, defense, and industrial environments.
-[TECHNICAL SKILLS]
-- PLC & Industrial Controls: Allen-Bradley Logix 5000, CompactLogix, Studio 5000, Siemens S7-1200/1500, Siemens TIA Portal, Delta DVP Series, WPLSoft, Beckhoff TwinCAT, IEC 61131-3 (Ladder Logic, Structured Text, Function Block Diagram).
-- HMI & SCADA: FactoryTalk View, Siemens WinCC, AVEVA InTouch, Indusoft Web Studio, Ignition Vision, Ignition Perspective, Alarm Management, Historian Integration, Dashboard Development.
-- Vision & Inspection Systems: Cognex D905, Cognex ViDi Suite, Keyence Vision Systems, Keyence Barcode Scanners, OCR Validation, VIN Verification, Conveyor Inspection Systems.
-- Industrial Communication: OPC UA, Modbus TCP/IP, Ethernet/IP, TCP/IP, DeviceNet, Profibus, CAN Bus, PLC-HMI Integration, SCADA Networking.
-- Programming & Databases: Python, C#, SQL, OSIsoft PI System, Historian Integration, Data Logging, Automation Scripting, Operational Reporting.
-- Electrical Design & Commissioning: AutoCAD Electrical, Electrical Panel Testing, Wiring Diagrams, I/O Validation, FAT, SAT, CAT, System-Level Troubleshooting, Onsite Commissioning.
-- Compliance & Cybersecurity: SIL, IEC 61131-3, OSHA Standards, NERC-CIP, 21 CFR Part 11, GAMP 5, ServiceNow Change Management.
-- Other: Material Handling Systems, Automotive Fixture Automation, Defense Systems Integration, Switchgear & Power Distribution Systems, Industrial Engineering Automation, Process Optimization, Industrial Networking.
-[PROFESSIONAL EXPERIENCE]
-BW Design Group | USA | HMI/SCADA Engineer | 04/2025 - Present
-- Engineered FactoryTalk View and Ignition Perspective HMIs integrated with Allen-Bradley PLCs, improving production visibility and operator efficiency by 15%.
-- Configured Siemens TIA Portal, Beckhoff TwinCAT, and Studio 5000 PLC logic for robotic manufacturing and automated assembly systems.
-- Implemented Cognex D905 OCR validation for VIN inspection systems, improving traceability and reducing manual verification efforts.
-- Migrated legacy SCADA applications to AVEVA InTouch and Indusoft Web Studio, improving alarm management and system maintainability.
-- Optimized OPC UA, TCP/IP, and Modbus networks connecting PLCs and SCADA systems, improving communication reliability.
-- Established NERC-CIP compliant security controls and ServiceNow workflows, strengthening industrial cybersecurity compliance.
-- Developed Ignition Perspective dashboards with centralized alarms, increasing manufacturing system uptime by 17%.
-- Reduced barcode validation failures by 29% through Cognex OCR optimization and PLC-based verification logic.
-- Accelerated FAT, SAT, and commissioning activities by 26% using standardized HMI templates and PLC modules.
-- Created reusable PLC function blocks and programming templates, reducing development effort by 30%.
-- Partnered with engineering and operations teams to resolve production issues, reducing downtime and improving overall equipment effectiveness (OEE).
-BAE Systems | USA | PLC & Automation Engineer | 06/2024 – 03/2025
-- Developed Siemens S7-1200/1500 and Delta DVP PLC automation systems using TIA Portal and WPLSoft, improving process sequencing accuracy and operational consistency across defense automation projects.
-- Developed Siemens WinCC HMI applications for process visualization and alarm management, improving operator response efficiency by 18%.
-- Produced AutoCAD Electrical schematics and panel layouts, increasing electrical design accuracy by 28% and reducing deployment errors.
-- Performed FAT, SAT, I/O validation, and commissioning for PLC-based control systems, improving commissioning efficiency by 22% and ensuring successful production startup.
-- Integrated analog and digital instrumentation signals into distributed PLC architectures, enhancing process stability and minimizing communication interruptions across automation environments.
-- Collaborated with electrical, mechanical, and instrumentation teams to deliver standards-compliant automation solutions and successful project deployments.
-TATA Motors | India | Automation & Control Systems Engineer | 11/2019 – 06/2021
-- Programmed Modicon PLCs and Wonderware InTouch SCADA applications for switchgear monitoring and power distribution systems, improving operational visibility and control reliability by 20%.
-- Integrated OSIsoft PI System historian infrastructure with SCADA platforms, improving historian reporting accuracy by 32% and enabling centralized asset monitoring.
-- Developed Python automation scripts for SCADA synchronization and Modbus TCP/IP data acquisition, reducing manual engineering validation efforts by 33%.
-- Developed C# utilities for sensor validation, operational reporting, and audit readiness processes, improving engineering productivity by 25%.
-- Configured Wonderware InTouch alarm management and monitoring dashboards, reducing switchgear alarm response times by 27%.
-- Supported commissioning and optimization of industrial control systems, improving system reliability by 22% and minimizing operational disruptions.`,
-  mounika: `[PROFESSIONAL SUMMARY]
-Controls Engineer with 4+ years of experience programming Allen-Bradley and Siemens PLCs, developing HMI/SCADA applications, and commissioning large-scale industrial automation systems. Delivered zero-deficiency FAT/SAT startups across manufacturing and process automation environments. Skilled in Ignition Perspective, FactoryTalk View, OPC UA, and Cognex vision integration.
-[TECHNICAL SKILLS]
-- PLC Programming & Industrial Controls: Allen-Bradley ControlLogix, CompactLogix, Studio 5000, Siemens S7-1200/1500, TIA Portal, Delta PLCs, Ladder Logic, Structured Text, Function Block Diagram.
-- HMI , SCADA & Industrial Monitoring: FactoryTalk View, Ignition Perspective, Ignition Vision, Siemens WinCC, AVEVA InTouch, InduSoft Web Studio, Alarm Management, Historian Integration, Dashboard Development.
-- Vision & Automation: Cognex Vision Systems, Keyence Vision Systems, OCR Validation, Barcode Verification, Conveyor Automation, Manufacturing Inspection Systems.
-- Industrial Communication & Networks : PROFINET, EtherNet/IP, Modbus TCP/RTU, OPC UA, troubleshooting network connectivity issues, device configuration, communication latency optimization.
-- Programming & Analytics: Python, SQL, C/C++, Data Analysis, Historian Reporting, Industrial Data Logging, Predictive Maintenance, Git, MATLAB/Simulink.
-- Electrical Design & Commissioning: AutoCAD Electrical, Control Panel Design, FAT, SAT, I/O Validation, Wiring Diagrams, NEC/UL Standards.
-- Testing & Standards: IEC 61131-3, OSHA Compliance, Control System Validation, Commissioning, Troubleshooting.
-- Data & IIoT: MQTT, AWS IoT, OPC UA, Industrial Data Analytics, Predictive Maintenance, Ignition Perspective.
-[PROFESSIONAL EXPERIENCE]
-BW Design Group | Texas | PLC Controls Engineer | 11/2024 - Present
-- Developed FactoryTalk View and Ignition Perspective HMI applications integrated with Allen-Bradley PLCs, improving production visibility and reducing operator response delays.
-- Programmed and optimized Siemens TIA Portal and Studio 5000 PLC logic supporting automated manufacturing and robotic assembly operations.
-- Integrated Cognex vision inspection and OCR validation systems with PLC-controlled production equipment, improving traceability and reducing manual verification effort.
-- Configured OPC UA and Modbus TCP/IP industrial communication networks, improving system reliability and eliminating production data synchronization issues.
-- Executed FAT, SAT, I/O validation, loop checks, and commissioning activities for large-scale automation projects, achieving successful startup with zero critical deficiencies.
-- Collaborated with operations, maintenance, and engineering teams to improve automation performance, reduce downtime, and increase manufacturing productivity.
-- Created reusable PLC function block libraries and standardized programming templates, reducing future project development effort by 30%.
-- Partnered with electrical, mechanical, and operations teams to troubleshoot production issues, minimize downtime, and improve overall equipment effectiveness (OEE).
-FLUOR Corporation | USA | PLC & Automation Engineer | 04/2023 – 10/2024
-- Developed Siemens S7-1500 and Delta PLC control logic for industrial process automation systems, improving equipment sequencing and operational reliability.
-- Designed WinCC and DOPSoft HMI applications providing real-time monitoring, alarm management, and process visualization capabilities.
-- Produced AutoCAD Electrical schematics, panel layouts, and control system documentation supporting standards-compliant automation deployments.
-- Conducted FAT, SAT, I/O validation, and commissioning activities, identifying and resolving automation issues prior to production startup.
-- Integrated instrumentation, analog devices, and field equipment into PLC architectures, improving process stability and control system performance.
-- Coordinated with instrumentation, electrical, and mechanical teams to support successful automation project execution and commissioning.
-TATA Motors | India | Automation & Control Systems Engineer | 11/2019 – 06/2021
-- Programmed Modicon PLCs and Wonderware InTouch SCADA systems supporting power distribution, switchgear monitoring, and industrial automation operations.
-- Integrated OSIsoft PI Historian with SCADA platforms to enable centralized asset monitoring, operational reporting, and long-term performance analysis.
-- Integrated CAN bus communication protocols and resolved timing-related issues, improving system reliability and reducing intermittent communication failures.
-- Configured Modbus TCP/IP communication networks between PLCs, SCADA servers, and field devices, improving system reliability and operational visibility.
-- Developed C# utilities for sensor validation, operational log processing, and automated reporting, supporting engineering and maintenance activities.
-- Collaborated with operations and engineering teams to troubleshoot control system issues, improve alarm response, and support continuous process improvement initiatives.`
-};
-
-let PROFILES = { ...HARDCODED_PROFILES };
-let DEFAULT_TEXTS = { ...HARDCODED_TEXTS };
-
-let activeCandidate = 'pravallika';
+let activeCandidate = null;
 let editingKey = null;
 
 function getActiveProfile() {
-  return PROFILES[activeCandidate];
+  return activeCandidate ? PROFILES[activeCandidate] : null;
 }
 
 // ── LOCAL STORAGE OPERATIONS ──
@@ -189,12 +28,10 @@ function saveCustomProfiles() {
   try {
     const custom = {};
     Object.keys(PROFILES).forEach(key => {
-      if (!HARDCODED_PROFILES[key]) {
-        custom[key] = {
-          profile: PROFILES[key],
-          text: DEFAULT_TEXTS[key]
-        };
-      }
+      custom[key] = {
+        profile: PROFILES[key],
+        text: DEFAULT_TEXTS[key]
+      };
     });
     localStorage.setItem('custom_resume_profiles', JSON.stringify(custom));
   } catch (e) {
@@ -204,20 +41,33 @@ function saveCustomProfiles() {
 
 // ── SWITCH CANDIDATE ──
 function switchCandidate(key) {
-  if (!PROFILES[key]) return;
-  activeCandidate = key;
-  document.getElementById('candidate-select').value = key;
-  document.getElementById('resume-text').value = DEFAULT_TEXTS[key].trim();
-  
-  // Show/hide edit and delete buttons based on whether it is a custom profile
   const deleteBtn = document.getElementById('delete-profile-btn');
   const editBtn = document.getElementById('edit-profile-btn');
-  const isCustom = !HARDCODED_PROFILES[key];
+  const textarea = document.getElementById('resume-text');
+
+  if (!key || !PROFILES[key]) {
+    activeCandidate = null;
+    if (document.getElementById('candidate-select')) {
+      document.getElementById('candidate-select').value = '';
+    }
+    if (textarea) textarea.value = '';
+    if (deleteBtn) deleteBtn.style.display = 'none';
+    if (editBtn) editBtn.style.display = 'none';
+    
+    detectSectionsAndCompanies();
+    updatePreview();
+    return;
+  }
+  
+  activeCandidate = key;
+  document.getElementById('candidate-select').value = key;
+  document.getElementById('resume-text').value = (DEFAULT_TEXTS[key] || '').trim();
+  
   if (deleteBtn) {
-    deleteBtn.style.display = isCustom ? 'flex' : 'none';
+    deleteBtn.style.display = 'flex';
   }
   if (editBtn) {
-    editBtn.style.display = isCustom ? 'flex' : 'none';
+    editBtn.style.display = 'flex';
   }
 
   detectSectionsAndCompanies();
@@ -230,16 +80,28 @@ function repopulateSelector() {
   if (!select) return;
   
   select.innerHTML = '';
-  Object.keys(PROFILES).forEach(key => {
+  const keys = Object.keys(PROFILES);
+  if (keys.length === 0) {
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'No Profiles Available';
+    select.appendChild(option);
+    return;
+  }
+  
+  keys.forEach(key => {
     const p = PROFILES[key];
     const option = document.createElement('option');
     option.value = key;
-    const isCustom = !HARDCODED_PROFILES[key] ? ' [Custom]' : '';
-    option.textContent = `${p.name} (${p.subtitle || 'Candidate'})${isCustom}`;
+    option.textContent = `${p.name} (${p.subtitle || 'Candidate'})`;
     select.appendChild(option);
   });
   
-  select.value = activeCandidate;
+  if (activeCandidate && PROFILES[activeCandidate]) {
+    select.value = activeCandidate;
+  } else {
+    select.value = '';
+  }
 }
 
 // ── MODAL DIALOG HANDLERS ──
@@ -255,8 +117,8 @@ function openProfileModal() {
 }
 
 function openEditProfileModal() {
-  if (HARDCODED_PROFILES[activeCandidate]) {
-    alert("You cannot edit default system profiles.");
+  if (!activeCandidate || !PROFILES[activeCandidate]) {
+    alert("No active profile to edit.");
     return;
   }
   
@@ -356,8 +218,8 @@ function saveNewProfile() {
 }
 
 function deleteActiveProfile() {
-  if (HARDCODED_PROFILES[activeCandidate]) {
-    alert("You cannot delete default system profiles.");
+  if (!activeCandidate || !PROFILES[activeCandidate]) {
+    alert("No active profile to delete.");
     return;
   }
   
@@ -370,9 +232,14 @@ function deleteActiveProfile() {
   delete DEFAULT_TEXTS[targetKey];
   
   saveCustomProfiles();
-  activeCandidate = 'pravallika';
+  
+  const keys = Object.keys(PROFILES);
   repopulateSelector();
-  switchCandidate('pravallika');
+  if (keys.length > 0) {
+    switchCandidate(keys[0]);
+  } else {
+    switchCandidate(null);
+  }
 }
 
 // Active profile proxy (replaces static PROFILE references)
@@ -692,6 +559,10 @@ function copyCompanyExp(index) {
 
 // -- PDF DOWNLOAD VIA BROWSER PRINT --
 document.getElementById('pdf-btn').onclick = () => {
+  if (!activeCandidate) {
+    alert('Please select or create a candidate profile first!');
+    return;
+  }
   const rawText = document.getElementById('resume-text').value.trim();
   if (!rawText) {
     alert('Please paste your resume content into the text box first!');
@@ -743,6 +614,10 @@ function ensureLibs() { return Promise.resolve(); }
 // ── NEXT SCRIPT BLOCK ──
 
 document.getElementById('dl-btn').onclick = async () => {
+  if (!activeCandidate) {
+    alert('Please select or create a candidate profile first.');
+    return;
+  }
   const raw = document.getElementById('resume-text').value.trim();
   if (!raw) { alert('Please paste your resume content first.'); return; }
 
@@ -956,6 +831,11 @@ document.getElementById('dl-btn').onclick = async () => {
 
 // ── EXPORT / IMPORT BACKUPS ──
 function exportBackup() {
+  const active = getActiveProfile();
+  if (!active) {
+    alert("No active candidate profile to backup.");
+    return;
+  }
   const customData = localStorage.getItem('custom_resume_profiles');
   if (!customData || customData === '{}') {
     alert("No custom candidate profiles exist to backup.");
@@ -963,7 +843,7 @@ function exportBackup() {
   }
   
   const blob = new Blob([customData], { type: 'application/json' });
-  saveAs(blob, 'resume_builder_profiles_backup.json');
+  saveAs(blob, active.name.replace(/\s+/g, '_') + '_backup.json');
 }
 
 function importBackup(input) {
@@ -1013,5 +893,10 @@ function importBackup(input) {
 window.addEventListener('DOMContentLoaded', () => {
   loadCustomProfiles();
   repopulateSelector();
-  switchCandidate(activeCandidate);
+  const keys = Object.keys(PROFILES);
+  if (keys.length > 0) {
+    switchCandidate(keys[0]);
+  } else {
+    switchCandidate(null);
+  }
 });

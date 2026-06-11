@@ -1,5 +1,12 @@
 # Changelog - Resume Builder
 
+## [v1.3.0] - 2026-06-11
+### Changed
+- Removed default hardcoded candidate profiles (Pravallika, Hardhik, Mounika) to support starting with a clean empty database.
+- Enabled edit/delete features for all profiles since all profiles are now custom profiles.
+- Updated export backup filename layout to dynamically save as `[Profile_Name]_backup.json`.
+- Implemented safety alerts for PDF and DOCX downloads when no candidate profile exists.
+
 ## [v1.2.0] - 2026-06-11
 ### Added
 - Created the local `.gemini` settings directory inside the workspace containing `project-mode.md`, `architecture.md`, `tasks.md`, `decisions.md`, `changelog.md`, `deployment.md`, and `troubleshooting.md`.

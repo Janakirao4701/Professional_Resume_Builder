@@ -9,10 +9,10 @@
 - [x] Fixed modal close method name mismatch (closeModal vs closeProfileModal).
 - [x] Implement in-place editing for custom candidate profiles.
 - [x] Deploy finalized build changes to GitHub repository.
-
-## Active Tasks
 - [x] Initialize dedicated `.gemini` settings directory inside workspace.
+- [x] Add PDF export capability directly from the browser (via window.print layout).
+- [x] Implement export/import backup file options to save profile databases.
+- [x] Remove default hardcoded candidate profiles (Pravallika, Hardhik, Mounika).
+- [x] Dynamically name exported backup file based on the active candidate profile.
 
 ## Pending / Future Tasks
-- [ ] Add PDF export capability directly from the browser (e.g. print layout or client-side PDF renderer).
-- [ ] Implement export/import backup file options to save profile databases.
