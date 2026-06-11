@@ -110,15 +110,14 @@ a:focus:not(:focus-visible) {
 .editor-outer-shell { animation-delay: 0.15s; }
 .preview-outer-shell { animation-delay: 0.2s; }
 
-/* ── HEADER (Mobile Default: Stacked Columns) ── */
+/* ── HEADER (Mobile Default: Compact Top Bar) ── */
 header {
   background: var(--app-surface);
-  padding: var(--space-4) var(--space-4);
+  padding: var(--space-3) var(--space-4);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
+  justify-content: space-between;
+  height: 56px;
   position: sticky;
   top: 0;
   z-index: 200;
@@ -163,7 +162,7 @@ header {
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   appearance: none;
   -webkit-appearance: none;
-  height: 44px; /* Touch target size */
+  height: 38px; /* Compact Mobile height */
   max-width: 130px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -184,32 +183,59 @@ header {
   color: var(--app-ink-muted);
 }
 
-/* Header Action Buttons (Mobile Default: Icon-only round buttons) */
+/* ── PREMIUM MOBILE FLOATING ACTION DOCK (< 1024px) ── */
 .action-buttons {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  gap: var(--space-2);
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
+  background: hsla(0, 0%, 100%, 0.75); /* Frosted white */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid hsla(60, 5%, 91%, 0.85);
+  padding: 6px 12px;
+  border-radius: 9999px; /* Pill layout */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: max-content !important;
+  max-width: 95vw !important;
+  overflow-x: auto;
+  scrollbar-width: none; /* Hide scrollbar in Firefox */
 }
 
-.btn-dl {
+.action-buttons::-webkit-scrollbar {
+  display: none; /* Hide scrollbar in Chrome/Safari */
+}
+
+.divider-v {
+  display: none !important; /* Hide separator on Mobile Dock */
+}
+
+/* Float items style as 44px tap circles */
+.btn-icon-add, .btn-icon-edit, .btn-icon-delete, .btn-dl {
+  border: 1px solid var(--app-border);
   background: var(--app-surface);
   color: var(--app-ink);
-  font-weight: 600;
-  font-size: var(--font-sm);
-  padding: 6px !important;
-  border-radius: 50% !important; /* Circle on Mobile */
-  border: 1px solid var(--app-border);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px !important; /* Clean Touch Targets */
-  height: 44px !important;
+  height: 44px !important; /* Touch target minimum */
+  width: 44px !important;
   min-width: 44px !important;
-  gap: 0 !important;
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  border-radius: 50% !important;
+  padding: 0 !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+}
+
+.btn-icon-add {
+  font-size: 20px;
+  font-weight: 500;
 }
 
 .btn-dl span:not(.btn-icon-circle) {
@@ -229,50 +255,18 @@ header {
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.btn-dl:hover {
-  background: var(--app-bg);
-  border-color: var(--app-border-hover);
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-}
-
-.btn-dl:active {
-  transform: scale(0.95);
-}
-
-.btn-dl:hover .btn-icon-circle {
-  transform: rotate(180deg);
-}
-
-/* Small Icon Header Buttons */
-.btn-icon-add, .btn-icon-edit, .btn-icon-delete {
-  border: 1px solid var(--app-border);
-  background: var(--app-surface);
-  color: var(--app-ink);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 44px !important; /* Touch target minimum */
-  width: 44px !important;
-  min-width: 44px !important;
-  border-radius: 50%;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.btn-icon-add:hover, .btn-icon-edit:hover {
+/* Hover and active tactile push feedback */
+.btn-icon-add:hover, .btn-icon-edit:hover, .btn-dl:hover {
   background: var(--app-bg);
   border-color: var(--app-border-hover);
   transform: scale(1.05);
 }
 
-.btn-icon-add:active, .btn-icon-edit:active {
-  transform: scale(0.95);
+.btn-icon-add:active, .btn-icon-edit:active, .btn-dl:active {
+  transform: scale(0.96); /* Tactile click simulation */
 }
 
 .btn-icon-delete {
-  background: var(--app-surface);
-  border-color: var(--app-border);
   color: hsl(0, 75%, 45%);
   display: none; /* Controlled dynamically by app.js */
 }
@@ -284,7 +278,7 @@ header {
 }
 
 .btn-icon-delete:active {
-  transform: scale(0.95);
+  transform: scale(0.96);
 }
 
 /* ── WORKSPACE (Mobile Default: Stacked Columns) ── */
@@ -455,7 +449,7 @@ header {
 }
 
 .paste-btn:active {
-  transform: scale(0.98);
+  transform: scale(0.96);
 }
 
 .paste-btn .btn-icon-circle {
@@ -969,16 +963,52 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 14px 32px;
+    height: 72px; /* Standard Desktop height */
   }
 
-  .action-buttons {
+  .logo-area {
     width: auto;
-    gap: 12px;
   }
 
-  /* Expand download buttons to show text on Desktop */
+  /* Return `.action-buttons` to header on Desktop */
+  .action-buttons {
+    position: static;
+    transform: none;
+    background: transparent;
+    backdrop-filter: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    border-radius: 0;
+    gap: 12px !important;
+    width: auto !important;
+    max-width: none !important;
+    overflow: visible;
+  }
+
+  .divider-v {
+    display: block !important;
+    width: 1px;
+    height: 24px;
+    background: var(--app-border);
+    margin: 0 var(--space-1);
+  }
+
+  /* Expand action buttons to normal size on Desktop */
+  .btn-icon-add, .btn-icon-edit, .btn-icon-delete {
+    height: 38px !important;
+    width: 38px !important;
+    min-width: 38px !important;
+  }
+  
+  .btn-icon-add {
+    font-size: 16px;
+  }
+
   .btn-dl {
     width: auto !important;
+    height: 38px !important;
+    min-width: 38px !important;
     border-radius: 9999px !important;
     padding: 6px 6px 6px 18px !important;
     font-size: var(--font-sm);
