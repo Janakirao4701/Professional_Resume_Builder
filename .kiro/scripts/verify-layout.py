@@ -35,6 +35,11 @@ RULES: Dict[str, Dict[str, Any]] = {
         'pattern': r'function\s+(?:switchMobileTab|toggleActionMenu)\s*\(',
         'message': 'Redundant mobile tab toggle or menu popup functions found in Javascript. These handlers must remain removed.',
         'reference': '.kiro/architecture.md#3-desktop-split-view--mobile-vertical-stack'
+    },
+    'require-aria-labels-for-inputs': {
+        'pattern': r'<(?:select|textarea)(?![^>]*\baria-label\b)[^>]*>',
+        'message': 'Select or Textarea element found without an aria-label. Inputs must have descriptive aria-labels for screen reader accessibility.',
+        'reference': '.kiro/architecture.md#4-validation'
     }
 }
 

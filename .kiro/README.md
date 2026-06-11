@@ -25,6 +25,12 @@ It checks for common anti-patterns like:
 - Absolute positioning on resume dates that breaks zoom.
 - Incorrect layout flexbox definitions on bullet elements.
 
+### ⚓ Automated Quality Gates
+
+This project enforces these layout rules automatically:
+1. **Local Git Pre-Commit Hook**: A pre-commit hook is set up at `.git/hooks/pre-commit` to automatically run verification checks before any commit is processed. If checks fail, the commit is blocked until resolved.
+2. **GitHub Actions CI/CD**: A workflow at `.github/workflows/validate.yml` automatically executes the validation script on every branch push or pull request on GitHub, preventing broken layouts from being merged.
+
 ---
 
 ## 📁 Directory Structure
