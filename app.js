@@ -296,7 +296,7 @@ function adjustPreviewScale() {
   const pane = document.querySelector('.preview-pane');
   const wrap = document.querySelector('.preview-wrap');
   const mockup = document.getElementById('resume-mockup');
-  if (!pane || !wrap || !mockup) return;
+  if (!pane || !wrap || !mockup || pane.clientWidth === 0) return;
   
   mockup.style.transform = 'none';
   mockup.style.transformOrigin = 'top center';
@@ -582,10 +582,19 @@ document.getElementById('pdf-btn').onclick = () => {
     return;
   }
   
-  // A slight delay to ensure UI updates before printing
+  // If preview panel is hidden (e.g. active tab is editor), temporarily switch to preview tab to force layout & pagination, print, and switch back.
+  const originalTab = workspaceTab;
+  if (originalTab === 'editor') {
+    switchWorkspaceTab('preview');
+  }
+  
+  // A slight delay to ensure UI updates and pagination calculations complete before printing
   setTimeout(() => {
     window.print();
-  }, 100);
+    if (originalTab === 'editor') {
+      switchWorkspaceTab('editor');
+    }
+  }, 300);
 };
 
 // Also parse companies// Also parse companies when user types/pastes manually in textarea
@@ -935,9 +944,9 @@ function switchWorkspaceTab(tabName) {
     workspace.className = `app-workspace view-${tabName}`;
   }
   
-  // Recalculate preview scaling if the preview pane is visible
+  // Regenerate preview and scale it when switching to a visible preview layout
   if (tabName === 'preview' || tabName === 'split') {
-    setTimeout(adjustPreviewScale, 50);
+    updatePreview();
   }
 }
 
@@ -958,6 +967,15 @@ window.addEventListener('resize', syncResponsiveTabs);
 window.addEventListener('DOMContentLoaded', () => {
   loadCustomProfiles();
   repopulateSelector();
+  
+  // Set up ResizeObserver to handle dynamic scaling cleanly and prevent race conditions on reload/resize
+  const pane = document.querySelector('.preview-pane');
+  if (pane) {
+    const resizeObserver = new ResizeObserver(() => {
+      adjustPreviewScale();
+    });
+    resizeObserver.observe(pane);
+  }
   
   // Initialize tab view based on window size
   if (window.innerWidth < 1024) {
