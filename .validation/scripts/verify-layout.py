@@ -14,32 +14,32 @@ RULES: Dict[str, Dict[str, Any]] = {
     'no-negative-text-indent': {
         'pattern': r'text-indent:\s*-\d+',
         'message': 'Negative text-indent detected. This clips bullets outside borders. Use Flexbox layout patterns instead.',
-        'reference': '.kiro/patterns/css-layouts.md#1-list-bullet-items-hanging-indent'
+        'reference': '.validation/patterns/css-layouts.md#1-list-bullet-items-hanging-indent'
     },
     'no-absolute-positioning-dates': {
         'pattern': r'position:\s*absolute;.*?left:\s*(?:[3-9]\d{2}|\d{4,})(?:px|pt)',
         'message': 'Absolute positioning with large left offsets used on dates. This breaks alignments on zoom. Use flexbox space-between.',
-        'reference': '.kiro/patterns/css-layouts.md#2-right-aligned-dates--role-layouts'
+        'reference': '.validation/patterns/css-layouts.md#2-right-aligned-dates--role-layouts'
     },
     'no-hidden-panels': {
         'pattern': r'\.app-workspace\.view-(?:edit|preview)\s+#(?:editor|preview)-panel\s*\{\s*display:\s*none',
         'message': 'Hidden editor/preview panel override detected in CSS. Workspace panels must remain visible and stack vertically.',
-        'reference': '.kiro/patterns/css-layouts.md#3-responsive-panel-layout-stacked-viewport'
+        'reference': '.validation/patterns/css-layouts.md#3-responsive-panel-layout-stacked-viewport'
     },
     'no-mobile-tab-markup': {
         'pattern': r'(?:class=["\'].*mobile-tabs-container.*["\']|id=["\']menu-toggle-btn["\'])',
         'message': 'Obsolete mobile tab containers or menu toggle buttons found in HTML. These layouts must remain removed.',
-        'reference': '.kiro/architecture.md#3-desktop-split-view--mobile-vertical-stack'
+        'reference': '.validation/architecture.md#3-desktop-split-view--mobile-vertical-stack'
     },
     'no-mobile-tab-handlers': {
         'pattern': r'function\s+(?:switchMobileTab|toggleActionMenu)\s*\(',
         'message': 'Redundant mobile tab toggle or menu popup functions found in Javascript. These handlers must remain removed.',
-        'reference': '.kiro/architecture.md#3-desktop-split-view--mobile-vertical-stack'
+        'reference': '.validation/architecture.md#3-desktop-split-view--mobile-vertical-stack'
     },
     'require-aria-labels-for-inputs': {
         'pattern': r'<(?:select|textarea)(?![^>]*\baria-label\b)[^>]*>',
         'message': 'Select or Textarea element found without an aria-label. Inputs must have descriptive aria-labels for screen reader accessibility.',
-        'reference': '.kiro/architecture.md#4-validation'
+        'reference': '.validation/architecture.md#4-validation'
     }
 }
 

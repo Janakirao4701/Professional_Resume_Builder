@@ -1,25 +1,42 @@
 :root {
-  /* Premium Utilitarian Warm Monochrome Palette */
-  --app-bg: #FBFBFA;
-  --app-surface: #FFFFFF;
-  --app-border: #EAEAE6;
-  --app-border-hover: #D3D3CE;
-  --app-ink: #1A1A1A;
-  --app-ink-muted: #7C7B77;
-  --app-accent: #111111;
-  --app-accent-hover: #2E2E2A;
-  --app-accent-glow: rgba(17, 17, 17, 0.04);
+  /* HSL Cohesive Color Palette (Modern & Professional) */
+  --primary-accent: hsl(240, 100%, 50%); /* Electric Blue */
+  --text-primary: hsl(0, 0%, 10%);       /* Near Black */
+  --background: hsl(0, 0%, 100%);        /* White */
 
-  /* Outer Tray Bezel Settings */
-  --outer-shell-bg: #F5F5F3;
-  --outer-shell-border: #E5E5E0;
-  
-  --paper-well-bg: #EBEAE6;
-  --border: #EAEAE6;
-  --bg: #FBFBFA;
-  --surface: #FFFFFF;
-  --ink: #1A1A1A;
-  --app-danger-light: #FDEBEC;
+  --app-bg: hsl(60, 9%, 98%);            /* Warm white background #FBFBFA */
+  --app-surface: var(--background);
+  --app-border: hsl(60, 5%, 91%);        /* Clean light grey #EAEAE6 */
+  --app-border-hover: hsl(60, 4%, 81%);  /* Border hover #D3D3CE */
+  --app-ink: var(--text-primary);
+  --app-ink-muted: hsl(45, 2%, 48%);     /* Muted ink #7C7B77 */
+  --app-accent: var(--primary-accent);
+  --app-accent-hover: hsl(240, 100%, 40%);
+  --app-accent-glow: hsla(240, 100%, 50%, 0.04);
+  --app-danger-light: hsl(355, 90%, 96%); /* Light red alert */
+
+  /* Bezel Tray and Well Settings */
+  --outer-shell-bg: hsl(60, 6%, 95%);    /* Bezel background #F5F5F3 */
+  --outer-shell-border: hsl(60, 5%, 89%); /* Bezel border #E5E5E0 */
+  --paper-well-bg: hsl(48, 5%, 91%);     /* Paper well background #EBEAE6 */
+  --border: var(--app-border);
+  --bg: var(--app-bg);
+  --surface: var(--app-surface);
+  --ink: var(--app-ink);
+
+  /* Typography Scales (Mobile-First: 16px Base Minimum) */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --font-xs: 12px;
+  --font-sm: 14px;
+  --font-base: 16px;
+  --font-md: 18px;
+  --font-lg: 20px;
+  --font-xl: 22px;
+  --font-2xl: 26px;
+  --font-3xl: 34px;
 
   /* Standard Spacing System (4px-grid scale) */
   --space-1: 4px;
@@ -33,16 +50,6 @@
   --space-11: 44px;
   --space-12: 48px;
   --space-16: 64px;
-
-  /* Standard Typography Scale */
-  --font-xs: 11px;
-  --font-sm: 12.5px;
-  --font-base: 14px;
-  --font-md: 16px;
-  --font-lg: 18px;
-  --font-xl: 20px;
-  --font-2xl: 24px;
-  --font-3xl: 32px;
 }
 
 * {
@@ -54,8 +61,9 @@
 body {
   background: var(--app-bg);
   min-height: 100dvh;
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-sans);
   color: var(--app-ink);
+  line-height: 1.5;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
@@ -102,13 +110,15 @@ a:focus:not(:focus-visible) {
 .editor-outer-shell { animation-delay: 0.15s; }
 .preview-outer-shell { animation-delay: 0.2s; }
 
-/* ── HEADER ── */
+/* ── HEADER (Mobile Default: Stacked Columns) ── */
 header {
   background: var(--app-surface);
-  padding: 14px 32px;
+  padding: var(--space-4) var(--space-4);
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
   position: sticky;
   top: 0;
   z-index: 200;
@@ -116,31 +126,21 @@ header {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
 }
 
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
 .logo-area {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: var(--space-2);
 }
 
 .app-title {
-  font-family: 'Instrument Serif', Georgia, serif;
-  font-size: 24px;
+  font-family: var(--font-display);
+  font-size: 20px;
   font-weight: 400;
   font-style: italic;
   color: var(--app-ink);
   letter-spacing: -0.02em;
-}
-
-.profile-controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
 }
 
 .select-wrapper {
@@ -153,18 +153,18 @@ header {
   background: var(--app-bg);
   color: var(--app-ink);
   border: 1px solid var(--app-border);
-  padding: 8px 16px;
+  padding: 6px 28px 6px 12px;
   border-radius: 9999px; /* Pill Shape */
   font-family: inherit;
-  font-size: 13px;
+  font-size: var(--font-sm);
   font-weight: 500;
   cursor: pointer;
   outline: none;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   appearance: none;
   -webkit-appearance: none;
-  padding-right: 32px;
-  max-width: 220px;
+  height: 44px; /* Touch target size */
+  max-width: 130px;
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
@@ -172,99 +172,76 @@ header {
 
 #candidate-select:hover {
   border-color: var(--app-border-hover);
-  background: #FBFBFA;
+  background: var(--app-bg);
 }
 
 .select-wrapper::after {
   content: "↓";
   font-size: 10px;
   position: absolute;
-  right: 14px;
+  right: 12px;
   pointer-events: none;
   color: var(--app-ink-muted);
 }
 
-.action-menu-wrapper {
-  display: flex;
-  align-items: center;
-}
-
-#menu-toggle-btn {
-  display: none !important;
-}
-
-.mobile-tabs-container {
-  display: none !important;
-}
-
-/* Header Action Buttons */
+/* Header Action Buttons (Mobile Default: Icon-only round buttons) */
 .action-buttons {
   display: flex;
-  gap: 12px;
+  justify-content: center;
+  width: 100%;
+  gap: var(--space-2);
 }
 
-/* Primary Pill CTAs with Nested Icon Circles */
 .btn-dl {
-  background: var(--app-accent);
-  color: var(--app-surface);
+  background: var(--app-surface);
+  color: var(--app-ink);
   font-weight: 600;
-  font-size: 13px;
-  padding: 6px 6px 6px 18px; /* Room for trailing nested circle */
-  border-radius: 9999px;
-  border: 1px solid transparent;
+  font-size: var(--font-sm);
+  padding: 6px !important;
+  border-radius: 50% !important; /* Circle on Mobile */
+  border: 1px solid var(--app-border);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
+  width: 44px !important; /* Clean Touch Targets */
+  height: 44px !important;
+  min-width: 44px !important;
+  gap: 0 !important;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 6px rgba(0,0,0,0.03);
 }
 
+.btn-dl span:not(.btn-icon-circle) {
+  display: none !important; /* Hide text on Mobile */
+}
+
 .btn-icon-circle {
-  width: 26px;
-  height: 26px;
+  width: 24px !important;
+  height: 24px !important;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
+  background: transparent !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--app-surface);
+  color: inherit !important;
+  margin: 0 !important;
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btn-dl:hover {
-  background: var(--app-accent-hover);
-  transform: scale(1.02);
+  background: var(--app-bg);
+  border-color: var(--app-border-hover);
+  transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(0,0,0,0.06);
 }
 
 .btn-dl:active {
-  transform: scale(0.98);
+  transform: scale(0.95);
 }
 
 .btn-dl:hover .btn-icon-circle {
   transform: rotate(180deg);
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.pdf-btn-style, .docx-btn-style {
-  background: var(--app-surface);
-  color: var(--app-ink);
-  border: 1px solid var(--app-border);
-}
-
-.pdf-btn-style .btn-icon-circle, .docx-btn-style .btn-icon-circle {
-  background: var(--app-bg);
-  color: var(--app-ink);
-}
-
-.pdf-btn-style:hover, .docx-btn-style:hover {
-  background: #FBFBFA;
-  border-color: var(--app-border-hover);
-}
-
-.pdf-btn-style:hover .btn-icon-circle, .docx-btn-style:hover .btn-icon-circle {
-  background: var(--outer-shell-bg);
 }
 
 /* Small Icon Header Buttons */
@@ -276,8 +253,9 @@ header {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 38px;
-  width: 38px;
+  height: 44px !important; /* Touch target minimum */
+  width: 44px !important;
+  min-width: 44px !important;
   border-radius: 50%;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -295,13 +273,13 @@ header {
 .btn-icon-delete {
   background: var(--app-surface);
   border-color: var(--app-border);
-  color: #c92a2a;
+  color: hsl(0, 75%, 45%);
   display: none; /* Controlled dynamically by app.js */
 }
 
 .btn-icon-delete:hover {
   background: var(--app-danger-light);
-  border-color: #ffc9c9;
+  border-color: hsl(0, 100%, 90%);
   transform: scale(1.05);
 }
 
@@ -309,99 +287,23 @@ header {
   transform: scale(0.95);
 }
 
-/* ── SPLIT DESKTOP WORKSPACE ── */
+/* ── WORKSPACE (Mobile Default: Stacked Columns) ── */
 .app-workspace {
   display: flex;
   flex-direction: column;
   flex: 1;
   width: 100%;
   gap: var(--space-4);
-  padding: var(--space-4);
-  height: auto;
-  overflow: visible;
+  padding: var(--space-2);
 }
 
 .editor-outer-shell,
 .preview-outer-shell {
-  display: flex !important;
-  width: 100% !important;
-  height: auto !important;
-}
-
-@media (max-width: 1023px) {
-  /* Stack vertically on Tablet and Mobile */
-  .app-workspace {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: var(--space-6);
-  }
-  
-  /* Global natural page scrolling for all views on tablet and mobile */
-  .editor-outer-shell, 
-  .preview-outer-shell {
-    height: auto !important;
-  }
-  
-  .inner-core-card {
-    height: auto !important;
-    overflow: visible !important;
-  }
-  
-  .editor-pane,
-  .preview-pane {
-    height: auto !important;
-    overflow-y: visible !important;
-  }
-  
-  /* Comfortable height for typing in editor on mobile/tablet */
-  .textarea-wrap {
-    min-height: 360px;
-  }
-}
-
-@media (max-width: 480px) {
-  /* Micro spacing scale for small mobile viewports */
-  .app-workspace {
-    padding: var(--space-2);
-    gap: var(--space-3);
-  }
-  .editor-outer-shell, .preview-outer-shell {
-    padding: var(--space-1);
-    border-radius: 16px;
-  }
-  .inner-core-card {
-    border-radius: 12px;
-  }
-  .editor-pane {
-    padding: var(--space-4);
-  }
-}
-
-@media (min-width: 1024px) {
-  /* Desktop layout: lock body screen view to avoid window double scrollbars */
-  body {
-    height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .app-workspace {
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-    padding: var(--space-6);
-    gap: var(--space-6);
-    display: grid !important;
-    grid-template-columns: minmax(380px, 30%) 1fr !important; /* Clamped left editor, fluid right preview */
-  }
-  
-  .app-workspace .editor-outer-shell,
-  .app-workspace .preview-outer-shell {
-    display: flex !important;
-    height: 100% !important;
-    min-height: 0 !important;
-  }
+  display: flex;
+  width: 100%;
+  height: auto;
+  padding: var(--space-1);
+  border-radius: 16px;
 }
 
 /* ── DOUBLE-BEZEL CONTAINER (Tray & Card Nested Architecture) ── */
@@ -412,56 +314,50 @@ header {
   border-radius: 24px; /* Big squircle outer radius */
   display: flex;
   flex-direction: column;
-  height: 100%;
-  min-width: 0; /* Let grid/flex layout shrink these panels below content width */
+  min-width: 0;
 }
 
 .inner-core-card {
   background: var(--app-surface);
   border: 1px solid var(--app-border);
-  border-radius: 16px; /* Concentric nested radius: calc(24px - 8px) */
+  border-radius: 16px; /* Nested radius */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.01);
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
+  height: auto;
 }
 
 .editor-pane {
-  padding: 24px;
-  overflow-y: auto;
+  padding: var(--space-4);
+  overflow-y: visible;
 }
 
 .preview-pane {
   background: var(--paper-well-bg);
-  padding: var(--space-10) var(--space-6);
+  padding: var(--space-6) var(--space-3); /* Tight padding to maximize mobile scaling */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* Align content to the top to ensure natural scrolling works correctly without cutting off the header */
-  align-items: center; /* Center pages horizontally */
-  overflow-y: auto;
-  overflow-x: hidden; /* Prevent horizontal scrollbars from the unscaled layout width */
-}
-
-@media (max-width: 480px) {
-  .preview-pane {
-    padding: var(--space-6) var(--space-3); /* 24px top/bottom, 12px left/right to maximize mobile scaling factor */
-  }
+  justify-content: flex-start;
+  align-items: center;
+  overflow-y: visible;
+  overflow-x: hidden;
 }
 
 /* ── INPUT ZONE ── */
 .input-zone {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
+  gap: var(--space-3);
 }
 
 .textarea-wrap {
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 320px;
+  min-height: 360px;
 }
 
 #resume-text {
@@ -469,12 +365,12 @@ header {
   flex: 1;
   border: 1px solid var(--app-border);
   border-radius: 12px;
-  padding: 18px;
-  font-family: 'JetBrains Mono', Courier, monospace;
-  font-size: 12.5px;
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: var(--font-sm);
   line-height: 1.6;
   color: var(--app-ink);
-  background: #FBFBFA;
+  background: var(--app-bg);
   resize: none;
   outline: none;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -489,9 +385,9 @@ header {
 /* Tags & Section Status Indicators */
 .tag-hint {
   display: flex;
-  gap: 8px;
+  gap: var(--space-2);
   flex-wrap: wrap;
-  margin-top: 14px;
+  margin-top: 12px;
 }
 
 .tag-pill {
@@ -511,9 +407,9 @@ header {
 }
 
 .tag-pill.found {
-  background: #EDF3EC;
-  color: #346538;
-  border-color: #d2e4d0;
+  background: hsl(120, 20%, 94%);
+  color: hsl(120, 35%, 30%);
+  border-color: hsl(120, 25%, 85%);
 }
 
 .tag-pill.found::before {
@@ -522,9 +418,9 @@ header {
 }
 
 .tag-pill.missing {
-  background: #FDEBEC;
-  color: #9F2F2D;
-  border-color: #f7d2d3;
+  background: var(--app-danger-light);
+  color: hsl(1, 55%, 40%);
+  border-color: hsl(1, 60%, 90%);
 }
 
 .tag-pill.missing::before {
@@ -534,20 +430,21 @@ header {
 
 /* Paste CTA Pill button */
 .paste-btn {
-  margin-top: 18px;
+  margin-top: 12px;
   width: 100%;
   background: var(--app-accent);
   color: var(--app-surface);
   font-weight: 600;
-  font-size: 13.5px;
-  padding: 6px 6px 6px 18px;
+  font-size: var(--font-sm);
+  padding: var(--space-2) var(--space-4);
+  height: 44px; /* Touch target minimum height */
   border-radius: 9999px;
   border: 1px solid transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: var(--space-3);
   transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 2px 6px rgba(0,0,0,0.03);
 }
@@ -564,27 +461,21 @@ header {
 .paste-btn .btn-icon-circle {
   background: rgba(255, 255, 255, 0.15);
   color: var(--app-surface);
-}
-
-.paste-btn:hover .btn-icon-circle {
-  transform: translateY(-1px);
+  width: 24px;
+  height: 24px;
 }
 
 .paste-btn.pasted {
-  background: #346538;
-}
-
-.paste-btn.pasted .btn-icon-circle {
-  background: rgba(255, 255, 255, 0.2);
+  background: hsl(120, 32%, 30%);
 }
 
 /* ── COMPANY SEGMENTS COPY MODULE ── */
 .company-section {
-  margin-top: 24px;
+  margin-top: 18px;
   border: 1px solid var(--app-border);
   border-radius: 12px;
-  background: #FBFBFA;
-  padding: 18px;
+  background: var(--app-bg);
+  padding: 16px;
   display: none;
 }
 
@@ -593,7 +484,7 @@ header {
 }
 
 .company-section-title {
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--app-ink);
   margin-bottom: 12px;
@@ -604,15 +495,16 @@ header {
 .company-btns {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .company-copy-btn {
   background: var(--app-surface);
   border: 1px solid var(--app-border);
-  padding: 10px 16px;
+  padding: var(--space-2) var(--space-4);
+  height: 44px; /* Touch target minimum height */
   border-radius: 8px;
-  font-size: 13px;
+  font-size: var(--font-sm);
   font-weight: 600;
   color: var(--app-ink);
   cursor: pointer;
@@ -625,24 +517,24 @@ header {
 
 .company-copy-btn:hover {
   border-color: var(--app-border-hover);
-  background: #FBFBFA;
+  background: var(--app-bg);
   transform: translateX(4px);
 }
 
 .company-copy-btn .copy-label {
-  font-size: 11px;
+  font-size: var(--font-xs);
   color: var(--app-ink-muted);
   font-weight: 400;
 }
 
 .company-copy-btn.copied {
-  border-color: #d2e4d0;
-  color: #346538;
-  background: #EDF3EC;
+  border-color: hsl(120, 25%, 85%);
+  color: hsl(120, 32%, 30%);
+  background: hsl(120, 20%, 94%);
 }
 
 .company-copy-btn.copied .copy-label {
-  color: #346538;
+  color: hsl(120, 32%, 30%);
   font-weight: 600;
 }
 
@@ -662,8 +554,8 @@ header {
   background: white;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   border-radius: 2px;
-  padding: 32pt; /* Symmetrical margins: 32pt top, bottom, left, right to keep content inside the 24pt border safely */
-  font-family: 'Times New Roman', Times, serif;
+  padding: 32pt; /* Symmetrical margins: 32pt */
+  font-family: var(--font-sans);
   color: #000000;
   line-height: 1.15;
   width: 8.5in;
@@ -696,7 +588,7 @@ header {
 }
 
 .empty-state p {
-  font-size: 13.5px;
+  font-size: var(--font-sm);
   color: var(--app-ink-muted);
 }
 
@@ -728,7 +620,7 @@ header {
 }
 
 .mock-contact a {
-  color: #0000ff;
+  color: var(--primary-accent);
   text-decoration: none;
 }
 
@@ -839,14 +731,14 @@ header {
   z-index: 10;
 }
 
-/* ── MODALS (Backdrop blur + clean card) ── */
+/* ── MODALS (Mobile Default: Single Column, Large Targets) ── */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(5, 5, 5, 0.4);
+  background: hsla(0, 0%, 2%, 0.4);
   backdrop-filter: blur(8px);
   display: none;
   align-items: center;
@@ -863,9 +755,9 @@ header {
   background: var(--app-surface);
   border: 1px solid var(--app-border);
   border-radius: 16px;
-  width: 90%;
+  width: 95%; /* 95% on Mobile */
   max-width: 600px;
-  max-height: 85vh;
+  max-height: 90vh; /* Taller viewport container for mobile */
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
@@ -884,7 +776,7 @@ header {
 }
 
 .modal-header {
-  padding: 18px 24px;
+  padding: 14px 18px;
   border-bottom: 1px solid var(--app-border);
   display: flex;
   justify-content: space-between;
@@ -892,7 +784,7 @@ header {
 }
 
 .modal-header h2 {
-  font-size: 16px;
+  font-size: var(--font-md);
   font-weight: 700;
   color: var(--app-ink);
   letter-spacing: -0.01em;
@@ -905,8 +797,8 @@ header {
   font-size: 18px;
   cursor: pointer;
   line-height: 1;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -920,7 +812,7 @@ header {
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 18px;
   overflow-y: auto;
   flex: 1;
 }
@@ -941,15 +833,21 @@ header {
 }
 
 .form-group input, .form-group textarea {
-  background: #FBFBFA;
+  background: var(--app-bg);
   border: 1px solid var(--app-border);
   border-radius: 6px;
   padding: 10px 14px;
+  height: 44px; /* Touch target minimum height */
   color: var(--app-ink);
   font-family: inherit;
-  font-size: 13px;
+  font-size: var(--font-sm);
   outline: none;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.form-group textarea {
+  height: auto; /* Allow textareas to display naturally */
+  min-height: 80px;
 }
 
 .form-group input:focus, .form-group textarea:focus {
@@ -959,15 +857,8 @@ header {
 
 .form-row {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-@media (max-width: 640px) {
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: 0;
-  }
+  grid-template-columns: 1fr; /* Single column default on Mobile */
+  gap: 0;
 }
 
 .form-section-title {
@@ -982,7 +873,7 @@ header {
 }
 
 .modal-footer {
-  padding: 18px 24px;
+  padding: 14px 18px;
   border-top: 1px solid var(--app-border);
   display: flex;
   justify-content: flex-end;
@@ -994,11 +885,15 @@ header {
   border: 1px solid var(--outer-shell-border);
   color: var(--app-ink-muted);
   padding: 8px 18px;
+  height: 44px; /* Touch target min height */
   border-radius: 9999px;
-  font-size: 13px;
+  font-size: var(--font-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-cancel:hover {
@@ -1011,260 +906,156 @@ header {
   color: var(--app-surface);
   border: 1px solid transparent;
   padding: 8px 20px;
+  height: 44px; /* Touch target min height */
   border-radius: 9999px;
-  font-size: 13px;
+  font-size: var(--font-sm);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-save:hover {
   background: var(--app-accent-hover);
 }
 
-/* ── RESPONSIVE STYLING (MODERN FRONTEND & UI-UX PRO-MAX RULES) ── */
-@media (max-width: 1023px) {
-  header {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    padding: 12px 24px !important;
-    height: auto !important;
-    min-height: 70px !important;
-    gap: var(--space-4) !important;
-  }
 
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
+/* ── 640px TABLET BREAKPOINT (min-width: 640px) ── */
+@media (min-width: 640px) {
   .logo-area {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  /* Compact backup buttons on tablet */
-  #export-backup-btn span:not(.btn-icon-circle),
-  #import-backup-btn span:not(.btn-icon-circle) {
-    display: none !important;
+    width: auto;
   }
   
-  #export-backup-btn,
-  #import-backup-btn {
-    padding: 6px !important;
-    gap: 0 !important;
-  }
-
-  .action-buttons {
-    display: flex !important;
-    position: static !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
-    gap: 8px !important;
-    flex-direction: row !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: none !important;
-    pointer-events: auto !important;
-  }
-
-  .action-buttons .btn-dl {
-    height: 38px !important;
-    border-radius: 9999px !important;
-    padding: 6px 12px 6px 12px !important;
-    font-size: 12px !important;
-  }
-
-  .action-buttons .btn-dl .btn-icon-circle {
-    width: 22px !important;
-    height: 22px !important;
-  }
-
-  .profile-controls {
-    display: flex !important;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .profile-controls .select-wrapper {
-    display: flex;
-    align-items: center;
-  }
-
   #candidate-select {
-    padding: 6px 12px;
-    padding-right: 28px;
-    height: 38px;
-    font-size: 12.5px;
-    max-width: 160px;
+    max-width: 200px;
   }
 
-  .btn-icon-add, .btn-icon-edit, .btn-icon-delete {
-    height: 38px !important;
-    width: 38px !important;
-    font-size: 13px !important;
+  .form-row {
+    grid-template-columns: 1fr 1fr; /* Two column fields on Tablet */
+    gap: 16px;
   }
 
-  /* Revert workspace changes: ensure both panels are visible stacked */
-  .app-workspace {
-    padding: var(--space-4) !important;
-    gap: var(--space-6) !important;
-    display: flex !important;
-    flex-direction: column !important;
-  }
-
-  .editor-outer-shell, .preview-outer-shell {
-    display: flex !important;
-    width: 100% !important;
-    height: auto !important;
-    padding: 8px !important;
-    border-radius: 24px !important;
-  }
-
-  .inner-core-card {
-    border-radius: 16px !important;
-    height: auto !important;
-    overflow: visible !important;
-  }
-
-  .editor-pane, .preview-pane {
-    height: auto !important;
-    overflow-y: visible !important;
-  }
-
-  .editor-pane {
-    padding: 20px !important;
-  }
-
-  .textarea-wrap {
-    min-height: 400px !important;
-  }
-}
-
-@media (max-width: 767px) {
-  header {
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 10px !important;
-    padding: 10px 16px !important;
-    min-height: auto !important;
-    max-height: 100px !important;
-  }
-
-  .logo-area {
-    width: 100% !important;
-    justify-content: space-between !important;
-    gap: 6px !important;
-  }
-
-  .app-title {
-    font-size: 20px !important;
-  }
-
-  #candidate-select {
-    max-width: 130px !important;
-    height: 36px !important;
-    padding: 4px 10px !important;
-    padding-right: 24px !important;
-    font-size: 12px !important;
-  }
-
-  .btn-icon-add, .btn-icon-edit, .btn-icon-delete {
-    height: 36px !important;
-    width: 36px !important;
-    min-width: 36px !important;
-  }
-
-  .action-buttons {
-    width: 100% !important;
-    justify-content: center !important;
-    gap: 8px !important;
-  }
-
-  /* Make all actions icon-only on mobile */
-  .action-buttons .btn-dl span:not(.btn-icon-circle) {
-    display: none !important;
-  }
-
-  .action-buttons .btn-dl {
-    padding: 6px !important;
-    gap: 0 !important;
-    width: 36px !important;
-    height: 36px !important;
-    min-width: 36px !important;
-    justify-content: center !important;
-    border-radius: 50% !important;
-  }
-
-  .action-buttons .btn-dl .btn-icon-circle {
-    width: 24px !important;
-    height: 24px !important;
-    margin: 0 !important;
-    background: transparent !important;
-    color: inherit !important;
-  }
-
-  .app-workspace {
-    padding: var(--space-2) !important;
-    gap: var(--space-3) !important;
-  }
-
-  .editor-outer-shell, .preview-outer-shell {
-    padding: 6px !important;
-    border-radius: 16px !important;
-  }
-
-  .inner-core-card {
-    border-radius: 12px !important;
-  }
-
-  .editor-pane {
-    padding: 16px !important;
-  }
-
-  .textarea-wrap {
-    min-height: 360px !important;
-  }
-}
-
-@media (max-width: 640px) {
   .modal-container {
-    width: 95% !important;
-    max-height: 90vh !important;
+    width: 90%;
   }
 
   .modal-header {
-    padding: 14px 18px !important;
+    padding: 18px 24px;
   }
 
   .modal-body {
-    padding: 18px !important;
+    padding: 24px;
   }
 
   .modal-footer {
-    padding: 14px 18px !important;
+    padding: 18px 24px;
   }
 }
 
-@media (max-width: 480px) {
-  .app-title {
-    font-size: 18px !important;
+
+/* ── 1024px DESKTOP BREAKPOINT (min-width: 1024px) ── */
+@media (min-width: 1024px) {
+  body {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 32px;
+  }
+
+  .action-buttons {
+    width: auto;
+    gap: 12px;
+  }
+
+  /* Expand download buttons to show text on Desktop */
+  .btn-dl {
+    width: auto !important;
+    border-radius: 9999px !important;
+    padding: 6px 6px 6px 18px !important;
+    font-size: var(--font-sm);
+    gap: 12px !important;
+  }
+
+  .btn-dl span:not(.btn-icon-circle) {
+    display: inline !important;
+  }
+
+  .btn-icon-circle {
+    width: 26px !important;
+    height: 26px !important;
+    background: var(--app-bg) !important;
+  }
+
+  .btn-dl.docx-btn-style .btn-icon-circle,
+  .btn-dl.pdf-btn-style .btn-icon-circle {
+    background: var(--app-bg) !important;
+  }
+
+  #export-backup-btn,
+  #import-backup-btn {
+    padding: 6px 6px 6px 18px !important;
+    gap: 12px !important;
   }
   
-  #candidate-select {
-    max-width: 100px !important;
+  #export-backup-btn span:not(.btn-icon-circle),
+  #import-backup-btn span:not(.btn-icon-circle) {
+    display: inline !important;
+  }
+
+  /* Desktop Asymmetric Workspace split grid */
+  .app-workspace {
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    padding: var(--space-6);
+    gap: var(--space-6);
+    display: grid !important;
+    grid-template-columns: minmax(380px, 30%) 1fr !important;
+  }
+
+  .editor-outer-shell,
+  .preview-outer-shell {
+    display: flex !important;
+    height: 100% !important;
+    min-height: 0 !important;
+  }
+
+  .inner-core-card {
+    height: 100% !important;
+    overflow: hidden;
+  }
+
+  .editor-pane {
+    padding: 24px;
+    overflow-y: auto;
+    height: 100%;
+  }
+
+  .preview-pane {
+    padding: var(--space-10) var(--space-6);
+    overflow-y: auto;
+    height: 100%;
+  }
+
+  .textarea-wrap {
+    min-height: 320px;
+    flex: 1;
   }
 }
+
 
 /* ── PRINT MEDIA STYLING (VERIFIED AND UNCHANGED) ── */
 @media print {
-  header, .input-zone, .divider { 
+  header, .input-zone, .divider, .company-section { 
     display: none !important; 
   }
   

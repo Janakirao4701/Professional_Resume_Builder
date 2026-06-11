@@ -8,7 +8,7 @@ Perform these checks before staging and committing any code modifications.
 
 Run the layout verification script from your project root:
 ```powershell
-python .kiro/scripts/verify-layout.py
+python .validation/scripts/verify-layout.py
 ```
 **Expectation**: All checks must pass with exit code `0`. If any violations are found, fix them before proceeding.
 

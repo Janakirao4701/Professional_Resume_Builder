@@ -11,7 +11,7 @@ def main():
     scripts_dir = Path(__file__).resolve().parent
     verify_script = scripts_dir / "verify-layout.py"
 
-    print("🚀 Running All Verification Checks...")
+    print("[RUN] Running All Verification Checks...")
     print("-" * 50)
 
     try:
@@ -31,7 +31,7 @@ def main():
         sys.exit(result.returncode)
 
     except Exception as e:
-        print(f"❌ Failed to execute validation scripts: {e}")
+        print(f"[ERROR] Failed to execute validation scripts: {e}")
         sys.exit(1)
 
 if __name__ == '__main__':

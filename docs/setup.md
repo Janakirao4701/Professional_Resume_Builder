@@ -18,7 +18,7 @@ No additional Python packages or database dependencies are needed. The scripts r
    Ensure all project files are located in your working directory:
    ```text
    resume_builder_app/
-   ├── .kiro/
+   ├── .validation/
    ├── docs/
    ├── app.js
    ├── index.html
@@ -28,7 +28,7 @@ No additional Python packages or database dependencies are needed. The scripts r
 2. **Verify Installation**:
    Open a terminal, navigate to the project directory, and execute:
    ```bash
-   python .kiro/scripts/verify-layout.py
+   python .validation/scripts/verify-layout.py
    ```
    **Expected Outcome**:
    ```text
@@ -56,7 +56,7 @@ To block commits automatically if any layout regressions are introduced:
    ```bash
    #!/bin/bash
    echo "Running layout verification hook..."
-   python .kiro/scripts/verify-layout.py
+   python .validation/scripts/verify-layout.py
    exit $?
    ```
 3. Make the hook executable:

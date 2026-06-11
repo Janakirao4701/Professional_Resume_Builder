@@ -6,7 +6,7 @@ This project is a Resume Builder candidates portal that generates clean, profess
 
 ## 🎯 Architecture Philosophy
 
-We use the `.kiro` simple architecture:
+We use a simple verification architecture:
 - **Human-Readable**: All patterns and checklists are written in Markdown files that any developer can read in 2 minutes.
 - **Enforced**: Local Python scripts automatically scan the workspace for visual and layout regressions.
 - **Minimalist**: No heavy JSON configs or complex abstractions.
@@ -17,7 +17,7 @@ We use the `.kiro` simple architecture:
 
 Before you commit any changes, run the automated layout verification script:
 ```bash
-python .kiro/scripts/verify-layout.py
+python .validation/scripts/verify-layout.py
 ```
 
 It checks for common anti-patterns like:
@@ -35,7 +35,7 @@ This project enforces these layout rules automatically:
 
 ## 📁 Directory Structure
 
-- **`.kiro/`**: Internal configuration, checklists, scripts, and layout patterns.
+- **`.validation/`**: Internal configuration, checklists, scripts, and layout patterns.
   - **`patterns/`**: Standard CSS/HTML layout rules.
   - **`checklists/`**: Pre-commit and pre-deployment checklists.
   - **`scripts/`**: Layout validation scripts.
@@ -44,7 +44,7 @@ This project enforces these layout rules automatically:
 ---
 
 ## 📖 Helpful Links
-- Technical architecture details: [.kiro/architecture.md](file:///c:/Users/janak/Downloads/resume_builder_app/.kiro/architecture.md)
-- Flexbox bullet layout patterns: [.kiro/patterns/css-layouts.md](file:///c:/Users/janak/Downloads/resume_builder_app/.kiro/patterns/css-layouts.md)
-- Quick Pre-Commit checklist: [.kiro/checklists/before-commit.md](file:///c:/Users/janak/Downloads/resume_builder_app/.kiro/checklists/before-commit.md)
+- Technical architecture details: [.validation/architecture.md](file:///c:/Users/janak/Downloads/resume_builder_app/.validation/architecture.md)
+- Flexbox bullet layout patterns: [.validation/patterns/css-layouts.md](file:///c:/Users/janak/Downloads/resume_builder_app/.validation/patterns/css-layouts.md)
+- Quick Pre-Commit checklist: [.validation/checklists/before-commit.md](file:///c:/Users/janak/Downloads/resume_builder_app/.validation/checklists/before-commit.md)
 - Common layout bugs and fixes: [docs/common-issues.md](file:///c:/Users/janak/Downloads/resume_builder_app/docs/common-issues.md)

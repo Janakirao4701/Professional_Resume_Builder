@@ -41,6 +41,6 @@ This document logs key design and layout decisions made for the Candidates Porta
 
 ## 🔍 Code Enforcement
 To ensure these layout decisions are not broken during refactors, we enforce:
-- Regular local runs of `.kiro/scripts/verify-layout.py`.
+- Regular local runs of `.validation/scripts/verify-layout.py`.
 - No inline styles on list bullets.
 - Strict CSS linting rules.

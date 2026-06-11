@@ -14,4 +14,4 @@ jobs:
           python-version: '3.x'
 
       - name: Run Layout Verification
-        run: python .kiro/scripts/verify-layout.py
+        run: python .validation/scripts/verify-layout.py

@@ -5,7 +5,7 @@ This guide describes how to troubleshoot layout validation scripts and debug vis
 ---
 
 ## 🛠️ 1. Verification Script Fails
-If running `python .kiro/scripts/verify-layout.py` reports violations:
+If running `python .validation/scripts/verify-layout.py` reports violations:
 
 1. **Locate the Error**:
    The output flags the file name and the exact line number of the violation:
@@ -14,10 +14,10 @@ If running `python .kiro/scripts/verify-layout.py` reports violations:
 
      [style.css:1240] Rule: no-negative-text-indent
      Violation: Negative text-indent detected. This clips bullets outside borders. Use Flexbox layout patterns instead.
-     Reference: .kiro/patterns/css-layouts.md#1-list-bullet-items-hanging-indent
+     Reference: .validation/patterns/css-layouts.md#1-list-bullet-items-hanging-indent
    ```
 2. **Apply the Fix**:
-   Open the highlighted file at the specified line number and refactor the style using the Flexbox layout patterns detailed in [.kiro/patterns/css-layouts.md](file:///c:/Users/janak/Downloads/resume_builder_app/.kiro/patterns/css-layouts.md).
+   Open the highlighted file at the specified line number and refactor the style using the Flexbox layout patterns detailed in [.validation/patterns/css-layouts.md](file:///c:/Users/janak/Downloads/resume_builder_app/.validation/patterns/css-layouts.md).
 3. **Re-run the Script**:
    Verify that the script now exits with `0` successfully.
 
