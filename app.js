@@ -914,10 +914,57 @@ function importBackup(input) {
   reader.readAsText(file);
 }
 
+let workspaceTab = 'split';
+
+function switchWorkspaceTab(tabName) {
+  workspaceTab = tabName;
+  
+  // Update active button state
+  document.querySelectorAll('.workspace-tabs .tab-btn').forEach(btn => {
+    if (btn.getAttribute('data-tab') === tabName) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+  
+  // Update layout class on workspace
+  const workspace = document.querySelector('.app-workspace');
+  if (workspace) {
+    workspace.className = `app-workspace view-${tabName}`;
+  }
+  
+  // Recalculate preview scaling if the preview pane is visible
+  if (tabName === 'preview' || tabName === 'split') {
+    setTimeout(adjustPreviewScale, 50);
+  }
+}
+
+function syncResponsiveTabs() {
+  const width = window.innerWidth;
+  const workspace = document.querySelector('.app-workspace');
+  if (!workspace) return;
+  
+  if (width < 1024) {
+    if (workspaceTab === 'split') {
+      switchWorkspaceTab('editor');
+    }
+  }
+}
+window.addEventListener('resize', syncResponsiveTabs);
+
 // Populate company copy buttons and preview on load
 window.addEventListener('DOMContentLoaded', () => {
   loadCustomProfiles();
   repopulateSelector();
+  
+  // Initialize tab view based on window size
+  if (window.innerWidth < 1024) {
+    switchWorkspaceTab('editor');
+  } else {
+    switchWorkspaceTab('split');
+  }
+  
   const keys = Object.keys(PROFILES);
   if (keys.length > 0) {
     switchCandidate(keys[0]);
