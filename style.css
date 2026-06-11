@@ -20,6 +20,29 @@
   --surface: #FFFFFF;
   --ink: #1A1A1A;
   --app-danger-light: #FDEBEC;
+
+  /* Standard Spacing System (4px-grid scale) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-11: 44px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Standard Typography Scale */
+  --font-xs: 11px;
+  --font-sm: 12.5px;
+  --font-base: 14px;
+  --font-md: 16px;
+  --font-lg: 18px;
+  --font-xl: 20px;
+  --font-2xl: 24px;
+  --font-3xl: 32px;
 }
 
 * {
@@ -37,6 +60,24 @@ body {
   flex-direction: column;
   overflow-x: hidden;
   letter-spacing: -0.01em;
+}
+
+/* ── GLOBAL ACCESSIBILITY FOCUS STATES ── */
+button:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--app-accent) !important;
+  outline-offset: 2px !important;
+}
+
+button:focus:not(:focus-visible),
+select:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+a:focus:not(:focus-visible) {
+  outline: none !important;
 }
 
 /* ── ENTRY ANIMATION ── */
@@ -210,8 +251,8 @@ header {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 34px;
-  width: 34px;
+  height: 38px;
+  width: 38px;
   border-radius: 50%;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -984,57 +1025,70 @@ header {
 /* ── RESPONSIVE HEADER STYLING ── */
 @media (max-width: 1150px) {
   header {
-    padding: 14px 16px;
+    padding: var(--space-3) var(--space-4);
   }
   .btn-dl span:not(.btn-icon-circle) {
     display: none;
   }
   .btn-dl {
-    padding: 6px;
-    width: 38px;
-    height: 38px;
+    padding: var(--space-1);
+    width: 44px; /* Accessible touch target size */
+    height: 44px;
     justify-content: center;
     gap: 0;
+  }
+  .btn-dl .btn-icon-circle {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .btn-icon-add, .btn-icon-edit, .btn-icon-delete {
+    height: 44px !important;
+    width: 44px !important;
+    font-size: var(--font-lg) !important;
+  }
+  .btn-icon-add svg, .btn-icon-edit svg, .btn-icon-delete svg {
+    width: 16px !important;
+    height: 16px !important;
   }
 }
 
 @media (max-width: 680px) {
   header {
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
     align-items: center;
-    padding: 12px 16px;
+    padding: var(--space-3) var(--space-4);
   }
   .logo-area {
     width: 100%;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--space-2);
   }
   .action-buttons {
     width: 100%;
     justify-content: center;
+    gap: var(--space-3);
   }
 }
 
 @media (max-width: 480px) {
   .app-title {
-    font-size: 18px;
+    font-size: var(--font-lg);
   }
   #candidate-select {
     max-width: 140px;
-    padding: 6px 12px;
-    font-size: 12px;
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--font-sm);
   }
   .logo-area {
-    gap: 6px;
-  }
-  .btn-icon-add, .btn-icon-edit, .btn-icon-delete {
-    height: 30px;
-    width: 30px;
+    gap: var(--space-2);
   }
   .action-buttons {
-    gap: 8px;
+    gap: var(--space-2);
   }
 }
 

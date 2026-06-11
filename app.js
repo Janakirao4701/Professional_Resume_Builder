@@ -922,13 +922,11 @@ let workspaceTab = 'split';
 function switchWorkspaceTab(tabName) {
   workspaceTab = tabName;
   
-  // Update active button state
+  // Update active button state and ARIA properties
   document.querySelectorAll('.workspace-tabs .tab-btn').forEach(btn => {
-    if (btn.getAttribute('data-tab') === tabName) {
-      btn.classList.add('active');
-    } else {
-      btn.classList.remove('active');
-    }
+    const isActive = btn.getAttribute('data-tab') === tabName;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
   });
   
   // Update layout class on workspace
