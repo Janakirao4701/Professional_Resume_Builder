@@ -560,11 +560,11 @@ header {
 
 /* ── COMPANY SEGMENTS COPY MODULE ── */
 .company-section {
-  margin-top: var(--space-12);
+  margin-top: var(--space-4);
   border: 1px solid var(--app-border);
   border-radius: 12px;
   background: var(--app-bg);
-  padding: var(--space-6);
+  padding: var(--space-4);
   display: none;
 }
 
@@ -576,7 +576,7 @@ header {
   font-size: 12px;
   font-weight: 700;
   color: var(--app-ink);
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-3);
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -584,14 +584,14 @@ header {
 .company-btns {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-2);
 }
 
 .company-copy-btn {
   background: var(--app-surface);
   border: 1px solid var(--app-border);
-  padding: var(--space-4) var(--space-5);
-  height: 56px;
+  padding: var(--space-2) var(--space-4);
+  height: 48px;
   border-radius: 10px;
   font-size: var(--font-base);
   font-weight: 600;
