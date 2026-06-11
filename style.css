@@ -388,24 +388,26 @@ header {
     gap: var(--space-6);
   }
   
-  .app-workspace.view-split .editor-outer-shell,
-  .app-workspace.view-split .preview-outer-shell {
+  /* Global natural page scrolling for all views on tablet and mobile */
+  .editor-outer-shell, 
+  .preview-outer-shell {
     height: auto !important;
   }
   
-  .app-workspace.view-split .inner-core-card {
+  .inner-core-card {
     height: auto !important;
     overflow: visible !important;
   }
   
-  .app-workspace.view-split .editor-pane,
-  .app-workspace.view-split .preview-pane {
+  .editor-pane,
+  .preview-pane {
     height: auto !important;
     overflow-y: visible !important;
   }
   
-  .app-workspace.view-split .textarea-wrap {
-    min-height: 360px; /* Comfortable height for typing in split view on mobile/tablet */
+  /* Comfortable height for typing in editor on mobile/tablet */
+  .textarea-wrap {
+    min-height: 360px;
   }
 }
 

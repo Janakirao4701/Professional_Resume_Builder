@@ -989,3 +989,15 @@ window.addEventListener('DOMContentLoaded', () => {
     switchCandidate(null);
   }
 });
+
+// Rerun preview builder on window load to ensure all stylesheets and layout dimensions have stabilized
+window.addEventListener('load', () => {
+  updatePreview();
+});
+
+// Also rerun when fonts are loaded to prevent layout shifts from fallback fonts
+if (document.fonts) {
+  document.fonts.ready.then(() => {
+    updatePreview();
+  });
+}
