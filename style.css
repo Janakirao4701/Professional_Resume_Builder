@@ -407,8 +407,9 @@ header {
   background: var(--paper-well-bg);
   padding: var(--space-10) var(--space-6);
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  justify-content: flex-start; /* Align content to the top to ensure natural scrolling works correctly without cutting off the header */
+  align-items: center; /* Center pages horizontally */
   overflow-y: auto;
   overflow-x: hidden; /* Prevent horizontal scrollbars from the unscaled layout width */
 }
