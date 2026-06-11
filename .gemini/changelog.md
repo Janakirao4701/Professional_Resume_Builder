@@ -6,6 +6,7 @@
 - Enabled edit/delete features for all profiles since all profiles are now custom profiles.
 - Updated export backup filename layout to dynamically save as `[Profile_Name]_backup.json`.
 - Implemented safety alerts for PDF and DOCX downloads when no candidate profile exists.
+- Fixed split-screen and mobile layout responsiveness by converting header action buttons to dynamic icons on narrow screens, restricting dropdown selector width, and enabling side-by-side editing starting at 768px width.
 
 ## [v1.2.0] - 2026-06-11
 ### Added
