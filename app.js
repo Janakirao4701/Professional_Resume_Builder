@@ -9,6 +9,62 @@ function getActiveProfile() {
   return activeCandidate ? PROFILES[activeCandidate] : null;
 }
 
+// ── CUSTOMIZER CONTROLS CONFIGURATION ──
+let activeSettings = {
+  template: 'template-classic',
+  font: 'font-serif',
+  size: 'size-11pt',
+  margin: 'margin-normal'
+};
+
+function loadActiveSettings() {
+  try {
+    const data = localStorage.getItem('custom_resume_settings');
+    if (data) {
+      const parsed = JSON.parse(data);
+      if (parsed) {
+        activeSettings = { ...activeSettings, ...parsed };
+      }
+    }
+  } catch (e) {
+    console.error("Failed to load settings", e);
+  }
+}
+
+function saveActiveSettings() {
+  try {
+    localStorage.setItem('custom_resume_settings', JSON.stringify(activeSettings));
+  } catch (e) {
+    console.error("Failed to save settings", e);
+  }
+}
+
+function applyStyleClasses() {
+  const mockup = document.getElementById('resume-mockup');
+  if (mockup) {
+    mockup.className = `${activeSettings.template} ${activeSettings.font} ${activeSettings.size} ${activeSettings.margin}`;
+  }
+  
+  const templateSelect = document.getElementById('template-select');
+  const fontSelect = document.getElementById('font-select');
+  const sizeSelect = document.getElementById('size-select');
+  const marginSelect = document.getElementById('margin-select');
+  
+  if (templateSelect) templateSelect.value = activeSettings.template;
+  if (fontSelect) fontSelect.value = activeSettings.font;
+  if (sizeSelect) sizeSelect.value = activeSettings.size;
+  if (marginSelect) marginSelect.value = activeSettings.margin;
+}
+
+function updateStyleSetting(key, val) {
+  activeSettings[key] = val;
+  saveActiveSettings();
+  applyStyleClasses();
+  updatePreview();
+}
+
+window.updateStyleSetting = updateStyleSetting;
+
 // ── LOCAL STORAGE OPERATIONS ──
 function loadCustomProfiles() {
   try {
@@ -404,6 +460,9 @@ function updatePreview() {
     return;
   }
 
+  // Apply active customizer class bindings to the mockup
+  mockup.className = `${activeSettings.template} ${activeSettings.font} ${activeSettings.size} ${activeSettings.margin}`;
+
   const { summary, skills, experience } = parseContent(raw);
   
   // Create elements array dynamically
@@ -419,7 +478,7 @@ function updatePreview() {
   // 1. Header (Name, Subtitle, Contact)
   const displayLinkedin = PROFILE.linkedin.replace(/-[a-zA-Z0-9]*\d+[a-zA-Z0-9]*$/, '');
   elements.push(createEl(`
-    <div style="text-align: center;">
+    <div class="mock-header">
       <div class="mock-name">${escHtml(PROFILE.name)}</div>
       <div class="mock-subtitle">${escHtml(PROFILE.subtitle)}</div>
       <div class="mock-contact">
@@ -524,11 +583,17 @@ function updatePreview() {
   mockup.appendChild(currentPage);
   let pageContent = currentPage.querySelector('.page-content');
 
+  // Calculate available inner page height dynamically based on margins (padding)
+  const pageStyle = window.getComputedStyle(currentPage);
+  const paddingTop = parseFloat(pageStyle.paddingTop) || 42.66;
+  const paddingBottom = parseFloat(pageStyle.paddingBottom) || 42.66;
+  const maxInnerHeight = 1056 - paddingTop - paddingBottom;
+
   elements.forEach(el => {
     pageContent.appendChild(el);
-    // Page height is 11in = 1056px. available inner content height is ~970px.
+    // Page height is 11in = 1056px. available inner content height is maxInnerHeight.
     // Use children.length > 1 safeguard to prevent infinite page creation loops.
-    if (pageContent.offsetHeight > 970 && pageContent.children.length > 1) {
+    if (pageContent.offsetHeight > maxInnerHeight && pageContent.children.length > 1) {
       pageContent.removeChild(el);
       pageNum++;
       currentPage = createPageEl(pageNum);
@@ -985,8 +1050,10 @@ function importBackup(input) {
 
 // Populate company copy buttons and preview on load
 window.addEventListener('DOMContentLoaded', () => {
+  loadActiveSettings();
   loadCustomProfiles();
   repopulateSelector();
+  applyStyleClasses();
   
   // Set up ResizeObserver to handle dynamic scaling cleanly and prevent race conditions on reload/resize
   const pane = document.querySelector('.preview-pane');
@@ -1017,4 +1084,355 @@ if (document.fonts) {
   });
 }
 
-// Redundant mobile tab and popover JS handlers removed. Pure CSS is used for responsive layout.
+// Redundant mobile tab and popover JS handlers removed. Pure CSS is used for responsive layout.
+
+
+// ── MOBILE MENU CONTROLS ──
+function toggleMobileMenu() {
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const menuPanel = document.getElementById('mobile-menu-panel');
+  const menuOverlay = document.getElementById('mobile-menu-overlay');
+  
+  const isActive = menuPanel.classList.contains('active');
+  
+  if (isActive) {
+    closeMobileMenu();
+  } else {
+    openMobileMenu();
+  }
+}
+
+function openMobileMenu() {
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const menuPanel = document.getElementById('mobile-menu-panel');
+  const menuOverlay = document.getElementById('mobile-menu-overlay');
+  
+  menuBtn.classList.add('active');
+  menuBtn.setAttribute('aria-expanded', 'true');
+  menuPanel.classList.add('active');
+  menuOverlay.classList.add('active');
+  
+  // Prevent body scroll when menu is open
+  document.body.style.overflow = 'hidden';
+}
+
+function closeMobileMenu() {
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const menuPanel = document.getElementById('mobile-menu-panel');
+  const menuOverlay = document.getElementById('mobile-menu-overlay');
+  
+  menuBtn.classList.remove('active');
+  menuBtn.setAttribute('aria-expanded', 'false');
+  menuPanel.classList.remove('active');
+  menuOverlay.classList.remove('active');
+  
+  // Restore body scroll
+  document.body.style.overflow = '';
+}
+
+// Initialize mobile menu event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const menuOverlay = document.getElementById('mobile-menu-overlay');
+  const menuPdfBtn = document.getElementById('menu-pdf-btn');
+  const menuDlBtn = document.getElementById('menu-dl-btn');
+  
+  if (menuBtn) {
+    menuBtn.addEventListener('click', toggleMobileMenu);
+  }
+  
+  if (menuOverlay) {
+    menuOverlay.addEventListener('click', closeMobileMenu);
+  }
+  
+  // Connect menu PDF button to main PDF function
+  if (menuPdfBtn) {
+    menuPdfBtn.addEventListener('click', function() {
+      if (!activeCandidate) {
+        alert('Please select or create a candidate profile first!');
+        return;
+      }
+      const rawText = document.getElementById('resume-text').value.trim();
+      if (!rawText) {
+        alert('Please paste your resume content into the text box first!');
+        return;
+      }
+      setTimeout(() => {
+        window.print();
+      }, 100);
+    });
+  }
+  
+  // Connect menu DOCX button to main DOCX function
+  if (menuDlBtn) {
+    menuDlBtn.addEventListener('click', async function() {
+      if (!activeCandidate) {
+        alert('Please select or create a candidate profile first.');
+        return;
+      }
+      const raw = document.getElementById('resume-text').value.trim();
+      if (!raw) { 
+        alert('Please paste your resume content first.'); 
+        return; 
+      }
+
+      const { summary, skills, experience } = parseContent(raw);
+      const btn = document.getElementById('dl-btn');
+      const menuBtn = document.getElementById('menu-dl-btn');
+      
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Generating...';
+      }
+      if (menuBtn) {
+        menuBtn.disabled = true;
+        const originalLabel = menuBtn.querySelector('.menu-item-label').textContent;
+        menuBtn.querySelector('.menu-item-label').textContent = 'Generating...';
+      }
+
+      try {
+        const { Document, Packer, Paragraph, TextRun, ExternalHyperlink,
+                AlignmentType, BorderStyle, LevelFormat, TabStopType } = docx;
+
+        const P = PROFILE;
+
+        function sectionHead(text) {
+          return new Paragraph({
+            spacing: { before: 240, after: 80 },
+            border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000', space: 2 } },
+            children: [new TextRun({ text: text.toUpperCase(), bold: true, size: 22, font: 'Times New Roman', color: '000000' })]
+          });
+        }
+
+        function bullet(text) {
+          return new Paragraph({
+            numbering: { reference: 'bullets', level: 0 },
+            spacing: { before: 30, after: 30 },
+            indent: { right: 360 },
+            children: [new TextRun({ text, font: 'Times New Roman', size: 22, color: '000000' })]
+          });
+        }
+
+        function skillsDocx(raw) {
+          if (!raw) return [];
+          return raw.split('\n').filter(l => l.trim()).map(line => {
+            const cleanLine = line.trim().replace(/^[-•*]\s*/, '');
+            const idx = cleanLine.indexOf(':');
+            if (idx > -1) {
+              return new Paragraph({
+                numbering: { reference: 'bullets', level: 0 },
+                spacing: { before: 30, after: 30 },
+                indent: { right: 360 },
+                children: [
+                  new TextRun({ text: cleanLine.substring(0, idx+1), bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
+                  new TextRun({ text: cleanLine.substring(idx+1), font: 'Times New Roman', size: 22, color: '000000' })
+                ]
+              });
+            } else {
+              return bullet(cleanLine);
+            }
+          });
+        }
+
+        function experienceDocx(raw) {
+          if (!raw) return [];
+          const lines = raw.split('\n').filter(l => l.trim());
+          const res = [];
+          lines.forEach(line => {
+            const t = line.trim();
+            if (/^[-•*]/.test(t)) {
+              res.push(bullet(t.replace(/^[-•*]\s*/, '')));
+            } else if (t.includes('|')) {
+              const parts = t.split('|').map(p => p.trim());
+              if (parts.length >= 4) {
+                res.push(new Paragraph({
+                  spacing: { before: 200, after: 40 },
+                  children: [
+                    new TextRun({ text: `${parts[0]}, ${parts[1]}`, bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
+                    new TextRun({ text: '\t', font: 'Times New Roman', size: 22 }),
+                    new TextRun({ text: parts[3], bold: true, font: 'Times New Roman', size: 22, color: '000000' })
+                  ],
+                  tabStops: [{ type: TabStopType.RIGHT, position: 9360 }]
+                }));
+                res.push(new Paragraph({
+                  spacing: { before: 40, after: 80 },
+                  children: [new TextRun({ text: parts[2], font: 'Times New Roman', size: 22, color: '000000' })]
+                }));
+              } else if (parts.length === 3) {
+                res.push(new Paragraph({
+                  spacing: { before: 200, after: 40 },
+                  children: [
+                    new TextRun({ text: parts[0], bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
+                    new TextRun({ text: '\t', font: 'Times New Roman', size: 22 }),
+                    new TextRun({ text: parts[2], bold: true, font: 'Times New Roman', size: 22, color: '000000' })
+                  ],
+                  tabStops: [{ type: TabStopType.RIGHT, position: 9360 }]
+                }));
+                res.push(new Paragraph({
+                  spacing: { before: 40, after: 80 },
+                  children: [new TextRun({ text: parts[1], font: 'Times New Roman', size: 22, color: '000000' })]
+                }));
+              } else {
+                res.push(new Paragraph({
+                  spacing: { before: 200, after: 40 },
+                  children: [new TextRun({ text: t, bold: true, font: 'Times New Roman', size: 22, color: '000000' })]
+                }));
+              }
+            } else {
+              res.push(new Paragraph({
+                spacing: { before: 60, after: 60 },
+                children: [new TextRun({ text: t, font: 'Times New Roman', size: 22, color: '000000' })]
+              }));
+            }
+          });
+          return res;
+        }
+
+        const displayLinkedin = P.linkedin.replace(/-[a-zA-Z0-9]*\d+[a-zA-Z0-9]*$/, '');
+        
+        const sections = [];
+
+        sections.push(new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { before: 80, after: 80 },
+          children: [new TextRun({ text: P.name, bold: true, size: 28, font: 'Times New Roman', color: '000000' })]
+        }));
+
+        sections.push(new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 120 },
+          children: [new TextRun({ text: P.subtitle, bold: true, size: 22, font: 'Times New Roman', color: '000000' })]
+        }));
+
+        sections.push(new Paragraph({
+          alignment: AlignmentType.CENTER,
+          spacing: { after: 240 },
+          children: [
+            new TextRun({ text: `${P.location} | ${P.phone} | `, font: 'Times New Roman', size: 22, color: '000000' }),
+            new ExternalHyperlink({
+              link: `mailto:${P.email}`,
+              children: [new TextRun({ text: P.email, font: 'Times New Roman', size: 22, color: '0000FF', underline: {} })]
+            }),
+            new TextRun({ text: ' | ', font: 'Times New Roman', size: 22, color: '000000' }),
+            new ExternalHyperlink({
+              link: `https://${P.linkedin}`,
+              children: [new TextRun({ text: displayLinkedin, font: 'Times New Roman', size: 22, color: '0000FF', underline: {} })]
+            })
+          ]
+        }));
+
+        if (summary) {
+          sections.push(sectionHead('PROFESSIONAL SUMMARY:'));
+          sections.push(new Paragraph({
+            spacing: { before: 60, after: 120 },
+            alignment: AlignmentType.JUSTIFIED,
+            children: [new TextRun({ text: summary, font: 'Times New Roman', size: 22, color: '000000' })]
+          }));
+        }
+
+        if (skills) {
+          sections.push(sectionHead('TECHNICAL SKILLS:'));
+          sections.push(...skillsDocx(skills));
+        }
+
+        if (experience) {
+          sections.push(sectionHead('PROFESSIONAL EXPERIENCE:'));
+          sections.push(...experienceDocx(experience));
+        }
+
+        sections.push(sectionHead('EDUCATION:'));
+        P.education.forEach(e => {
+          sections.push(new Paragraph({
+            spacing: { before: 200, after: 40 },
+            children: [
+              new TextRun({ text: e.degree, bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
+              new TextRun({ text: '\t', font: 'Times New Roman', size: 22 }),
+              new TextRun({ text: e.dates, bold: true, font: 'Times New Roman', size: 22, color: '000000' })
+            ],
+            tabStops: [{ type: TabStopType.RIGHT, position: 9360 }]
+          }));
+          sections.push(new Paragraph({
+            spacing: { before: 40, after: 80 },
+            children: [new TextRun({ text: `${e.school}${e.location ? ', ' + e.location : ''}`, font: 'Times New Roman', size: 22, color: '000000' })]
+          }));
+        });
+
+        if (P.certs && P.certs.length) {
+          sections.push(sectionHead('CERTIFICATIONS:'));
+          P.certs.forEach(c => sections.push(bullet(c)));
+        }
+
+        const doc = new Document({
+          numbering: {
+            config: [{
+              reference: 'bullets',
+              levels: [{
+                level: 0,
+                format: LevelFormat.BULLET,
+                text: '•',
+                alignment: AlignmentType.LEFT,
+                style: { paragraph: { indent: { left: 720, hanging: 360 } } }
+              }]
+            }]
+          },
+          sections: [{
+            properties: {
+              page: {
+                margin: { top: 576, right: 576, bottom: 576, left: 576 }
+              }
+            },
+            children: sections
+          }]
+        });
+
+        const blob = await Packer.toBlob(doc);
+        const filename = `${P.name.replace(/\s+/g, '_')}_Resume.docx`;
+        saveAs(blob, filename);
+
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>Download DOCX</span><span class="btn-icon-circle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></span>';
+        }
+        if (menuBtn) {
+          menuBtn.disabled = false;
+          menuBtn.querySelector('.menu-item-label').textContent = 'Download DOCX';
+        }
+      } catch (err) {
+        console.error('DOCX generation error:', err);
+        alert('Failed to generate DOCX. Please try again.');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>Download DOCX</span><span class="btn-icon-circle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></span>';
+        }
+        if (menuBtn) {
+          menuBtn.disabled = false;
+          menuBtn.querySelector('.menu-item-label').textContent = 'Download DOCX';
+        }
+      }
+    });
+  }
+  
+  // Update mobile menu profile button visibility based on active profile
+  function updateMobileMenuButtons() {
+    const menuEditBtn = document.getElementById('menu-edit-profile');
+    const menuDeleteBtn = document.getElementById('menu-delete-profile');
+    
+    if (activeCandidate && PROFILES[activeCandidate]) {
+      if (menuEditBtn) menuEditBtn.style.display = 'flex';
+      if (menuDeleteBtn) menuDeleteBtn.style.display = 'flex';
+    } else {
+      if (menuEditBtn) menuEditBtn.style.display = 'none';
+      if (menuDeleteBtn) menuDeleteBtn.style.display = 'none';
+    }
+  }
+  
+  // Override switchCandidate to also update mobile menu buttons
+  const originalSwitchCandidate = switchCandidate;
+  switchCandidate = function(key) {
+    originalSwitchCandidate(key);
+    updateMobileMenuButtons();
+  };
+  
+  // Initial update
+  updateMobileMenuButtons();
+});

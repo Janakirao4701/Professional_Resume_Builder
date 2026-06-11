@@ -29,6 +29,11 @@
   --font-display: 'Instrument Serif', Georgia, serif;
   --font-mono: 'JetBrains Mono', monospace;
 
+  /* Mockup Resume font defaults */
+  --mock-font-base: 11pt;
+  --mock-font-title: 14pt;
+  --mock-font-sub: 11pt;
+
   --font-xs: 13px;
   --font-sm: 15px;
   --font-base: 16px;
@@ -441,6 +446,77 @@ header {
   gap: var(--space-3);
 }
 
+.customizer-controls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+  width: 100%;
+  padding: 12px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  .customizer-controls {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-3);
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.customizer-controls .control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.customizer-controls label {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  color: var(--app-ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.customizer-controls select {
+  height: 44px; /* Touch target minimum height */
+  padding: 0 12px;
+  background: var(--app-bg);
+  color: var(--app-ink);
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  font-size: var(--font-sm);
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 36px;
+}
+
+.customizer-controls select:hover {
+  border-color: var(--app-border-hover);
+  background-color: var(--app-surface);
+}
+
+.customizer-controls select:focus {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 3px var(--app-accent-glow);
+}
+
 .textarea-wrap {
   position: relative;
   display: flex;
@@ -644,7 +720,7 @@ header {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   border-radius: 2px;
   padding: 32pt; /* Symmetrical margins: 32pt */
-  font-family: var(--font-sans);
+  font-family: inherit;
   color: #000000;
   line-height: 1.15;
   width: 8.5in;
@@ -682,8 +758,69 @@ header {
 }
 
 /* ── MOCKUP DOCUMENT SPECIFICATIONS ── */
-.mock-name {
-  font-size: 14pt;
+#resume-mockup {
+  --mock-font-base: 11pt;
+  --mock-font-title: 14pt;
+  --mock-font-sub: 11pt;
+  font-family: var(--font-sans); /* Default */
+}
+
+/* Font Families */
+#resume-mockup.font-serif {
+  font-family: var(--font-display);
+}
+#resume-mockup.font-sans {
+  font-family: var(--font-sans);
+}
+#resume-mockup.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Font Sizes */
+#resume-mockup.size-10pt {
+  --mock-font-base: 10pt;
+  --mock-font-title: 13pt;
+  --mock-font-sub: 10pt;
+}
+#resume-mockup.size-11pt {
+  --mock-font-base: 11pt;
+  --mock-font-title: 14pt;
+  --mock-font-sub: 11pt;
+}
+#resume-mockup.size-12pt {
+  --mock-font-base: 12pt;
+  --mock-font-title: 15.5pt;
+  --mock-font-sub: 12pt;
+}
+
+/* Margins */
+#resume-mockup.margin-compact .preview-page {
+  padding: 24pt;
+}
+#resume-mockup.margin-normal .preview-page {
+  padding: 32pt;
+}
+#resume-mockup.margin-spacious .preview-page {
+  padding: 40pt;
+}
+
+#resume-mockup.margin-compact .mock-page-border {
+  top: 16pt; left: 16pt; right: 16pt; bottom: 16pt;
+}
+#resume-mockup.margin-normal .mock-page-border {
+  top: 24pt; left: 24pt; right: 24pt; bottom: 24pt;
+}
+#resume-mockup.margin-spacious .mock-page-border {
+  top: 32pt; left: 32pt; right: 32pt; bottom: 32pt;
+}
+
+/* Template Layout Variations */
+/* Classic Template: Centered, Traditional */
+.template-classic .mock-header {
+  text-align: center;
+}
+.template-classic .mock-name {
+  font-size: var(--mock-font-title);
   font-weight: bold;
   color: #000000;
   letter-spacing: -0.1px;
@@ -691,34 +828,22 @@ header {
   margin-top: 4pt;
   text-align: center;
 }
-
-.mock-subtitle {
-  font-size: 11pt;
+.template-classic .mock-subtitle {
+  font-size: var(--mock-font-sub);
   font-weight: bold;
   color: #000000;
   text-align: center;
   margin-bottom: 6pt;
 }
-
-.mock-contact {
-  font-size: 11pt;
+.template-classic .mock-contact {
+  font-size: var(--mock-font-sub);
   color: #000000;
   text-align: center;
   margin-bottom: 12pt;
   line-height: 1.25;
 }
-
-.mock-contact a {
-  color: var(--primary-accent);
-  text-decoration: none;
-}
-
-.mock-contact a:hover {
-  text-decoration: underline;
-}
-
-.mock-section-head {
-  font-size: 11pt;
+.template-classic .mock-section-head {
+  font-size: var(--mock-font-sub);
   font-weight: bold;
   text-transform: uppercase;
   color: #000000;
@@ -727,9 +852,115 @@ header {
   border-bottom: 0.5pt solid #000000;
   padding-bottom: 2pt;
 }
+.template-classic .mock-page-border {
+  display: block;
+}
+
+/* Modern Template: Left-aligned, Accent styling */
+.template-modern .mock-header {
+  text-align: left;
+  border-bottom: 2px solid hsl(220, 20%, 80%);
+  padding-bottom: 8pt;
+  margin-bottom: 12pt;
+}
+.template-modern .mock-name {
+  font-size: calc(var(--mock-font-title) * 1.2);
+  font-weight: 800;
+  color: hsl(220, 45%, 15%);
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 3pt;
+  margin-top: 2pt;
+}
+.template-modern .mock-subtitle {
+  font-size: var(--mock-font-sub);
+  font-weight: 600;
+  color: hsl(220, 45%, 35%);
+  text-align: left;
+  margin-bottom: 4pt;
+}
+.template-modern .mock-contact {
+  font-size: calc(var(--mock-font-sub) * 0.9);
+  color: hsl(220, 15%, 30%);
+  text-align: left;
+  margin-bottom: 0;
+  line-height: 1.35;
+}
+.template-modern .mock-section-head {
+  font-size: calc(var(--mock-font-sub) * 0.95);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: hsl(220, 50%, 30%);
+  background: hsl(220, 20%, 95%);
+  padding: 4pt 6pt;
+  margin: 16pt 0 6pt 0;
+  text-align: left;
+  border: none;
+  border-radius: 4px;
+}
+.template-modern .mock-page-border {
+  display: none;
+}
+
+/* Minimalist Template: Elegant typography, ample breathing room */
+.template-minimalist .mock-header {
+  text-align: left;
+  margin-bottom: 16pt;
+}
+.template-minimalist .mock-name {
+  font-size: calc(var(--mock-font-title) * 1.15);
+  font-weight: 400;
+  color: hsl(0, 0%, 10%);
+  text-align: left;
+  letter-spacing: 0.5px;
+  margin-bottom: 2pt;
+  margin-top: 2pt;
+}
+.template-minimalist .mock-subtitle {
+  font-size: var(--mock-font-sub);
+  font-weight: 400;
+  color: hsl(0, 0%, 40%);
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 8pt;
+}
+.template-minimalist .mock-contact {
+  font-size: calc(var(--mock-font-sub) * 0.88);
+  color: hsl(0, 0%, 40%);
+  text-align: left;
+  border-top: 1px solid hsl(0, 0%, 90%);
+  padding-top: 6pt;
+  margin-top: 4pt;
+  line-height: 1.35;
+}
+.template-minimalist .mock-section-head {
+  font-size: calc(var(--mock-font-sub) * 0.88);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: hsl(0, 0%, 25%);
+  margin: 16pt 0 6pt 0;
+  text-align: left;
+  border: none;
+  letter-spacing: 1.5px;
+  padding-bottom: 0;
+}
+.template-minimalist .mock-page-border {
+  display: none;
+}
+
+/* Common Mockup Classes (read variables) */
+.mock-contact a {
+  color: var(--primary-accent);
+  text-decoration: none;
+}
+.mock-contact a:hover {
+  text-decoration: underline;
+}
 
 .mock-text {
-  font-size: 11pt;
+  font-size: var(--mock-font-base);
   color: #000000;
   margin-left: 0;
   margin-bottom: 6pt;
@@ -743,7 +974,7 @@ header {
   align-items: baseline;
   position: relative;
   font-weight: bold;
-  font-size: 11pt;
+  font-size: var(--mock-font-base);
   color: #000000;
   margin-left: 0;
   margin-top: 10pt;
@@ -755,7 +986,7 @@ header {
 }
 
 .mock-exp-role {
-  font-size: 11pt;
+  font-size: var(--mock-font-base);
   color: #000000;
   font-weight: normal;
   margin-left: 0;
@@ -763,7 +994,7 @@ header {
 }
 
 .mock-bullet {
-  font-size: 11pt;
+  font-size: var(--mock-font-base);
   color: #000000;
   margin-left: 0 !important;
   margin-right: 0 !important;
@@ -790,7 +1021,7 @@ header {
   align-items: baseline;
   position: relative;
   font-weight: bold;
-  font-size: 11pt;
+  font-size: var(--mock-font-base);
   color: #000000;
   margin-left: 0;
   margin-top: 10pt;
@@ -802,7 +1033,7 @@ header {
 }
 
 .mock-edu-school {
-  font-size: 11pt;
+  font-size: var(--mock-font-base);
   color: #000000;
   font-weight: normal;
   margin-left: 0;
@@ -811,10 +1042,6 @@ header {
 
 .mock-page-border {
   position: absolute;
-  top: 24pt;
-  left: 24pt;
-  right: 24pt;
-  bottom: 24pt;
   border: 0.5pt solid #000000;
   pointer-events: none;
   z-index: 10;
@@ -1370,22 +1597,47 @@ header {
     overflow: visible !important;
     position: relative !important;
     box-sizing: border-box !important;
-    padding: 32pt !important;
   }
   
   .preview-page:last-child {
     page-break-after: avoid !important;
   }
 
+  /* Dynamic Margins for Printing */
+  #resume-mockup.margin-compact .preview-page {
+    padding: 24pt !important;
+  }
+  #resume-mockup.margin-normal .preview-page {
+    padding: 32pt !important;
+  }
+  #resume-mockup.margin-spacious .preview-page {
+    padding: 40pt !important;
+  }
+
+  /* Dynamic Borders for Printing */
   .mock-page-border {
     position: absolute !important;
-    top: 24pt !important;
-    left: 24pt !important;
-    right: 24pt !important;
-    bottom: 24pt !important;
     border: 0.5pt solid #000000 !important;
     pointer-events: none !important;
     z-index: 10 !important;
+  }
+
+  #resume-mockup.template-classic .mock-page-border {
+    display: block !important;
+  }
+  #resume-mockup.template-modern .mock-page-border,
+  #resume-mockup.template-minimalist .mock-page-border {
+    display: none !important;
+  }
+
+  #resume-mockup.margin-compact .mock-page-border {
+    top: 16pt !important; left: 16pt !important; right: 16pt !important; bottom: 16pt !important;
+  }
+  #resume-mockup.margin-normal .mock-page-border {
+    top: 24pt !important; left: 24pt !important; right: 24pt !important; bottom: 24pt !important;
+  }
+  #resume-mockup.margin-spacious .mock-page-border {
+    top: 32pt !important; left: 32pt !important; right: 32pt !important; bottom: 32pt !important;
   }
 
   @page {
