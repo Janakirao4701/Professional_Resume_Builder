@@ -1016,3 +1016,49 @@ if (document.fonts) {
     updatePreview();
   });
 }
+
+// ── MOBILE TAB SWITCHING ──
+function switchMobileTab(tab) {
+  const workspace = document.querySelector('.app-workspace');
+  const tabEdit = document.getElementById('tab-edit');
+  const tabPreview = document.getElementById('tab-preview');
+  
+  if (!workspace || !tabEdit || !tabPreview) return;
+  
+  if (tab === 'edit') {
+    workspace.classList.remove('view-preview');
+    workspace.classList.add('view-edit');
+    tabEdit.classList.add('active');
+    tabPreview.classList.remove('active');
+  } else if (tab === 'preview') {
+    workspace.classList.remove('view-edit');
+    workspace.classList.add('view-preview');
+    tabEdit.classList.remove('active');
+    tabPreview.classList.add('active');
+    
+    // Force scale adjustment when preview panel becomes visible
+    setTimeout(() => {
+      adjustPreviewScale();
+      updatePreview();
+    }, 50);
+  }
+}
+
+// ── MOBILE ACTIONS MENU DROPDOWN ──
+function toggleActionMenu() {
+  const menu = document.getElementById('action-buttons');
+  if (menu) {
+    menu.classList.toggle('active');
+  }
+}
+
+// Click outside action menu to close it automatically
+document.addEventListener('click', (event) => {
+  const menu = document.getElementById('action-buttons');
+  const toggleBtn = document.getElementById('menu-toggle-btn');
+  if (!menu || !toggleBtn) return;
+  
+  if (!menu.contains(event.target) && !toggleBtn.contains(event.target)) {
+    menu.classList.remove('active');
+  }
+});
