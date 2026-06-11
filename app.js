@@ -246,7 +246,18 @@ function deleteActiveProfile() {
 const PROFILE_PROXY = new Proxy({}, {
   get(target, prop) {
     const active = getActiveProfile();
-    return active ? active[prop] : undefined;
+    if (!active) return undefined;
+    
+    if (prop === 'education') return active.education || [];
+    if (prop === 'certs') return active.certs || [];
+    if (prop === 'linkedin') return active.linkedin || '';
+    if (prop === 'location') return active.location || '';
+    if (prop === 'phone') return active.phone || '';
+    if (prop === 'email') return active.email || '';
+    if (prop === 'name') return active.name || '';
+    if (prop === 'subtitle') return active.subtitle || '';
+    
+    return active[prop];
   }
 });
 
@@ -591,6 +602,12 @@ document.getElementById('resume-text').oninput = function() {
     this.value = sanitized;
     if (cursor !== null) this.setSelectionRange(cursor, cursor);
   }
+  
+  if (activeCandidate) {
+    DEFAULT_TEXTS[activeCandidate] = sanitized;
+    saveCustomProfiles();
+  }
+
   detectSectionsAndCompanies();
   updatePreview();
 };
@@ -836,12 +853,21 @@ function exportBackup() {
     alert("No active candidate profile to backup.");
     return;
   }
-  const customData = localStorage.getItem('custom_resume_profiles');
-  if (!customData || customData === '{}') {
-    alert("No custom candidate profiles exist to backup.");
+  
+  if (Object.keys(PROFILES).length === 0) {
+    alert("No candidate profiles exist to backup.");
     return;
   }
   
+  const custom = {};
+  Object.keys(PROFILES).forEach(key => {
+    custom[key] = {
+      profile: PROFILES[key],
+      text: DEFAULT_TEXTS[key]
+    };
+  });
+  
+  const customData = JSON.stringify(custom);
   const blob = new Blob([customData], { type: 'application/json' });
   saveAs(blob, active.name.replace(/\s+/g, '_') + '_backup.json');
 }
