@@ -1025,213 +1025,203 @@ header {
 /* ── RESPONSIVE STYLING (MODERN FRONTEND & UI-UX PRO-MAX RULES) ── */
 @media (max-width: 1023px) {
   header {
-    display: grid !important;
-    grid-template-areas: 
-      "brand actions"
-      "profile profile"
-      "tabs tabs" !important;
-    grid-template-columns: 1fr auto !important;
-    grid-template-rows: auto auto auto !important;
-    padding: 0 !important;
-    gap: 0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 12px 24px !important;
+    height: auto !important;
+    min-height: 70px !important;
+    gap: var(--space-4) !important;
   }
 
   .header-left {
-    display: contents;
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
   .logo-area {
-    grid-area: brand;
-    padding: 12px 16px;
     display: flex;
     align-items: center;
-  }
-
-  .action-menu-wrapper {
-    grid-area: actions;
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    position: relative;
-  }
-
-  #menu-toggle-btn {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    width: 44px; /* Accessible touch target */
-    height: 44px;
-    border-radius: 50%;
-    border: 1px solid var(--app-border);
-    background: var(--app-surface);
-    color: var(--app-ink);
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  #menu-toggle-btn:hover {
-    background: var(--app-bg);
-    border-color: var(--app-border-hover);
-  }
-
-  #menu-toggle-btn:active {
-    transform: scale(0.95);
-  }
-
-  /* Popover Action Buttons Dropdown Menu */
-  .action-buttons {
-    display: flex;
-    position: absolute;
-    top: calc(100% - 4px);
-    right: 16px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid var(--app-border);
-    border-radius: 16px;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
-    flex-direction: column;
-    padding: 10px;
-    gap: 8px;
-    min-width: 200px;
-    z-index: 250;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(-8px) scale(0.95);
-    transform-origin: top right;
-    pointer-events: none;
-    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease, visibility 0.25s ease;
-  }
-
-  .action-buttons.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
-  }
-
-  .action-buttons .btn-dl {
-    width: 100%;
-    height: 44px; /* Touch target minimum */
-    justify-content: space-between;
-    padding: 6px 12px 6px 18px;
-    border-radius: 10px;
-    font-size: 13px;
-    font-weight: 600;
-    margin: 0;
-    background: var(--app-surface);
-    color: var(--app-ink);
-    border: 1px solid var(--app-border);
-  }
-
-  .action-buttons .btn-dl span:not(.btn-icon-circle) {
-    display: inline !important;
-  }
-
-  .action-buttons .btn-dl .btn-icon-circle {
-    width: 28px;
-    height: 28px;
-    background: var(--app-bg);
-    color: var(--app-ink);
-  }
-
-  .action-buttons .btn-dl:hover {
-    background: var(--app-bg);
-    border-color: var(--app-border-hover);
-  }
-
-  /* Full-width Profile Controls Bar */
-  .profile-controls {
-    grid-area: profile;
-    display: flex !important;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 16px;
-    background: var(--app-bg);
-    border-top: 1px solid var(--app-border);
-    border-bottom: 1px solid var(--app-border);
     gap: 8px;
   }
 
-  .profile-controls .select-wrapper {
-    flex: 1;
-  }
-
-  .profile-controls #candidate-select {
-    width: 100%;
-    max-width: none;
-    height: 44px; /* Easy tap size */
-  }
-
-  .btn-icon-add, .btn-icon-edit, .btn-icon-delete {
-    height: 44px !important;
-    width: 44px !important;
-    min-width: 44px;
-    border-radius: 50%;
-    font-size: var(--font-lg) !important;
-  }
-
-  .btn-icon-add svg, .btn-icon-edit svg, .btn-icon-delete svg {
-    width: 16px !important;
-    height: 16px !important;
-  }
-
-  /* Tabs Switcher for Workspace Panels */
-  .mobile-tabs-container {
-    grid-area: tabs;
-    display: flex !important;
-    background: var(--app-surface);
-    padding: 8px 16px 12px 16px;
-    gap: 8px;
-    width: 100%;
-  }
-
-  .mobile-tab-btn {
-    flex: 1;
-    background: var(--app-bg);
-    border: 1px solid var(--app-border);
-    color: var(--app-ink-muted);
-    padding: 11px 16px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .mobile-tab-btn:active {
-    transform: scale(0.97);
-  }
-
-  .mobile-tab-btn.active {
-    background: var(--app-accent);
-    color: var(--app-surface);
-    border-color: var(--app-accent);
-    box-shadow: 0 4px 12px rgba(17, 17, 17, 0.12);
-  }
-
-  /* Stacking views based on active tab */
-  .app-workspace.view-edit #preview-panel {
+  /* Compact backup buttons on tablet */
+  #export-backup-btn span:not(.btn-icon-circle),
+  #import-backup-btn span:not(.btn-icon-circle) {
     display: none !important;
   }
-
-  .app-workspace.view-preview #editor-panel {
-    display: none !important;
-  }
-
-  .app-workspace {
-    padding: 12px !important;
+  
+  #export-backup-btn,
+  #import-backup-btn {
+    padding: 6px !important;
     gap: 0 !important;
   }
 
+  .action-buttons {
+    display: flex !important;
+    position: static !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    gap: 8px !important;
+    flex-direction: row !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    pointer-events: auto !important;
+  }
+
+  .action-buttons .btn-dl {
+    height: 38px !important;
+    border-radius: 9999px !important;
+    padding: 6px 12px 6px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .action-buttons .btn-dl .btn-icon-circle {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .profile-controls {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .profile-controls .select-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  #candidate-select {
+    padding: 6px 12px;
+    padding-right: 28px;
+    height: 38px;
+    font-size: 12.5px;
+    max-width: 160px;
+  }
+
+  .btn-icon-add, .btn-icon-edit, .btn-icon-delete {
+    height: 38px !important;
+    width: 38px !important;
+    font-size: 13px !important;
+  }
+
+  /* Revert workspace changes: ensure both panels are visible stacked */
+  .app-workspace {
+    padding: var(--space-4) !important;
+    gap: var(--space-6) !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
   .editor-outer-shell, .preview-outer-shell {
-    padding: 4px !important;
-    border-radius: 20px !important;
+    display: flex !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 8px !important;
+    border-radius: 24px !important;
   }
 
   .inner-core-card {
     border-radius: 16px !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .editor-pane, .preview-pane {
+    height: auto !important;
+    overflow-y: visible !important;
+  }
+
+  .editor-pane {
+    padding: 20px !important;
+  }
+
+  .textarea-wrap {
+    min-height: 400px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  header {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    padding: 10px 16px !important;
+    min-height: auto !important;
+    max-height: 100px !important;
+  }
+
+  .logo-area {
+    width: 100% !important;
+    justify-content: space-between !important;
+    gap: 6px !important;
+  }
+
+  .app-title {
+    font-size: 20px !important;
+  }
+
+  #candidate-select {
+    max-width: 130px !important;
+    height: 36px !important;
+    padding: 4px 10px !important;
+    padding-right: 24px !important;
+    font-size: 12px !important;
+  }
+
+  .btn-icon-add, .btn-icon-edit, .btn-icon-delete {
+    height: 36px !important;
+    width: 36px !important;
+    min-width: 36px !important;
+  }
+
+  .action-buttons {
+    width: 100% !important;
+    justify-content: center !important;
+    gap: 8px !important;
+  }
+
+  /* Make all actions icon-only on mobile */
+  .action-buttons .btn-dl span:not(.btn-icon-circle) {
+    display: none !important;
+  }
+
+  .action-buttons .btn-dl {
+    padding: 6px !important;
+    gap: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+  }
+
+  .action-buttons .btn-dl .btn-icon-circle {
+    width: 24px !important;
+    height: 24px !important;
+    margin: 0 !important;
+    background: transparent !important;
+    color: inherit !important;
+  }
+
+  .app-workspace {
+    padding: var(--space-2) !important;
+    gap: var(--space-3) !important;
+  }
+
+  .editor-outer-shell, .preview-outer-shell {
+    padding: 6px !important;
+    border-radius: 16px !important;
+  }
+
+  .inner-core-card {
+    border-radius: 12px !important;
   }
 
   .editor-pane {
@@ -1239,13 +1229,7 @@ header {
   }
 
   .textarea-wrap {
-    min-height: 420px !important;
-  }
-  
-  .modal-close {
-    width: 44px !important;
-    height: 44px !important;
-    font-size: 22px !important;
+    min-height: 360px !important;
   }
 }
 
@@ -1270,20 +1254,11 @@ header {
 
 @media (max-width: 480px) {
   .app-title {
-    font-size: 20px !important;
+    font-size: 18px !important;
   }
-
-  .mobile-tabs-container {
-    padding: 6px 12px 10px 12px !important;
-  }
-
-  .mobile-tab-btn {
-    padding: 9px 12px !important;
-    font-size: 12.5px !important;
-  }
-
-  .profile-controls {
-    padding: 8px 12px !important;
+  
+  #candidate-select {
+    max-width: 100px !important;
   }
 }
 
