@@ -294,35 +294,34 @@ function detectSections() {
 // ── SCALE PREVIEW TO FIT VIEWPORT ──
 function adjustPreviewScale() {
   const pane = document.querySelector('.preview-pane');
+  const wrap = document.querySelector('.preview-wrap');
   const mockup = document.getElementById('resume-mockup');
-  if (!pane || !mockup) return;
+  if (!pane || !wrap || !mockup) return;
   
   mockup.style.transform = 'none';
-  mockup.style.marginBottom = '0';
+  mockup.style.transformOrigin = 'top center';
+  wrap.style.width = 'auto';
+  wrap.style.height = 'auto';
   
-  const paneWidth = pane.clientWidth - 32;
+  const paneWidth = pane.clientWidth - 48; // Leave breathing room (24px padding on each side)
   const mockupWidth = mockup.offsetWidth;
   const mockupHeight = mockup.offsetHeight;
   
   if (paneWidth < mockupWidth) {
     const scale = paneWidth / mockupWidth;
     mockup.style.transform = `scale(${scale})`;
+    mockup.style.transformOrigin = 'top left';
+    
+    // Resize the layout wrapper container to match the scaled mockup size
+    wrap.style.width = `${mockupWidth * scale}px`;
+    wrap.style.height = `${mockupHeight * scale}px`;
+  } else {
+    mockup.style.transform = 'none';
     mockup.style.transformOrigin = 'top center';
-    const heightReduction = mockupHeight * (1 - scale);
-    mockup.style.marginBottom = `-${heightReduction}px`;
+    wrap.style.width = 'auto';
+    wrap.style.height = 'auto';
   }
 }
-window.addEventListener('resize', adjustPreviewScale);
-
-
-// ── SCALE PREVIEW TO FIT VIEWPORT ──
-
-window.addEventListener('resize', adjustPreviewScale);
-
-// ── PREVIEW BUILDER ──
-
-// ── SCALE PREVIEW TO FIT VIEWPORT ──
-
 window.addEventListener('resize', adjustPreviewScale);
 
 // ── PREVIEW BUILDER ──

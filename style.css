@@ -280,6 +280,7 @@ header {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-width: 0; /* Let grid/flex layout shrink these panels below content width */
 }
 
 .inner-core-card {
@@ -305,6 +306,7 @@ header {
   justify-content: center;
   align-items: flex-start;
   overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal scrollbars from the unscaled layout width */
 }
 
 /* ── INPUT ZONE ── */
