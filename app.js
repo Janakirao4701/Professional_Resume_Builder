@@ -3,6 +3,7 @@ let DEFAULT_TEXTS = {};
 
 let activeCandidate = null;
 let editingKey = null;
+let lastTriggerElement = null;
 
 function getActiveProfile() {
   return activeCandidate ? PROFILES[activeCandidate] : null;
@@ -128,6 +129,7 @@ function repopulateSelector() {
 
 // ── MODAL DIALOG HANDLERS ──
 function openProfileModal() {
+  lastTriggerElement = document.activeElement;
   editingKey = null;
   const modalTitle = document.getElementById('modal-title');
   const submitBtn = document.getElementById('modal-submit-btn');
@@ -136,6 +138,12 @@ function openProfileModal() {
   
   document.getElementById('profile-form').reset();
   document.getElementById('profile-modal').classList.add('active');
+  
+  // Auto-focus first input for screen-reader and keyboard convenience
+  setTimeout(() => {
+    const input = document.getElementById('prof-name');
+    if (input) input.focus();
+  }, 50);
 }
 
 function openEditProfileModal() {
@@ -144,6 +152,7 @@ function openEditProfileModal() {
     return;
   }
   
+  lastTriggerElement = document.activeElement;
   editingKey = activeCandidate;
   const modalTitle = document.getElementById('modal-title');
   const submitBtn = document.getElementById('modal-submit-btn');
@@ -174,11 +183,48 @@ function openEditProfileModal() {
   document.getElementById('prof-resume-text').value = DEFAULT_TEXTS[editingKey] || '';
   
   document.getElementById('profile-modal').classList.add('active');
+  
+  // Auto-focus first input for screen-reader and keyboard convenience
+  setTimeout(() => {
+    const input = document.getElementById('prof-name');
+    if (input) input.focus();
+  }, 50);
 }
 
 function closeProfileModal() {
   document.getElementById('profile-modal').classList.remove('active');
+  if (lastTriggerElement) {
+    lastTriggerElement.focus();
+    lastTriggerElement = null;
+  }
 }
+
+// Trap focus inside profile modal when it's open (WCAG AA Compliance)
+function trapModalFocus(event) {
+  if (event.key !== 'Tab') return;
+  const modal = document.getElementById('profile-modal');
+  if (!modal || !modal.classList.contains('active')) return;
+
+  const focusableSelectors = 'button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  const focusables = modal.querySelectorAll(focusableSelectors);
+  if (!focusables.length) return;
+
+  const first = focusables[0];
+  const last = focusables[focusables.length - 1];
+
+  if (event.shiftKey) {
+    if (document.activeElement === first) {
+      last.focus();
+      event.preventDefault();
+    }
+  } else {
+    if (document.activeElement === last) {
+      first.focus();
+      event.preventDefault();
+    }
+  }
+}
+document.addEventListener('keydown', trapModalFocus);
 
 function saveNewProfile() {
   const name = document.getElementById('prof-name').value.trim();

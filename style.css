@@ -222,23 +222,23 @@ header {
   background: rgba(255, 255, 255, 0.25);
 }
 
-.pdf-btn-style {
+.pdf-btn-style, .docx-btn-style {
   background: var(--app-surface);
   color: var(--app-ink);
   border: 1px solid var(--app-border);
 }
 
-.pdf-btn-style .btn-icon-circle {
+.pdf-btn-style .btn-icon-circle, .docx-btn-style .btn-icon-circle {
   background: var(--app-bg);
   color: var(--app-ink);
 }
 
-.pdf-btn-style:hover {
+.pdf-btn-style:hover, .docx-btn-style:hover {
   background: #FBFBFA;
   border-color: var(--app-border-hover);
 }
 
-.pdf-btn-style:hover .btn-icon-circle {
+.pdf-btn-style:hover .btn-icon-circle, .docx-btn-style:hover .btn-icon-circle {
   background: var(--outer-shell-bg);
 }
 
@@ -357,15 +357,18 @@ header {
   body {
     height: 100vh;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   
   .app-workspace {
-    height: calc(100vh - 66px); /* Header is ~66px, lock remaining viewport height */
+    flex: 1;
+    min-height: 0;
     overflow: hidden;
     padding: var(--space-6);
     gap: var(--space-6);
     display: grid !important;
-    grid-template-columns: 30% 70% !important; /* Left 30% Editor, Right 70% Preview */
+    grid-template-columns: minmax(380px, 30%) 1fr !important; /* Clamped left editor, fluid right preview */
   }
   
   .app-workspace .editor-outer-shell,
@@ -1024,6 +1027,11 @@ header {
   .btn-icon-add svg, .btn-icon-edit svg, .btn-icon-delete svg {
     width: 16px !important;
     height: 16px !important;
+  }
+  .modal-close {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 22px !important;
   }
 }
 
