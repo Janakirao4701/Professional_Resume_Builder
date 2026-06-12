@@ -25523,12 +25523,21 @@ document.getElementById('dl-btn').onclick = async () => {
     // Add linkedin
     if (P.linkedin) {
       if (contactChildren.length > 0) contactChildren.push(textSeparator());
-      const displayLinkedin = P.linkedin.replace(/-[a-zA-Z0-9]*\d+[a-zA-Z0-9]*$/, '');
+      let rawLinkedin = P.linkedin.trim();
+      let hrefLinkedin = rawLinkedin;
+      if (!/^https?:\/\//i.test(hrefLinkedin)) {
+        hrefLinkedin = 'https://' + hrefLinkedin;
+      }
+      let displayLinkedin = rawLinkedin.replace(/^https?:\/\//i, '');
+      displayLinkedin = displayLinkedin.replace(/^www\./i, '');
+      displayLinkedin = displayLinkedin.replace(/-[a-zA-Z0-9]+(?=\/?$)/, '');
+      displayLinkedin = displayLinkedin.replace(/\/+$/, '');
+      
       contactChildren.push(new ExternalHyperlink({
         children: [
           new TextRun({ text: displayLinkedin, font: 'Times New Roman', size: 22, color: '0000ff', underline: true })
         ],
-        link: `https://${P.linkedin}`
+        link: hrefLinkedin
       }));
     }
     
