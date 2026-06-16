@@ -25497,6 +25497,16 @@ document.getElementById('dl-btn').onclick = async () => {
       }));
     });
 
+    // Certifications Paragraphs
+    const certParagraphs = [];
+    const activeCerts = (P.certs || []).map(c => c.trim()).filter(Boolean);
+    if (activeCerts.length) {
+      certParagraphs.push(sectionHead('Certifications'));
+      activeCerts.forEach(c => {
+        certParagraphs.push(bullet(c));
+      });
+    }
+
     // Contact children
     const contactChildren = [];
     const textSeparator = () => new TextRun({ text: '  |  ', font: 'Times New Roman', size: 22, color: '000000' });
@@ -25576,7 +25586,8 @@ document.getElementById('dl-btn').onclick = async () => {
           ...skillsDocx(skills),
           sectionHead('Professional Experience'),
           ...expDocx(experience),
-          ...eduParagraphs
+          ...eduParagraphs,
+          ...certParagraphs
         ]
       }]
     });
