@@ -301,7 +301,7 @@ function saveNewProfile() {
   const edu2_location = document.getElementById('prof-edu2-location').value.trim();
   
   const certsVal = document.getElementById('prof-certs').value.trim();
-  const certs = certsVal ? certsVal.split(',').map(c => c.trim()) : [];
+  const certs = certsVal ? certsVal.split(',').map(c => c.trim()).filter(Boolean) : [];
   
   let resumeText = document.getElementById('prof-resume-text').value.trim();
   
@@ -557,9 +557,10 @@ function updatePreview() {
   });
 
   // 6. Certifications
-  if (PROFILE.certs && PROFILE.certs.length) {
+  const activeCerts = (PROFILE.certs || []).map(c => c.trim()).filter(Boolean);
+  if (activeCerts.length) {
     elements.push(createEl(`<div class="mock-section-head">CERTIFICATIONS:</div>`));
-    PROFILE.certs.forEach(c => {
+    activeCerts.forEach(c => {
       elements.push(createEl(`<div class="mock-bullet">${escHtml(c)}</div>`));
     });
   }
@@ -910,6 +911,16 @@ document.getElementById('dl-btn').onclick = async () => {
       }));
     });
 
+    // Certifications Paragraphs
+    const certParagraphs = [];
+    const activeCerts = (P.certs || []).map(c => c.trim()).filter(Boolean);
+    if (activeCerts.length) {
+      certParagraphs.push(sectionHead('Certifications'));
+      activeCerts.forEach(c => {
+        certParagraphs.push(bullet(c));
+      });
+    }
+
     // Contact children
     const displayLinkedin = P.linkedin.replace(/-[a-zA-Z0-9]*\d+[a-zA-Z0-9]*$/, '');
     const contactParagraph = new Paragraph({
@@ -962,7 +973,8 @@ document.getElementById('dl-btn').onclick = async () => {
           ...skillsDocx(skills),
           sectionHead('Professional Experience'),
           ...expDocx(experience),
-          ...eduParagraphs
+          ...eduParagraphs,
+          ...certParagraphs
         ]
       }]
     });
@@ -1357,9 +1369,10 @@ document.addEventListener('DOMContentLoaded', function() {
           }));
         });
 
-        if (P.certs && P.certs.length) {
+        const activeCerts = (P.certs || []).map(c => c.trim()).filter(Boolean);
+        if (activeCerts.length) {
           sections.push(sectionHead('CERTIFICATIONS:'));
-          P.certs.forEach(c => sections.push(bullet(c)));
+          activeCerts.forEach(c => sections.push(bullet(c)));
         }
 
         const doc = new Document({
