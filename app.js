@@ -1,221 +1,354 @@
-let PROFILES = {};
-let DEFAULT_TEXTS = {};
+// ── MULTI-PROFILE STORAGE AND MANAGEMENT ──
+let profiles = {};
+let currentProfileId = 'default';
+let PROFILE = {};
 
-let activeCandidate = null;
-let editingKey = null;
-let lastTriggerElement = null;
-
-function getActiveProfile() {
-  return activeCandidate ? PROFILES[activeCandidate] : null;
-}
-
-// ── CUSTOMIZER CONTROLS CONFIGURATION ──
-let activeSettings = {
-  template: 'template-classic',
-  font: 'font-serif',
-  size: 'size-11pt',
-  margin: 'margin-normal'
+const PROMPT_TEMPLATES = {
+  software_engineer: 'resume_prompts/software_engineer_prompt.md',
+  python_developer: 'resume_prompts/python_developer_prompt.md',
+  java_developer: 'resume_prompts/java_developer_prompt.md',
+  dotnet_developer: 'resume_prompts/dotnet_developer_prompt.md',
+  devops_engineer: 'resume_prompts/devops_engineer_prompt.md',
+  data_engineer: 'resume_prompts/data_engineer_prompt.md',
+  data_analyst: 'resume_prompts/data_analyst_prompt.md',
+  business_analyst: 'resume_prompts/business_analyst_prompt.md',
+  automation_engineer: 'resume_prompts/automation_engineer_prompt.md',
+  controls_engineer: 'resume_prompts/controls_engineer_prompt.md',
+  plc_controls_engineer: 'resume_prompts/plc_controls_engineer_prompt.md',
+  universal_resume: 'resume_prompts/universal_resume_prompt.md'
 };
 
-function loadActiveSettings() {
-  try {
-    const data = localStorage.getItem('custom_resume_settings');
-    if (data) {
-      const parsed = JSON.parse(data);
-      if (parsed) {
-        activeSettings = { ...activeSettings, ...parsed };
+// Hardcoded Default Profile as fallback
+const DEFAULT_PROFILE_DATA = {
+  profile: {
+    name:     'John Doe',
+    subtitle: 'Professional Title',
+    email:    'john.doe@email.com',
+    phone:    '+1 (123) 456-7890',
+    location: 'City, Country',
+    linkedin: 'linkedin.com/in/johndoe',
+    education: [
+      { degree: 'Degree Name', dates: 'Start – End Date', school: 'University/Institution Name', location: 'Location' }
+    ],
+    certs: []
+  },
+  text: `[PROFESSIONAL SUMMARY]
+A brief summary of your professional background, key expertise, and accomplishments.
+
+[TECHNICAL SKILLS]
+Core Competencies: Skill 1, Skill 2, Skill 3, Skill 4.
+Tools & Technologies: Tool A, Tool B, Tool C, Tool D.
+
+[PROFESSIONAL EXPERIENCE]
+Company Name | Location | Job Title | Dates
+- Developed and deployed key systems, improving efficiency by 20%
+- Collaborated with cross-functional teams to deliver high-quality projects`
+};
+
+function saveToStorage() {
+  localStorage.setItem('resume_builder_profiles', JSON.stringify(profiles));
+}
+
+function upgradeAllProfiles() {
+  Object.keys(profiles).forEach(id => {
+    const p = profiles[id];
+    if (!p.profile) p.profile = {};
+    if (!p.profile.education) p.profile.education = [];
+    if (!p.profile.certs) p.profile.certs = [];
+    
+    // Reconstruct tags text from drawer summary/skills if the text box doesn't have the tags yet
+    const rawText = p.text || '';
+    const hasSummaryTag = rawText.includes('[SUMMARY]') || rawText.includes('[PROFESSIONAL SUMMARY]');
+    const hasSkillsTag = rawText.includes('[SKILLS]') || rawText.includes('[TECHNICAL SKILLS]');
+    
+    if (!hasSummaryTag && !hasSkillsTag && (p.profile.summary || p.profile.skills)) {
+      let newText = "";
+      if (p.profile.summary) {
+        newText += `[PROFESSIONAL SUMMARY]\n${p.profile.summary.trim()}\n\n`;
       }
+      if (p.profile.skills) {
+        newText += `[TECHNICAL SKILLS]\n${p.profile.skills.trim()}\n\n`;
+      }
+      if (rawText) {
+        if (rawText.includes('[EXPERIENCE]') || rawText.includes('[PROFESSIONAL EXPERIENCE]')) {
+          newText += rawText.trim();
+        } else {
+          newText += `[PROFESSIONAL EXPERIENCE]\n${rawText.trim()}`;
+        }
+      }
+      p.text = newText;
+      delete p.profile.summary;
+      delete p.profile.skills;
     }
-  } catch (e) {
-    console.error("Failed to load settings", e);
-  }
+  });
 }
 
-function saveActiveSettings() {
-  try {
-    localStorage.setItem('custom_resume_settings', JSON.stringify(activeSettings));
-  } catch (e) {
-    console.error("Failed to save settings", e);
-  }
-}
-
-function applyStyleClasses() {
-  const mockup = document.getElementById('resume-mockup');
-  if (mockup) {
-    mockup.className = `${activeSettings.template} ${activeSettings.font} ${activeSettings.size} ${activeSettings.margin}`;
+function initProfiles() {
+  const stored = localStorage.getItem('resume_builder_profiles');
+  const storedId = localStorage.getItem('resume_builder_current_profile_id');
+  
+  if (stored) {
+    try {
+      profiles = JSON.parse(stored);
+    } catch(e) {
+      console.error("Failed to parse profiles from localStorage, using default.");
+      profiles = { default: DEFAULT_PROFILE_DATA };
+    }
+  } else {
+    profiles = { default: DEFAULT_PROFILE_DATA };
   }
   
-  const templateSelect = document.getElementById('template-select');
-  const fontSelect = document.getElementById('font-select');
-  const sizeSelect = document.getElementById('size-select');
-  const marginSelect = document.getElementById('margin-select');
+  // Migrate profiles to tagless format
+  upgradeAllProfiles();
   
-  if (templateSelect) templateSelect.value = activeSettings.template;
-  if (fontSelect) fontSelect.value = activeSettings.font;
-  if (sizeSelect) sizeSelect.value = activeSettings.size;
-  if (marginSelect) marginSelect.value = activeSettings.margin;
-}
-
-function updateStyleSetting(key, val) {
-  activeSettings[key] = val;
-  saveActiveSettings();
-  applyStyleClasses();
-  updatePreview();
-}
-
-window.updateStyleSetting = updateStyleSetting;
-
-// ── LOCAL STORAGE OPERATIONS ──
-function loadCustomProfiles() {
-  try {
-    const data = localStorage.getItem('custom_resume_profiles');
-    if (data) {
-      const parsed = JSON.parse(data);
-      Object.keys(parsed).forEach(key => {
-        PROFILES[key] = parsed[key].profile;
-        DEFAULT_TEXTS[key] = parsed[key].text;
-      });
-    }
-    
-    // Pre-populate a default candidate profile if empty to prevent a blank workspace on first load
-    if (Object.keys(PROFILES).length === 0) {
-      const defaultKey = 'custom_hardhik_rao_chidura';
-      PROFILES[defaultKey] = {
-        name: "Hardhik Rao Chidura",
-        subtitle: "PLC Controls & Automation | HMI/SCADA Engineer",
-        email: "hardhikraochidura@gmail.com",
-        phone: "+1 (845) 484-9588",
-        location: "Wyoming, USA",
-        linkedin: "linkedin.com/in/hardhik-rao-chidura",
-        education: [
-          { degree: "Master of Science in Computer Engineering", dates: "09/2022 - 05/2024", school: "University of Houston", location: "Houston, TX" },
-          { degree: "Bachelor of Technology", dates: "06/2018 - 05/2022", school: "SRK Institute of Technology", location: "Andhra Pradesh, India" }
-        ],
-        certs: ["AWS Certified Developer", "PMP"]
-      };
-      
-      DEFAULT_TEXTS[defaultKey] = `[PROFESSIONAL SUMMARY]\nControls Engineer with 4+ years of experience in PLC programming, HMI/SCADA development, commissioning, and industrial automation. Expertise in Allen-Bradley, Siemens, and Delta control systems, with hands-on experience in FactoryTalk View, Ignition Perspective, WinCC, OPC UA, and Modbus TCP/IP. Skilled in FAT/SAT, industrial networking, Python automation, and control system integration. Proven ability to improve system reliability, reduce downtime, and support manufacturing operations across automotive, defense, and industrial environments.\n\n[TECHNICAL SKILLS]\n- PLC & Industrial Controls: Allen-Bradley Logix 5000, CompactLogix, Studio 5000, Siemens S7-1200/1500, Siemens TIA Portal, Delta DVP Series, WPLSoft, Beckhoff TwinCAT, IEC 61131-3 (Ladder Logic, Structured Text, Function Block Diagram).\n- HMI & SCADA: FactoryTalk View, Siemens WinCC, AVEVA InTouch, Indusoft Web Studio, Ignition Vision, Ignition Perspective, Alarm Management, Historian Integration, Dashboard Development.\n- Vision & Inspection Systems: Cognex D905, Cognex ViDi Suite, Keyence Vision Systems, Keyence Barcode Scanners, OCR Validation, VIN Verification, Conveyor Inspection Systems.\n- Industrial Communication: OPC UA, Modbus TCP/IP, Ethernet/IP, TCP/IP, DeviceNet, Profibus, CAN Bus, PLC-HMI Integration, SCADA Networking.\n- Programming & Databases: Python, C#, SQL, OSIsoft PI System, Historian Integration, Data Logging, Automation Scripting, Operational Reporting.\n- Electrical Design & Commissioning: AutoCAD Electrical, Electrical Panel Testing, Wiring Diagrams, I/O Validation, FAT, SAT, CAT, System-Level Troubleshooting, Onsite Commissioning.\n- Compliance & Cybersecurity: SIL, IEC 61131-3, OSHA Standards, NERC CIP, 21 CFR Part 11, GAMP 5, ServiceNow Change Management.\n- Other: Material Handling Systems, Automotive Fixture Automation, Defense Systems Integration, Switchgear & Power Distribution Systems, Industrial Engineering Automation, Process Optimization, Industrial Networking.\n\n[PROFESSIONAL EXPERIENCE]\nBW Design Group, USA | 04/2025 - Present | HMI/SCADA Engineer | Wyoming, USA\n- Engineered FactoryTalk View and Ignition Perspective HMIs integrated with Allen-Bradley PLCs, improving production visibility and operator efficiency by 15%.\n- Configured Siemens TIA Portal, Beckhoff TwinCAT, and Studio 5000 PLC logic for robotic manufacturing and automated assembly systems.\n- Implemented Cognex D905 OCR validation for VIN inspection systems, improving traceability and reducing manual verification efforts.\n- Migrated legacy SCADA applications to AVEVA InTouch and Indusoft Web Studio, improving alarm management and system maintainability.\n- Optimized OPC UA, TCP/IP, and Modbus networks connecting PLCs and SCADA systems, improving communication reliability.\n- Established NERC-CIP compliant security controls and ServiceNow workflows, strengthening industrial cybersecurity compliance.\n- Developed Ignition Perspective dashboards with centralized alarms, increasing manufacturing system uptime by 17%.\n- Reduced barcode validation failures by 79% through Cognex vision optimization and PLC-based verification logic.\n- Accelerated FAT, SAT, and commissioning activities by 26% using standardized HMI templates and PLC modules.\n- Created reusable PLC function blocks and programming templates, reducing development effort by 30%.\n- Partnered with engineering and operations teams to resolve production issues, reducing downtime and improving overall equipment effectiveness (OEE).`;
-      
-      saveCustomProfiles();
-    }
-  } catch (e) {
-    console.error("Failed to load custom profiles", e);
-  }
-}
-
-function saveCustomProfiles() {
-  try {
-    const custom = {};
-    Object.keys(PROFILES).forEach(key => {
-      custom[key] = {
-        profile: PROFILES[key],
-        text: DEFAULT_TEXTS[key]
-      };
-    });
-    localStorage.setItem('custom_resume_profiles', JSON.stringify(custom));
-  } catch (e) {
-    console.error("Failed to save custom profiles", e);
-  }
-}
-
-// ── SWITCH CANDIDATE ──
-function switchCandidate(key) {
-  const deleteBtn = document.getElementById('delete-profile-btn');
-  const editBtn = document.getElementById('edit-profile-btn');
-  const textarea = document.getElementById('resume-text');
-
-  if (!key || !PROFILES[key]) {
-    activeCandidate = null;
-    if (document.getElementById('candidate-select')) {
-      document.getElementById('candidate-select').value = '';
-    }
-    if (textarea) textarea.value = '';
-    if (deleteBtn) deleteBtn.style.display = 'none';
-    if (editBtn) editBtn.style.display = 'none';
-    
-    detectSectionsAndCompanies();
-    updatePreview();
-    return;
+  if (storedId && profiles[storedId]) {
+    currentProfileId = storedId;
+  } else {
+    currentProfileId = Object.keys(profiles)[0] || 'default';
   }
   
-  activeCandidate = key;
-  document.getElementById('candidate-select').value = key;
-  document.getElementById('resume-text').value = (DEFAULT_TEXTS[key] || '').trim();
+  if (!profiles[currentProfileId]) {
+    currentProfileId = Object.keys(profiles)[0] || 'default';
+  }
   
-  if (deleteBtn) {
-    deleteBtn.style.display = 'flex';
-  }
-  if (editBtn) {
-    editBtn.style.display = 'flex';
-  }
-
+  PROFILE = profiles[currentProfileId].profile;
+  
+  // Set textarea content
+  document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
+  
+  updateProfileSelectDropdown();
+  renderFormFields();
   detectSectionsAndCompanies();
   updatePreview();
 }
 
-// ── REPOPULATE SELECT OPTIONS ──
-function repopulateSelector() {
-  const select = document.getElementById('candidate-select');
-  if (!select) return;
+function updateProfileSelectDropdown() {
+  const select = document.getElementById('profile-select');
+  const optionsHtml = Object.keys(profiles).map(id => {
+    return `<option value="${id}" ${id === currentProfileId ? 'selected' : ''}>${escHtml(id)}</option>`;
+  }).join('');
   
-  select.innerHTML = '';
-  const keys = Object.keys(PROFILES);
-  if (keys.length === 0) {
-    const option = document.createElement('option');
-    option.value = '';
-    option.textContent = 'No Profiles Available';
-    select.appendChild(option);
+  if (select) {
+    select.innerHTML = optionsHtml;
+  }
+  
+  const mobileSelect = document.getElementById('mobile-profile-select');
+  if (mobileSelect) {
+    mobileSelect.innerHTML = optionsHtml;
+  }
+}
+
+function switchProfile(profileId) {
+  // Save current textarea content to active profile
+  const textareaVal = document.getElementById('resume-text').value;
+  profiles[currentProfileId].text = textareaVal;
+  
+  // Switch
+  currentProfileId = profileId;
+  PROFILE = profiles[currentProfileId].profile;
+  localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
+  saveToStorage();
+  
+  // Sync select dropdowns
+  const select = document.getElementById('profile-select');
+  if (select) select.value = currentProfileId;
+  const mobileSelect = document.getElementById('mobile-profile-select');
+  if (mobileSelect) mobileSelect.value = currentProfileId;
+  
+  // Update UI
+  document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
+  renderFormFields();
+  detectSectionsAndCompanies();
+  updatePreview();
+}
+
+function createNewProfile() {
+  const name = prompt("Enter a label/identifier for the new profile (e.g. 'Software_Engineer'):");
+  if (!name) return;
+  const cleanLabel = name.trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '_');
+  if (!cleanLabel) { showToast("Invalid profile label. Use letters, numbers, underscores, or hyphens."); return; }
+  if (profiles[cleanLabel]) { showToast("A profile with that label already exists."); return; }
+  
+  profiles[cleanLabel] = {
+    profile: {
+      name: '',
+      subtitle: '',
+      email: '',
+      phone: '',
+      location: '',
+      linkedin: '',
+      education: [],
+      certs: []
+    },
+    text: `[PROFESSIONAL SUMMARY]\n\n\n[TECHNICAL SKILLS]\n\n\n[PROFESSIONAL EXPERIENCE]\n`
+  };
+  
+  currentProfileId = cleanLabel;
+  localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
+  PROFILE = profiles[currentProfileId].profile;
+  saveToStorage();
+  updateProfileSelectDropdown();
+  document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
+  renderFormFields();
+  detectSectionsAndCompanies();
+  updatePreview();
+  showToast("Created blank profile: " + cleanLabel);
+  
+  // Auto-expand drawer for the new profile
+  const drawer = document.getElementById('profile-drawer');
+  if (!drawer.classList.contains('active')) {
+    toggleDetailsForm();
+  }
+}
+
+function duplicateCurrentProfile() {
+  const name = prompt("Enter a label/identifier for the duplicated profile (e.g. 'Software_Engineer_Copy'):");
+  if (!name) return;
+  const cleanLabel = name.trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '_');
+  if (!cleanLabel) { showToast("Invalid profile label. Use letters, numbers, underscores, or hyphens."); return; }
+  if (profiles[cleanLabel]) { showToast("A profile with that label already exists."); return; }
+  
+  // Save current textarea content to active profile before duplicating
+  const textareaVal = document.getElementById('resume-text').value;
+  profiles[currentProfileId].text = textareaVal;
+  
+  // Clone active profile's details and text
+  profiles[cleanLabel] = JSON.parse(JSON.stringify(profiles[currentProfileId]));
+  
+  currentProfileId = cleanLabel;
+  localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
+  PROFILE = profiles[currentProfileId].profile;
+  saveToStorage();
+  updateProfileSelectDropdown();
+  document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
+  renderFormFields();
+  detectSectionsAndCompanies();
+  updatePreview();
+  showToast("Duplicated profile to: " + cleanLabel);
+}
+
+function renameCurrentProfile() {
+  const newLabel = prompt("Enter a new label for the active profile:", currentProfileId);
+  if (!newLabel) return;
+  const cleanLabel = newLabel.trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '_');
+  if (!cleanLabel) { showToast("Invalid profile label."); return; }
+  if (profiles[cleanLabel] && cleanLabel !== currentProfileId) {
+    showToast("A profile with that label already exists.");
     return;
   }
   
-  keys.forEach(key => {
-    const p = PROFILES[key];
-    const option = document.createElement('option');
-    option.value = key;
-    option.textContent = `${p.name} (${p.subtitle || 'Candidate'})`;
-    select.appendChild(option);
-  });
+  if (cleanLabel !== currentProfileId) {
+    const oldLabel = currentProfileId;
+    profiles[cleanLabel] = profiles[currentProfileId];
+    delete profiles[currentProfileId];
+    
+    currentProfileId = cleanLabel;
+    PROFILE = profiles[currentProfileId].profile;
+    localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
+    saveToStorage();
+    updateProfileSelectDropdown();
+    showToast(`Renamed profile from "${oldLabel}" to "${cleanLabel}"`);
+  }
+}
+
+function deleteCurrentProfile() {
+  const keys = Object.keys(profiles);
+  if (keys.length <= 1) {
+    showToast("You must keep at least one profile.");
+    return;
+  }
+  const targetId = currentProfileId;
+  if (confirm(`Are you sure you want to delete the profile "${targetId}"?`)) {
+    delete profiles[targetId];
+    currentProfileId = Object.keys(profiles)[0];
+    localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
+    PROFILE = profiles[currentProfileId].profile;
+    saveToStorage();
+    updateProfileSelectDropdown();
+    document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
+    renderFormFields();
+    detectSectionsAndCompanies();
+    updatePreview();
+    showToast(`Deleted profile "${targetId}"`);
+  }
+}
+
+function toggleDetailsForm() {
+  const drawer = document.getElementById('profile-drawer');
+  const overlay = document.getElementById('drawer-overlay');
+  const btn = document.getElementById('toggle-details-btn');
   
-  if (activeCandidate && PROFILES[activeCandidate]) {
-    select.value = activeCandidate;
+  if (!drawer.classList.contains('active')) {
+    drawer.classList.add('active');
+    overlay.classList.add('active');
+    btn.classList.add('active');
   } else {
-    select.value = '';
+    drawer.classList.remove('active');
+    overlay.classList.remove('active');
+    btn.classList.remove('active');
   }
 }
 
-// ── MODAL DIALOG HANDLERS ──
-function openProfileModal() {
-  lastTriggerElement = document.activeElement;
-  editingKey = null;
-  const modalTitle = document.getElementById('modal-title');
-  const submitBtn = document.getElementById('modal-submit-btn');
-  if (modalTitle) modalTitle.textContent = "Create New Candidate Profile";
-  if (submitBtn) submitBtn.textContent = "Save Profile";
-  
-  document.getElementById('profile-form').reset();
-  document.getElementById('profile-modal').classList.add('active');
-  
-  // Auto-focus first input for screen-reader and keyboard convenience
-  setTimeout(() => {
-    const input = document.getElementById('prof-name');
-    if (input) input.focus();
-  }, 50);
+function updateProfileField(field, value) {
+  profiles[currentProfileId].profile[field] = value;
+  saveToStorage();
+  updatePreview();
 }
 
-function openEditProfileModal() {
-  if (!activeCandidate || !PROFILES[activeCandidate]) {
-    alert("No active profile to edit.");
-    return;
+function updateEduField(index, field, value) {
+  if (!profiles[currentProfileId].profile.education[index]) return;
+  profiles[currentProfileId].profile.education[index][field] = value;
+  saveToStorage();
+  updatePreview();
+}
+
+function updateCertField(index, value) {
+  if (!profiles[currentProfileId].profile.certs) profiles[currentProfileId].profile.certs = [];
+  profiles[currentProfileId].profile.certs[index] = value;
+  saveToStorage();
+  updatePreview();
+}
+
+// Ensure profiles save text changes when user edits textarea
+function saveTextToActiveProfile() {
+  if (profiles[currentProfileId]) {
+    profiles[currentProfileId].text = document.getElementById('resume-text').value;
+    saveToStorage();
   }
-  
-  lastTriggerElement = document.activeElement;
-  editingKey = activeCandidate;
-  const modalTitle = document.getElementById('modal-title');
-  const submitBtn = document.getElementById('modal-submit-btn');
-  if (modalTitle) modalTitle.textContent = "Edit Candidate Profile";
-  if (submitBtn) submitBtn.textContent = "Update Profile";
-  
-  const p = PROFILES[editingKey];
+}
+
+function addEducationRow() {
+  if (!profiles[currentProfileId].profile.education) profiles[currentProfileId].profile.education = [];
+  profiles[currentProfileId].profile.education.push({ degree: '', school: '', dates: '', location: '' });
+  saveToStorage();
+  renderFormFields();
+  updatePreview();
+}
+
+function removeEducationRow(index) {
+  profiles[currentProfileId].profile.education.splice(index, 1);
+  saveToStorage();
+  renderFormFields();
+  updatePreview();
+}
+
+function addCertRow() {
+  if (!profiles[currentProfileId].profile.certs) profiles[currentProfileId].profile.certs = [];
+  profiles[currentProfileId].profile.certs.push('');
+  saveToStorage();
+  renderFormFields();
+  updatePreview();
+}
+
+function removeCertRow(index) {
+  profiles[currentProfileId].profile.certs.splice(index, 1);
+  saveToStorage();
+  renderFormFields();
+  updatePreview();
+}
+
+function renderFormFields() {
+  const p = profiles[currentProfileId].profile;
   document.getElementById('prof-name').value = p.name || '';
   document.getElementById('prof-subtitle').value = p.subtitle || '';
   document.getElementById('prof-email').value = p.email || '';
@@ -223,168 +356,131 @@ function openEditProfileModal() {
   document.getElementById('prof-location').value = p.location || '';
   document.getElementById('prof-linkedin').value = p.linkedin || '';
   
-  const edu1 = p.education && p.education[0] ? p.education[0] : {};
-  document.getElementById('prof-edu1-degree').value = edu1.degree || '';
-  document.getElementById('prof-edu1-dates').value = edu1.dates || '';
-  document.getElementById('prof-edu1-school').value = edu1.school || '';
-  document.getElementById('prof-edu1-location').value = edu1.location || '';
-  
-  const edu2 = p.education && p.education[1] ? p.education[1] : {};
-  document.getElementById('prof-edu2-degree').value = edu2.degree || '';
-  document.getElementById('prof-edu2-dates').value = edu2.dates || '';
-  document.getElementById('prof-edu2-school').value = edu2.school || '';
-  document.getElementById('prof-edu2-location').value = edu2.location || '';
-  
-  document.getElementById('prof-certs').value = (p.certs || []).join(', ');
-  document.getElementById('prof-resume-text').value = DEFAULT_TEXTS[editingKey] || '';
-  
-  document.getElementById('profile-modal').classList.add('active');
-  
-  // Auto-focus first input for screen-reader and keyboard convenience
-  setTimeout(() => {
-    const input = document.getElementById('prof-name');
-    if (input) input.focus();
-  }, 50);
+  // Render education
+  const eduContainer = document.getElementById('education-fields-container');
+  eduContainer.innerHTML = (p.education || []).map((e, index) => `
+    <div class="edu-item-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+        <span style="font-size:10px; color:var(--app-ink-muted); font-weight:700;">EDUCATION #${index+1}</span>
+        <button class="btn-remove" onclick="removeEducationRow(${index})">✕ Remove</button>
+      </div>
+      <div class="form-grid-mini">
+        <input type="text" placeholder="Degree / Program" value="${escHtml(e.degree || '')}" oninput="updateEduField(${index}, 'degree', this.value)">
+        <input type="text" placeholder="School / University" value="${escHtml(e.school || '')}" oninput="updateEduField(${index}, 'school', this.value)">
+        <input type="text" placeholder="Dates (e.g. 06/2021 – 05/2023)" value="${escHtml(e.dates || '')}" oninput="updateEduField(${index}, 'dates', this.value)">
+        <input type="text" placeholder="Location (e.g. Houston, TX)" value="${escHtml(e.location || '')}" oninput="updateEduField(${index}, 'location', this.value)">
+      </div>
+    </div>
+  `).join('');
+
+  // Render certs
+  const certsContainer = document.getElementById('certs-fields-container');
+  certsContainer.innerHTML = (p.certs || []).map((c, index) => `
+    <div class="cert-item-row" style="display:flex; gap:8px; margin-bottom:6px;">
+      <input type="text" placeholder="Certification Name" value="${escHtml(c || '')}" oninput="updateCertField(${index}, this.value)" style="flex:1; background:#0f172a; border:1px solid var(--app-border); border-radius:6px; padding:8px 10px; color:#fff; font-size:12px; outline:none;">
+      <button class="btn-remove-icon" onclick="removeCertRow(${index})">✕</button>
+    </div>
+  `).join('');
 }
 
-function closeProfileModal() {
-  document.getElementById('profile-modal').classList.remove('active');
-  if (lastTriggerElement) {
-    lastTriggerElement.focus();
-    lastTriggerElement = null;
-  }
+function triggerImport() {
+  document.getElementById('import-file-input').click();
 }
 
-// Trap focus inside profile modal when it's open (WCAG AA Compliance)
-function trapModalFocus(event) {
-  if (event.key !== 'Tab') return;
-  const modal = document.getElementById('profile-modal');
-  if (!modal || !modal.classList.contains('active')) return;
-
-  const focusableSelectors = 'button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
-  const focusables = modal.querySelectorAll(focusableSelectors);
-  if (!focusables.length) return;
-
-  const first = focusables[0];
-  const last = focusables[focusables.length - 1];
-
-  if (event.shiftKey) {
-    if (document.activeElement === first) {
-      last.focus();
-      event.preventDefault();
+function importProfiles(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const importedData = JSON.parse(e.target.result);
+      if (typeof importedData !== 'object' || importedData === null) {
+        throw new Error("Invalid file format. Must be a JSON object.");
+      }
+      
+      const keys = Object.keys(importedData);
+      if (keys.length === 0) {
+        throw new Error("No profiles found in the backup file.");
+      }
+      
+      let validCount = 0;
+      keys.forEach(k => {
+        const item = importedData[k];
+        if (item && typeof item === 'object' && item.profile && typeof item.profile === 'object') {
+          validCount++;
+        }
+      });
+      
+      if (validCount === 0) {
+        throw new Error("No valid profiles found. Each profile must have a 'profile' object.");
+      }
+      
+      if (confirm(`Found ${validCount} profiles in backup: ${keys.join(', ')}.\nDo you want to merge them into your current profiles? (Profiles with the same label will be overwritten)`)) {
+        keys.forEach(k => {
+          const item = importedData[k];
+          if (item && typeof item === 'object' && item.profile && typeof item.profile === 'object') {
+            profiles[k] = {
+              profile: {
+                name: item.profile.name || '',
+                subtitle: item.profile.subtitle || '',
+                email: item.profile.email || '',
+                phone: item.profile.phone || '',
+                location: item.profile.location || '',
+                linkedin: item.profile.linkedin || '',
+                summary: item.profile.summary || '',
+                skills: item.profile.skills || '',
+                education: Array.isArray(item.profile.education) ? item.profile.education.map(e => ({
+                  degree: e.degree || '',
+                  school: e.school || '',
+                  dates: e.dates || '',
+                  location: e.location || ''
+                })) : [],
+                certs: Array.isArray(item.profile.certs) ? item.profile.certs.map(c => String(c)) : []
+              },
+              text: item.text || ''
+            };
+          }
+        });
+        
+        upgradeAllProfiles();
+        
+        currentProfileId = keys[0];
+        localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
+        PROFILE = profiles[currentProfileId].profile;
+        
+        saveToStorage();
+        updateProfileSelectDropdown();
+        document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
+        renderFormFields();
+        detectSectionsAndCompanies();
+        updatePreview();
+        
+        showToast("Profiles successfully imported!");
+      }
+    } catch (err) {
+      showToast("Error importing profiles: " + err.message);
+    } finally {
+      event.target.value = '';
     }
-  } else {
-    if (document.activeElement === last) {
-      first.focus();
-      event.preventDefault();
-    }
-  }
+  };
+  reader.readAsText(file);
 }
-document.addEventListener('keydown', trapModalFocus);
 
-function saveNewProfile() {
-  const name = document.getElementById('prof-name').value.trim();
-  const subtitle = document.getElementById('prof-subtitle').value.trim();
-  const email = document.getElementById('prof-email').value.trim();
-  const phone = document.getElementById('prof-phone').value.trim();
-  const location = document.getElementById('prof-location').value.trim();
-  const linkedin = document.getElementById('prof-linkedin').value.trim();
+function exportProfiles() {
+  const textareaVal = document.getElementById('resume-text').value;
+  profiles[currentProfileId].text = textareaVal;
   
-  const edu1_degree = document.getElementById('prof-edu1-degree').value.trim();
-  const edu1_dates = document.getElementById('prof-edu1-dates').value.trim();
-  const edu1_school = document.getElementById('prof-edu1-school').value.trim();
-  const edu1_location = document.getElementById('prof-edu1-location').value.trim();
-  
-  const edu2_degree = document.getElementById('prof-edu2-degree').value.trim();
-  const edu2_dates = document.getElementById('prof-edu2-dates').value.trim();
-  const edu2_school = document.getElementById('prof-edu2-school').value.trim();
-  const edu2_location = document.getElementById('prof-edu2-location').value.trim();
-  
-  const certsVal = document.getElementById('prof-certs').value.trim();
-  const certs = certsVal ? certsVal.split(',').map(c => c.trim()).filter(Boolean) : [];
-  
-  let resumeText = document.getElementById('prof-resume-text').value.trim();
-  
-  if (!resumeText) {
-    // Generate a default boilerplate based on their name & subtitle
-    resumeText = `[PROFESSIONAL SUMMARY]\nExperienced ${subtitle} with a proven track record of delivering successful projects, improving system efficiency, and collaborating with cross-functional teams.\n\n[TECHNICAL SKILLS]\nPrimary Skills: Focus Area 1, Focus Area 2.\nTools & Technologies: Tool 1, Tool 2, Tool 3.\n\n[PROFESSIONAL EXPERIENCE]\nYour Company | Location | ${subtitle} | Dates\n- Accomplished key development milestone reducing latency.\n- Led systems design and verification loops.`;
-  }
-  
-  const education = [
-    { degree: edu1_degree, dates: edu1_dates, school: edu1_school, location: edu1_location }
-  ];
-  if (edu2_degree && edu2_school) {
-    education.push({ degree: edu2_degree, dates: edu2_dates, school: edu2_school, location: edu2_location });
-  }
-  
-  let keyToUse = editingKey;
-  if (!keyToUse) {
-    keyToUse = 'custom_' + name.toLowerCase().replace(/[^a-z0-9]/g, '_') + '_' + Date.now();
-  }
-  
-  PROFILES[keyToUse] = {
-    name,
-    subtitle,
-    email,
-    phone,
-    location,
-    linkedin,
-    education,
-    certs
+  // Package only the current active profile to export
+  const activeProfileData = {
+    [currentProfileId]: profiles[currentProfileId]
   };
   
-  DEFAULT_TEXTS[keyToUse] = resumeText;
-  
-  saveCustomProfiles();
-  repopulateSelector();
-  switchCandidate(keyToUse);
-  closeProfileModal();
+  const dataStr = JSON.stringify(activeProfileData, null, 2);
+  const blob = new Blob([dataStr], { type: 'application/json' });
+  saveAs(blob, `${currentProfileId}_backup.json`);
+  showToast(`Exported "${currentProfileId}" backup successfully!`);
 }
-
-function deleteActiveProfile() {
-  if (!activeCandidate || !PROFILES[activeCandidate]) {
-    alert("No active profile to delete.");
-    return;
-  }
-  
-  if (!confirm(`Are you sure you want to delete ${PROFILES[activeCandidate].name}'s profile?`)) {
-    return;
-  }
-  
-  const targetKey = activeCandidate;
-  delete PROFILES[targetKey];
-  delete DEFAULT_TEXTS[targetKey];
-  
-  saveCustomProfiles();
-  
-  const keys = Object.keys(PROFILES);
-  repopulateSelector();
-  if (keys.length > 0) {
-    switchCandidate(keys[0]);
-  } else {
-    switchCandidate(null);
-  }
-}
-
-// Active profile proxy (replaces static PROFILE references) with safe null-object fallbacks
-const PROFILE_PROXY = new Proxy({}, {
-  get(target, prop) {
-    const active = getActiveProfile();
-    
-    // Ensure arrays are returned for list properties even if profile is null or properties are missing
-    if (prop === 'education') return active ? (active.education || []) : [];
-    if (prop === 'certs') return active ? (active.certs || []) : [];
-    
-    // Return empty string fallback for any text property to prevent undefined property access crashes (e.g. replace() calls)
-    const val = active ? active[prop] : '';
-    return val || '';
-  }
-});
-
-const PROFILE = PROFILE_PROXY;
-
-// ── DEFAULT USER PROFILE ──
-
 
 // ── SECTION PARSER ──
 function parseContent(raw) {
@@ -395,59 +491,45 @@ function parseContent(raw) {
   return { summary: get(summaryRx), skills: get(skillsRx), experience: get(experienceRx) };
 }
 
-function detectSections() {
-  const raw = document.getElementById('resume-text').value;
-  const { summary, skills, experience } = parseContent(raw);
-  const chips = document.getElementById('chips');
-  const tags = [
-    { label: 'Summary', found: !!summary },
-    { label: 'Skills',  found: !!skills  },
-    { label: 'Experience', found: !!experience }
-  ];
-  chips.innerHTML = tags.map(t =>
-    `<span class="tag-pill ${t.found ? 'found' : 'missing'}">${t.found ? '✓' : '○'} ${t.label}</span>`
-  ).join('');
-}
 
 // ── PREVIEW BUILDER ──
 
 // ── SCALE PREVIEW TO FIT VIEWPORT ──
 function adjustPreviewScale() {
   const pane = document.querySelector('.preview-pane');
-  const wrap = document.querySelector('.preview-wrap');
   const mockup = document.getElementById('resume-mockup');
-  if (!pane || !wrap || !mockup || pane.clientWidth === 0) return;
+  if (!pane || !mockup) return;
+  
+  if (pane.clientWidth === 0) return;
   
   mockup.style.transform = 'none';
-  mockup.style.transformOrigin = 'top center';
-  mockup.style.margin = '0 auto';
-  wrap.style.width = 'auto';
-  wrap.style.height = 'auto';
+  mockup.style.marginBottom = '0';
   
-  const style = window.getComputedStyle(pane);
-  const paddingLeft = parseFloat(style.paddingLeft) || 0;
-  const paddingRight = parseFloat(style.paddingRight) || 0;
-  const paneWidth = pane.clientWidth - paddingLeft - paddingRight;
+  const paneWidth = pane.clientWidth - 32;
+  if (paneWidth <= 0) return;
+  
   const mockupWidth = mockup.offsetWidth;
   const mockupHeight = mockup.offsetHeight;
   
   if (paneWidth < mockupWidth) {
     const scale = paneWidth / mockupWidth;
     mockup.style.transform = `scale(${scale})`;
-    mockup.style.transformOrigin = 'top left';
-    mockup.style.margin = '0';
-    
-    // Resize the layout wrapper container to match the scaled mockup size
-    wrap.style.width = `${mockupWidth * scale}px`;
-    wrap.style.height = `${mockupHeight * scale}px`;
-  } else {
-    mockup.style.transform = 'none';
     mockup.style.transformOrigin = 'top center';
-    mockup.style.margin = '0 auto';
-    wrap.style.width = 'auto';
-    wrap.style.height = 'auto';
+    const heightReduction = mockupHeight * (1 - scale);
+    mockup.style.marginBottom = `-${heightReduction}px`;
   }
 }
+window.addEventListener('resize', adjustPreviewScale);
+
+
+// ── SCALE PREVIEW TO FIT VIEWPORT ──
+
+window.addEventListener('resize', adjustPreviewScale);
+
+// ── PREVIEW BUILDER ──
+
+// ── SCALE PREVIEW TO FIT VIEWPORT ──
+
 window.addEventListener('resize', adjustPreviewScale);
 
 // ── PREVIEW BUILDER ──
@@ -455,13 +537,10 @@ function updatePreview() {
   const raw = document.getElementById('resume-text').value.trim();
   const mockup = document.getElementById('resume-mockup');
 
-  if (!raw) {
-    mockup.innerHTML = `<div class="empty-state"><div class="icon">📋</div><p>Paste your resume content above to see a live preview here</p></div>`;
+  if (!raw && !PROFILE.name) {
+    mockup.innerHTML = `<div class="empty-state" style="display:flex; flex-direction:column; align-items:center; justify-content:center;"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--app-ink-muted); margin-bottom: 8px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0A2.25 2.25 0 0 1 13.5 4.75h-3a2.25 2.25 0 0 1-2.166-1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.346.102.637.318.806.622L18 7.5V19.5a2.25 2.25 0 0 1-2.25 2.25H8.25A2.25 2.25 0 0 1 6 19.5V7.5l1.112-2.012a1.125 1.125 0 0 1 .806-.622" /></svg><p>Paste your resume content above to see a live preview here</p></div>`;
     return;
   }
-
-  // Apply active customizer class bindings to the mockup
-  mockup.className = `${activeSettings.template} ${activeSettings.font} ${activeSettings.size} ${activeSettings.margin}`;
 
   const { summary, skills, experience } = parseContent(raw);
   
@@ -476,16 +555,30 @@ function updatePreview() {
   }
 
   // 1. Header (Name, Subtitle, Contact)
-  const displayLinkedin = PROFILE.linkedin.replace(/-[a-zA-Z0-9]*\d+[a-zA-Z0-9]*$/, '');
+  const contactParts = [];
+  if (PROFILE.location) contactParts.push(escHtml(PROFILE.location));
+  if (PROFILE.phone) contactParts.push(escHtml(PROFILE.phone));
+  if (PROFILE.email) contactParts.push(`<a href="mailto:${escHtml(PROFILE.email)}">${escHtml(PROFILE.email)}</a>`);
+  if (PROFILE.linkedin) {
+    let rawUrl = PROFILE.linkedin.trim();
+    let hrefUrl = rawUrl;
+    if (!/^https?:\/\//i.test(hrefUrl)) {
+      hrefUrl = 'https://' + hrefUrl;
+    }
+    let display = rawUrl.replace(/^https?:\/\//i, '');
+    display = display.replace(/^www\./i, '');
+    display = display.replace(/-[a-zA-Z0-9]+(?=\/?$)/, '');
+    display = display.replace(/\/+$/, '');
+    contactParts.push(`<a href="${escHtml(hrefUrl)}" target="_blank">${escHtml(display)}</a>`);
+  }
+  const contactHtml = contactParts.join(' &nbsp;|&nbsp; ');
+
   elements.push(createEl(`
-    <div class="mock-header">
-      <div class="mock-name">${escHtml(PROFILE.name)}</div>
-      <div class="mock-subtitle">${escHtml(PROFILE.subtitle)}</div>
+    <div style="text-align: center;">
+      <div class="mock-name">${escHtml(PROFILE.name || '')}</div>
+      <div class="mock-subtitle">${escHtml(PROFILE.subtitle || '')}</div>
       <div class="mock-contact">
-        ${escHtml(PROFILE.location)} &nbsp;|&nbsp; 
-        ${escHtml(PROFILE.phone)} &nbsp;|&nbsp; 
-        <a href="mailto:${PROFILE.email}">${escHtml(PROFILE.email)}</a> &nbsp;|&nbsp; 
-        <a href="https://${PROFILE.linkedin}" target="_blank">${escHtml(displayLinkedin)}</a>
+        ${contactHtml}
       </div>
     </div>
   `));
@@ -503,9 +596,9 @@ function updatePreview() {
       const cleanLine = line.trim().replace(/^[-•*]\s*/, '');
       const idx = cleanLine.indexOf(':');
       if (idx > -1) {
-        elements.push(createEl(`<div class="mock-bullet"><strong>${escHtml(cleanLine.substring(0, idx+1))}</strong>${escHtml(cleanLine.substring(idx+1))}</div>`));
+        elements.push(createEl(`<div class="mock-text" style="text-align: left; margin-bottom: 4pt;"><strong>${escHtml(cleanLine.substring(0, idx+1))}</strong>${escHtml(cleanLine.substring(idx+1))}</div>`));
       } else {
-        elements.push(createEl(`<div class="mock-bullet">${escHtml(cleanLine)}</div>`));
+        elements.push(createEl(`<div class="mock-text" style="text-align: left; margin-bottom: 4pt;">${escHtml(cleanLine)}</div>`));
       }
     });
   }
@@ -522,19 +615,24 @@ function updatePreview() {
         if (parts.length >= 4) {
           elements.push(createEl(`
             <div class="mock-exp-header">
-              <span>${escHtml(parts[0])}, ${escHtml(parts[1])}</span>
+              <span>${escHtml(parts[2])}</span>
               <span>${escHtml(parts[3])}</span>
             </div>
           `));
-          elements.push(createEl(`<div class="mock-exp-role">${escHtml(parts[2])}</div>`));
+          elements.push(createEl(`
+            <div class="mock-exp-header" style="font-weight: normal; margin-top: 0; margin-bottom: 4pt;">
+              <span style="font-weight: normal;">${escHtml(parts[0])}</span>
+              <span style="font-weight: normal;">${escHtml(parts[1])}</span>
+            </div>
+          `));
         } else if (parts.length === 3) {
           elements.push(createEl(`
             <div class="mock-exp-header">
-              <span>${escHtml(parts[0])}</span>
+              <span>${escHtml(parts[1])}</span>
               <span>${escHtml(parts[2])}</span>
             </div>
           `));
-          elements.push(createEl(`<div class="mock-exp-role">${escHtml(parts[1])}</div>`));
+          elements.push(createEl(`<div class="mock-exp-role">${escHtml(parts[0])}</div>`));
         } else {
           elements.push(createEl(`<div class="mock-exp-header"><span>${escHtml(t)}</span></div>`));
         }
@@ -557,10 +655,9 @@ function updatePreview() {
   });
 
   // 6. Certifications
-  const activeCerts = (PROFILE.certs || []).map(c => c.trim()).filter(Boolean);
-  if (activeCerts.length) {
+  if (PROFILE.certs && PROFILE.certs.length) {
     elements.push(createEl(`<div class="mock-section-head">CERTIFICATIONS:</div>`));
-    activeCerts.forEach(c => {
+    PROFILE.certs.forEach(c => {
       elements.push(createEl(`<div class="mock-bullet">${escHtml(c)}</div>`));
     });
   }
@@ -584,17 +681,11 @@ function updatePreview() {
   mockup.appendChild(currentPage);
   let pageContent = currentPage.querySelector('.page-content');
 
-  // Calculate available inner page height dynamically based on margins (padding)
-  const pageStyle = window.getComputedStyle(currentPage);
-  const paddingTop = parseFloat(pageStyle.paddingTop) || 42.66;
-  const paddingBottom = parseFloat(pageStyle.paddingBottom) || 42.66;
-  const maxInnerHeight = 1056 - paddingTop - paddingBottom;
-
   elements.forEach(el => {
     pageContent.appendChild(el);
-    // Page height is 11in = 1056px. available inner content height is maxInnerHeight.
+    // Page height is 11in = 1056px. available inner content height is ~970px.
     // Use children.length > 1 safeguard to prevent infinite page creation loops.
-    if (pageContent.offsetHeight > maxInnerHeight && pageContent.children.length > 1) {
+    if (pageContent.offsetHeight > 970 && pageContent.children.length > 1) {
       pageContent.removeChild(el);
       pageNum++;
       currentPage = createPageEl(pageNum);
@@ -604,6 +695,7 @@ function updatePreview() {
     }
   });
 
+  updateCombinedPromptPreview();
   setTimeout(adjustPreviewScale, 10);
 }
 
@@ -619,7 +711,7 @@ async function pasteFromClipboard() {
   try {
     let text = await navigator.clipboard.readText();
     if (!text || !text.trim()) {
-      alert('Clipboard is empty. Copy your resume text first.');
+      showToast('Clipboard is empty. Copy your resume text first.');
       return;
     }
     text = text.replace(/^(\d+\.)(?!\d)\s*/gm, '- ');
@@ -635,9 +727,15 @@ async function pasteFromClipboard() {
       btn.classList.remove('pasted');
     }, 2000);
   } catch (err) {
-    // Fallback: focus textarea so user can Ctrl+V
-    alert('Clipboard access denied. Please paste manually into the text area (Ctrl+V).');
-    document.getElementById('resume-text').focus();
+    // Fallback: focus textarea so user can Ctrl+V and flash drop-area
+    showToast('Clipboard access blocked. Please paste manually using Ctrl+V (or Cmd+V).');
+    const textarea = document.getElementById('resume-text');
+    const dropArea = document.querySelector('.drop-area');
+    if (textarea) textarea.focus();
+    if (dropArea) {
+      dropArea.classList.add('flash-focus');
+      setTimeout(() => dropArea.classList.remove('flash-focus'), 1600);
+    }
   }
 }
 
@@ -697,37 +795,89 @@ function copyCompanyExp(index) {
   const btn = document.getElementById(`company-btn-${index}`);
   btn.classList.add('copied');
   btn.querySelector('.copy-label').textContent = '✓ Copied!';
+  showToast(`Copied ${company.name} experience to clipboard`);
   setTimeout(() => {
     btn.classList.remove('copied');
     btn.querySelector('.copy-label').textContent = 'Click to copy';
   }, 2000);
 }
 
-document.getElementById('pdf-btn').onclick = () => {
-  if (!activeCandidate) {
-    alert('Please select or create a candidate profile first!');
+// -- DIRECT PDF DOWNLOAD VIA HTML2PDF --
+document.getElementById('pdf-btn').onclick = async () => {
+  const raw = document.getElementById('resume-text').value.trim();
+  if (!raw) {
+    showToast('Please enter some resume content before downloading.');
     return;
   }
-  const rawText = document.getElementById('resume-text').value.trim();
-  if (!rawText) {
-    alert('Please paste your resume content into the text box first!');
-    return;
-  }
+
+  const btn = document.getElementById('pdf-btn');
+  btn.disabled = true;
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = 'Generating…';
+  showToast('Generating PDF document…');
+
+  const element = document.getElementById('resume-mockup');
   
-  // A slight delay to ensure UI updates complete before printing
-  setTimeout(() => {
-    window.print();
-  }, 100);
+  // Save original styles
+  const originalTransform = element.style.transform;
+  const originalMarginBottom = element.style.marginBottom;
+  
+  // Temporarily reset transform to full scale for capture
+  element.style.transform = 'none';
+  element.style.marginBottom = '0';
+  
+  // Temporarily strip page shadows/margins for clean PDF splits
+  const pages = element.querySelectorAll('.preview-page');
+  const originalPageStyles = [];
+  pages.forEach(p => {
+    originalPageStyles.push({
+      boxShadow: p.style.boxShadow,
+      margin: p.style.margin,
+      border: p.style.border,
+      borderRadius: p.style.borderRadius
+    });
+    p.style.boxShadow = 'none';
+    p.style.margin = '0';
+    p.style.border = 'none';
+    p.style.borderRadius = '0';
+  });
+
+  const opt = {
+    margin:       0,
+    filename:     `${currentProfileId}_Resume.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2.5, useCORS: true, logging: false },
+    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+
+  try {
+    // Trigger download directly from the styled preview element
+    await html2pdf().set(opt).from(element).save();
+    showToast('PDF Resume downloaded successfully!');
+  } catch (err) {
+    console.error(err);
+    showToast('Error generating PDF: ' + err.message);
+  } finally {
+    // Restore original styles immediately
+    element.style.transform = originalTransform;
+    element.style.marginBottom = originalMarginBottom;
+    pages.forEach((p, i) => {
+      p.style.boxShadow = originalPageStyles[i].boxShadow;
+      p.style.margin = originalPageStyles[i].margin;
+      p.style.border = originalPageStyles[i].border;
+      p.style.borderRadius = originalPageStyles[i].borderRadius;
+    });
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
 };
 
-// Also parse companies// Also parse companies when user types/pastes manually in textarea
-const _origDetect = detectSections;
+// Also parse companies when user types/pastes manually in textarea
 function detectSectionsAndCompanies() {
-  _origDetect();
   const raw = document.getElementById('resume-text').value;
   parseCompanies(raw);
 }
-// Override oninput to also parse companies
+// Override oninput to also parse companies and save text to active profile
 document.getElementById('resume-text').oninput = function() {
   const original = this.value;
   const sanitized = original.replace(/^(\d+\.)(?!\d)\s*/gm, '- ');
@@ -736,19 +886,89 @@ document.getElementById('resume-text').oninput = function() {
     this.value = sanitized;
     if (cursor !== null) this.setSelectionRange(cursor, cursor);
   }
-  
-  if (activeCandidate) {
-    DEFAULT_TEXTS[activeCandidate] = sanitized;
-    saveCustomProfiles();
-  }
-
+  saveTextToActiveProfile();
   detectSectionsAndCompanies();
   updatePreview();
 };
 
+// ── TOAST NOTIFICATION SYSTEM ──
+function showToast(message) {
+  const container = document.getElementById('toast-container');
+  if (!container) return;
+  
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color:#3b82f6; flex-shrink: 0; display: inline-block; vertical-align: middle; margin-right: 6px;"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.5c1.153-.086 2.294-.213 3.423-.379 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg> <span>${escHtml(message)}</span>`;
+  
+  container.appendChild(toast);
+  
+  // Trigger animation
+  setTimeout(() => {
+    toast.classList.add('fade-out');
+    toast.addEventListener('animationend', () => {
+      toast.remove();
+    });
+  }, 2500);
+}
+
+
+// ── GLOBAL OFFLINE PASTE CAPTURE ──
+document.addEventListener('paste', (e) => {
+  const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+  if (!pastedText) return;
+
+  const textarea = document.getElementById('resume-text');
+  if (!textarea) return;
+
+  const activeEl = document.activeElement;
+  if (activeEl !== textarea && activeEl.tagName !== 'INPUT' && activeEl.tagName !== 'TEXTAREA') {
+    e.preventDefault();
+    const sanitized = pastedText.replace(/^(\d+\.)(?!\d)\s*/gm, '- ');
+    textarea.value = sanitized;
+    detectSectionsAndCompanies();
+    updatePreview();
+    showToast('Pasted resume content successfully!');
+  }
+});
+
+// ── DRAG AND DROP TEXT FILES ──
+window.addEventListener('DOMContentLoaded', () => {
+  const dropArea = document.querySelector('.drop-area');
+  if (dropArea) {
+    dropArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropArea.style.borderColor = 'var(--app-accent)';
+      dropArea.style.background = 'rgba(0, 112, 243, 0.02)';
+    });
+    
+    dropArea.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dropArea.style.borderColor = 'var(--app-border)';
+      dropArea.style.background = '#000';
+    });
+    
+    dropArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropArea.style.borderColor = 'var(--app-border)';
+      dropArea.style.background = '#000';
+      
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+          document.getElementById('resume-text').value = evt.target.result;
+          detectSectionsAndCompanies();
+          updatePreview();
+          showToast("Imported resume text file");
+        };
+        reader.readAsText(file);
+      }
+    });
+  }
+});
+
 // ── DOCX DOWNLOAD ──
 
-// ── NEXT SCRIPT BLOCK ──
 
 function saveAs(blob, filename) {
   const url = URL.createObjectURL(blob);
@@ -762,110 +982,114 @@ function saveAs(blob, filename) {
 
 function ensureLibs() { return Promise.resolve(); }
 
-// ── NEXT SCRIPT BLOCK ──
-
 document.getElementById('dl-btn').onclick = async () => {
-  if (!activeCandidate) {
-    alert('Please select or create a candidate profile first.');
+  const raw = document.getElementById('resume-text').value.trim();
+  if (!raw) {
+    showToast('Please enter some resume content before downloading.');
     return;
   }
-  const raw = document.getElementById('resume-text').value.trim();
-  if (!raw) { alert('Please paste your resume content first.'); return; }
 
   const { summary, skills, experience } = parseContent(raw);
+  const P = PROFILE;
+
   const btn = document.getElementById('dl-btn');
   btn.disabled = true;
-  btn.innerHTML = '⏳ Generating...';
+  btn.classList.add('loading');
+  showToast('Generating DOCX document…');
 
   try {
     const { Document, Packer, Paragraph, TextRun, ExternalHyperlink,
             AlignmentType, BorderStyle, LevelFormat, TabStopType } = docx;
 
-    const P = PROFILE;
-
     // Headings format (uppercase text, bold, size 22 / 11pt, margin-left: 360 / 18pt, border bottom)
     function sectionHead(text) {
       return new Paragraph({
         spacing: { before: 240, after: 80 },
-        
         border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000', space: 2 } },
         children: [new TextRun({ text: text.toUpperCase(), bold: true, size: 22, font: 'Times New Roman', color: '000000' })]
       });
     }
 
-    // Bullet items (size 22 / 11pt, regular, spacing before 30 after 30, indent left 720 hanging 360)
+    // Bullet items (size 22 / 11pt, regular, spacing before 30 after 30, indent left 240 hanging 240, custom tab stop at 240)
     function bullet(text) {
       return new Paragraph({
-        numbering: { reference: 'bullets', level: 0 },
         spacing: { before: 30, after: 30 },
-        indent: { right: 360 },
-        children: [new TextRun({ text, font: 'Times New Roman', size: 22, color: '000000' })]
+        indent: { left: 240, hanging: 240 },
+        tabStops: [{ type: TabStopType.LEFT, position: 240 }],
+        children: [
+          new TextRun({ text: "•\t", font: 'Times New Roman', size: 22, color: '000000' }),
+          new TextRun({ text, font: 'Times New Roman', size: 22, color: '000000' })
+        ]
       });
     }
 
-    // Skills logic
+    // Skills logic (supports multiple dash types)
     function skillsDocx(raw) {
       if (!raw) return [];
       return raw.split('\n').filter(l => l.trim()).map(line => {
-        const cleanLine = line.trim().replace(/^[-•*]\s*/, '');
+        const cleanLine = line.trim().replace(/^[-•*–—\u2013\u2014\u2022]\s*/, '');
         const idx = cleanLine.indexOf(':');
         if (idx > -1) {
           return new Paragraph({
-            numbering: { reference: 'bullets', level: 0 },
             spacing: { before: 30, after: 30 },
-            indent: { right: 360 },
             children: [
               new TextRun({ text: cleanLine.substring(0, idx+1), bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
               new TextRun({ text: cleanLine.substring(idx+1), font: 'Times New Roman', size: 22, color: '000000' })
             ]
           });
         }
-        return bullet(cleanLine);
+        return new Paragraph({
+          spacing: { before: 30, after: 30 },
+          children: [new TextRun({ text: cleanLine, font: 'Times New Roman', size: 22, color: '000000' })]
+        });
       });
     }
 
-    // Experience logic
+    // Experience logic (supports multiple dash types, right-aligns dates/locations)
     function expDocx(raw) {
       if (!raw) return [];
       return raw.split('\n').filter(l => l.trim()).map(line => {
         const t = line.trim();
-        if (/^[-•*]/.test(t)) return bullet(t.replace(/^[-•*]\s*/, ''));
+        if (/^[-•*–—\u2013\u2014\u2022]/.test(t)) return bullet(t.replace(/^[-•*–—\u2013\u2014\u2022]\s*/, ''));
         if (t.includes('|')) {
           const parts = t.split('|').map(p => p.trim());
           const rows = [];
           if (parts.length >= 4) {
-            // Company and Location with Dates (tabbed right)
+            // Role with Dates (tabbed right margin at 10800 dxa)
             rows.push(new Paragraph({
               spacing: { before: 180, after: 40 },
-              
-              tabStops: [{ type: TabStopType.LEFT, position: 8640 }],
+              tabStops: [{ type: TabStopType.RIGHT, position: 10800 }],
               children: [
-                new TextRun({ text: `${parts[0]}, ${parts[1]}`, bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
+                new TextRun({ text: parts[2], bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
                 new TextRun({ text: '\t' }),
                 new TextRun({ text: parts[3], bold: true, font: 'Times New Roman', size: 22, color: '000000' })
               ]
             }));
-            // Role
+            // Company with Location (tabbed right margin at 10800 dxa)
             rows.push(new Paragraph({
               spacing: { before: 0, after: 60 },
-              
-              children: [new TextRun({ text: parts[2], font: 'Times New Roman', size: 22, color: '000000' })]
+              tabStops: [{ type: TabStopType.RIGHT, position: 10800 }],
+              children: [
+                new TextRun({ text: parts[0], font: 'Times New Roman', size: 22, color: '000000' }),
+                new TextRun({ text: '\t' }),
+                new TextRun({ text: parts[1], font: 'Times New Roman', size: 22, color: '000000' })
+              ]
             }));
           } else if (parts.length === 3) {
+            // Role with Dates (tabbed right margin at 10800 dxa)
             rows.push(new Paragraph({
               spacing: { before: 180, after: 40 },
-              
-              tabStops: [{ type: TabStopType.LEFT, position: 8640 }],
+              tabStops: [{ type: TabStopType.RIGHT, position: 10800 }],
               children: [
-                new TextRun({ text: parts[0], bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
+                new TextRun({ text: parts[1], bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
                 new TextRun({ text: '\t' }),
                 new TextRun({ text: parts[2], bold: true, font: 'Times New Roman', size: 22, color: '000000' })
               ]
             }));
+            // Company
             rows.push(new Paragraph({
               spacing: { before: 0, after: 60 },
-              
-              children: [new TextRun({ text: parts[1], font: 'Times New Roman', size: 22, color: '000000' })]
+              children: [new TextRun({ text: parts[0], font: 'Times New Roman', size: 22, color: '000000' })]
             }));
           }
           return rows;
@@ -873,7 +1097,6 @@ document.getElementById('dl-btn').onclick = async () => {
         // Plain text lines
         return new Paragraph({
           spacing: { before: 60, after: 60 },
-          indent: { right: 360 },
           children: [new TextRun({ text: t, font: 'Times New Roman', size: 22, color: '000000' })]
         });
       }).flat();
@@ -886,18 +1109,16 @@ document.getElementById('dl-btn').onclick = async () => {
       summaryParagraphs.push(new Paragraph({
         alignment: AlignmentType.JUSTIFIED,
         spacing: { before: 0, after: 80 },
-        
         children: [new TextRun({ text: summary, font: 'Times New Roman', size: 22, color: '000000' })]
       }));
     }
 
-    // Education Paragraphs (flex rows formatted as tab stops)
+    // Education Paragraphs (flex rows formatted as right tab stops at 10800 dxa)
     const eduParagraphs = [sectionHead('Education')];
     P.education.forEach(e => {
       eduParagraphs.push(new Paragraph({
         spacing: { before: 180, after: 40 },
-        
-        tabStops: [{ type: TabStopType.LEFT, position: 8640 }],
+        tabStops: [{ type: TabStopType.RIGHT, position: 10800 }],
         children: [
           new TextRun({ text: e.degree, bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
           new TextRun({ text: '\t' }),
@@ -906,7 +1127,6 @@ document.getElementById('dl-btn').onclick = async () => {
       }));
       eduParagraphs.push(new Paragraph({
         spacing: { before: 0, after: 60 },
-        indent: { right: 360 },
         children: [new TextRun({ text: `${e.school}${e.location ? ', ' + e.location : ''}`, font: 'Times New Roman', size: 22, color: '000000' })]
       }));
     });
@@ -922,26 +1142,53 @@ document.getElementById('dl-btn').onclick = async () => {
     }
 
     // Contact children
-    const displayLinkedin = P.linkedin.replace(/-[a-zA-Z0-9]*\d+[a-zA-Z0-9]*$/, '');
+    const contactChildren = [];
+    const textSeparator = () => new TextRun({ text: '  |  ', font: 'Times New Roman', size: 22, color: '000000' });
+    
+    // Add location and phone
+    const contactParts = [];
+    if (P.location) contactParts.push(P.location);
+    if (P.phone) contactParts.push(P.phone);
+    if (contactParts.length > 0) {
+      contactChildren.push(new TextRun({ text: contactParts.join('  |  '), font: 'Times New Roman', size: 22, color: '000000' }));
+    }
+    
+    // Add email
+    if (P.email) {
+      if (contactChildren.length > 0) contactChildren.push(textSeparator());
+      contactChildren.push(new ExternalHyperlink({
+        children: [
+          new TextRun({ text: P.email, font: 'Times New Roman', size: 22, color: '0000ff', underline: true })
+        ],
+        link: `mailto:${P.email}`
+      }));
+    }
+    
+    // Add linkedin
+    if (P.linkedin) {
+      if (contactChildren.length > 0) contactChildren.push(textSeparator());
+      let rawLinkedin = P.linkedin.trim();
+      let hrefLinkedin = rawLinkedin;
+      if (!/^https?:\/\//i.test(hrefLinkedin)) {
+        hrefLinkedin = 'https://' + hrefLinkedin;
+      }
+      let displayLinkedin = rawLinkedin.replace(/^https?:\/\//i, '');
+      displayLinkedin = displayLinkedin.replace(/^www\./i, '');
+      displayLinkedin = displayLinkedin.replace(/-[a-zA-Z0-9]+(?=\/?$)/, '');
+      displayLinkedin = displayLinkedin.replace(/\/+$/, '');
+      
+      contactChildren.push(new ExternalHyperlink({
+        children: [
+          new TextRun({ text: displayLinkedin, font: 'Times New Roman', size: 22, color: '0000ff', underline: true })
+        ],
+        link: hrefLinkedin
+      }));
+    }
+    
     const contactParagraph = new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { before: 0, after: 200 },
-      children: [
-        new TextRun({ text: `${P.location}  |  ${P.phone}  |  `, font: 'Times New Roman', size: 22, color: '000000' }),
-        new ExternalHyperlink({
-          children: [
-            new TextRun({ text: P.email, font: 'Times New Roman', size: 22, color: '0000ff', underline: true })
-          ],
-          link: `mailto:${P.email}`
-        }),
-        new TextRun({ text: '  |  ', font: 'Times New Roman', size: 22, color: '000000' }),
-        new ExternalHyperlink({
-          children: [
-            new TextRun({ text: displayLinkedin, font: 'Times New Roman', size: 22, color: '0000ff', underline: true })
-          ],
-          link: `https://${P.linkedin}`
-        })
-      ]
+      children: contactChildren
     });
 
     const doc = new Document({
@@ -951,7 +1198,7 @@ document.getElementById('dl-btn').onclick = async () => {
         properties:{
           page:{
             size:{width:12240,height:15840},
-            margin:{top:640,right:640,bottom:640,left:640},
+            margin:{top:720,right:720,bottom:720,left:720},
             borders: {
               pageBorders: {
                 display: 'allPages',
@@ -980,472 +1227,221 @@ document.getElementById('dl-btn').onclick = async () => {
     });
 
     const blob = await Packer.toBlob(doc);
-    saveAs(blob, PROFILE.name.replace(/\s+/g, '_') + '_Resume.docx');
+    saveAs(blob, `${currentProfileId}_Resume.docx`);
+    showToast('DOCX Resume downloaded successfully!');
 
   } catch(err) {
     console.error(err);
-    alert('Error generating DOCX: ' + err.message);
+    showToast('Error generating DOCX: ' + err.message);
   }
 
   btn.disabled = false;
-  btn.innerHTML = '<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l4-4m-4 4l-4-4"/></svg> Download DOCX';
+  btn.classList.remove('loading');
 };
 
-// ── EXPORT / IMPORT BACKUPS ──
-function exportBackup() {
-  const active = getActiveProfile();
-  if (!active) {
-    alert("No active candidate profile to backup.");
-    return;
+// Mobile navigation and view switching logic
+function setMobileView(view) {
+  const body = document.body;
+  const navEdit = document.getElementById('mobile-nav-edit');
+  const navPreview = document.getElementById('mobile-nav-preview');
+  
+  if (view === 'preview') {
+    body.classList.add('show-preview');
+    if (navEdit) navEdit.classList.remove('active');
+    if (navPreview) navPreview.classList.add('active');
+    // Force preview rendering and pagination when visible
+    if (typeof updatePreview === 'function') {
+      updatePreview();
+    }
+    // Adjust scale for mobile preview
+    if (typeof adjustPreviewScale === 'function') {
+      setTimeout(adjustPreviewScale, 50);
+    }
+  } else {
+    body.classList.remove('show-preview');
+    if (navEdit) navEdit.classList.add('active');
+    if (navPreview) navPreview.classList.remove('active');
   }
-  
-  if (Object.keys(PROFILES).length === 0) {
-    alert("No candidate profiles exist to backup.");
-    return;
-  }
-  
-  const custom = {};
-  Object.keys(PROFILES).forEach(key => {
-    custom[key] = {
-      profile: PROFILES[key],
-      text: DEFAULT_TEXTS[key]
-    };
-  });
-  
-  const customData = JSON.stringify(custom);
-  const blob = new Blob([customData], { type: 'application/json' });
-  saveAs(blob, active.name.replace(/\s+/g, '_') + '_backup.json');
 }
 
-function importBackup(input) {
-  const file = input.files[0];
-  if (!file) return;
+function toggleMobileMenu(show) {
+  const overlay = document.getElementById('mobile-menu-overlay');
+  const drawer = document.getElementById('mobile-menu-drawer');
+  if (!overlay || !drawer) return;
+  if (show) {
+    overlay.classList.add('active');
+    drawer.classList.add('active');
+  } else {
+    overlay.classList.remove('active');
+    drawer.classList.remove('active');
+  }
+}
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const parsed = JSON.parse(e.target.result);
-      
-      if (typeof parsed !== 'object' || parsed === null) {
-        throw new Error("Invalid backup format");
-      }
-      
-      let importCount = 0;
-      Object.keys(parsed).forEach(key => {
-        if (parsed[key] && parsed[key].profile && parsed[key].text) {
-          PROFILES[key] = parsed[key].profile;
-          DEFAULT_TEXTS[key] = parsed[key].text;
-          importCount++;
-        }
-      });
+function triggerMobilePDF() {
+  toggleMobileMenu(false);
+  const pdfBtn = document.getElementById('pdf-btn');
+  if (pdfBtn) pdfBtn.click();
+}
 
-      if (importCount === 0) {
-        throw new Error("No valid candidate profiles found in the backup file");
-      }
+function triggerMobileDOCX() {
+  toggleMobileMenu(false);
+  const dlBtn = document.getElementById('dl-btn');
+  if (dlBtn) dlBtn.click();
+}
 
-      saveCustomProfiles();
-      repopulateSelector();
-      
-      const importedKeys = Object.keys(parsed).filter(k => parsed[k] && parsed[k].profile);
-      if (importedKeys.length > 0) {
-        switchCandidate(importedKeys[0]);
-      }
-      
-      alert(`Successfully imported ${importCount} candidate profile(s) from backup!`);
-    } catch(err) {
-      alert("Failed to import backup: " + err.message);
+function triggerMobileImport() {
+  toggleMobileMenu(false);
+  triggerImport();
+}
+
+function triggerMobileExport() {
+  toggleMobileMenu(false);
+  exportProfiles();
+}
+
+// ── AI TAILORING ASSISTANT LOGIC ──
+let currentPromptTemplateText = "";
+
+function toggleAIAssistant() {
+  const container = document.querySelector('.ai-assistant-container');
+  const btn = document.getElementById('ai-assistant-toggle');
+  if (container) {
+    container.classList.toggle('expanded');
+    const isExpanded = container.classList.contains('expanded');
+    if (btn) {
+      btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
     }
-    input.value = '';
-  };
-  reader.readAsText(file);
+    if (isExpanded) {
+      const select = document.getElementById('ai-role-select');
+      if (select && select.value) {
+        loadSelectedPrompt();
+      }
+    }
+  }
+}
+
+async function loadSelectedPrompt() {
+  const select = document.getElementById('ai-role-select');
+  const preview = document.getElementById('ai-prompt-preview');
+  if (!select || !preview) return;
+
+  const role = select.value;
+  if (!role) {
+    currentPromptTemplateText = "";
+    preview.value = "";
+    return;
+  }
+
+  const filePath = PROMPT_TEMPLATES[role];
+  if (!filePath) {
+    showToast("Invalid prompt template path.");
+    return;
+  }
+
+  try {
+    const response = await fetch(filePath);
+    if (!response.ok) {
+      throw new Error(`Failed to load prompt: ${response.statusText}`);
+    }
+    const templateText = await response.text();
+    currentPromptTemplateText = templateText;
+    updateCombinedPromptPreview();
+  } catch (err) {
+    console.error(err);
+    showToast("Error loading prompt template.");
+    preview.value = "Error loading template: " + err.message;
+  }
+}
+
+function updateCombinedPromptPreview() {
+  const preview = document.getElementById('ai-prompt-preview');
+  if (!preview) return;
+
+  if (!currentPromptTemplateText) {
+    preview.value = "Select a role above to generate the AI prompt…";
+    return;
+  }
+
+  preview.value = generateCombinedPrompt();
+}
+
+function generateCombinedPrompt() {
+  const p = PROFILE || {};
+  const currentResumeText = document.getElementById('resume-text').value.trim();
+
+  let metadata = `
+---
+
+### BASE RESUME TO REWRITE:
+
+**CANDIDATE INFORMATION:**
+Name: ${p.name || ''}
+Professional Title: ${p.subtitle || ''}
+Email: ${p.email || ''}
+Phone: ${p.phone || ''}
+Location: ${p.location || ''}
+LinkedIn: ${p.linkedin || ''}
+
+**EDUCATION:**
+`;
+
+  if (p.education && p.education.length > 0) {
+    p.education.forEach(e => {
+      metadata += `- ${e.degree || ''} | ${e.school || ''} | ${e.dates || ''} | ${e.location || ''}\n`;
+    });
+  } else {
+    metadata += `(None listed)\n`;
+  }
+
+  metadata += `\n**CERTIFICATIONS:**\n`;
+  if (p.certs && p.certs.length > 0) {
+    p.certs.forEach(c => {
+      if (c && c.trim()) {
+        metadata += `- ${c}\n`;
+      }
+    });
+  } else {
+    metadata += `(None listed)\n`;
+  }
+
+  metadata += `
+**PROFESSIONAL EXPERIENCE:**
+${currentResumeText || '(None listed)'}
+`;
+
+  return `${currentPromptTemplateText}\n${metadata}`;
+}
+
+async function copyAIPrompt() {
+  const preview = document.getElementById('ai-prompt-preview');
+  const btn = document.getElementById('btn-copy-prompt');
+  if (!preview || !btn || !currentPromptTemplateText) {
+    showToast("No prompt to copy. Select a role first.");
+    return;
+  }
+
+  const combinedPrompt = generateCombinedPrompt();
+
+  try {
+    await navigator.clipboard.writeText(combinedPrompt);
+    showToast("AI Prompt copied to clipboard!");
+    
+    btn.classList.add('copied');
+    const span = btn.querySelector('span');
+    const originalText = span.textContent;
+    span.textContent = "✓ Copied!";
+    
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      span.textContent = originalText;
+    }, 2000);
+  } catch (err) {
+    console.error(err);
+    showToast("Failed to copy prompt. Please copy manually from the preview.");
+  }
 }
 
 // Populate company copy buttons and preview on load
 window.addEventListener('DOMContentLoaded', () => {
-  loadActiveSettings();
-  loadCustomProfiles();
-  repopulateSelector();
-  applyStyleClasses();
-  
-  // Set up ResizeObserver to handle dynamic scaling cleanly and prevent race conditions on reload/resize
-  const pane = document.querySelector('.preview-pane');
-  if (pane) {
-    const resizeObserver = new ResizeObserver(() => {
-      adjustPreviewScale();
-    });
-    resizeObserver.observe(pane);
-  }
-  
-  const keys = Object.keys(PROFILES);
-  if (keys.length > 0) {
-    switchCandidate(keys[0]);
-  } else {
-    switchCandidate(null);
-  }
-});
-
-// Rerun preview builder on window load to ensure all stylesheets and layout dimensions have stabilized
-window.addEventListener('load', () => {
-  updatePreview();
-});
-
-// Also rerun when fonts are loaded to prevent layout shifts from fallback fonts
-if (document.fonts) {
-  document.fonts.ready.then(() => {
-    updatePreview();
-  });
-}
-
-// Redundant mobile tab and popover JS handlers removed. Pure CSS is used for responsive layout.
-
-
-// ── MOBILE MENU CONTROLS ──
-function toggleMobileMenu() {
-  const menuBtn = document.getElementById('mobile-menu-btn');
-  const menuPanel = document.getElementById('mobile-menu-panel');
-  const menuOverlay = document.getElementById('mobile-menu-overlay');
-  
-  const isActive = menuPanel.classList.contains('active');
-  
-  if (isActive) {
-    closeMobileMenu();
-  } else {
-    openMobileMenu();
-  }
-}
-
-function openMobileMenu() {
-  const menuBtn = document.getElementById('mobile-menu-btn');
-  const menuPanel = document.getElementById('mobile-menu-panel');
-  const menuOverlay = document.getElementById('mobile-menu-overlay');
-  
-  menuBtn.classList.add('active');
-  menuBtn.setAttribute('aria-expanded', 'true');
-  menuPanel.classList.add('active');
-  menuOverlay.classList.add('active');
-  
-  // Prevent body scroll when menu is open
-  document.body.style.overflow = 'hidden';
-}
-
-function closeMobileMenu() {
-  const menuBtn = document.getElementById('mobile-menu-btn');
-  const menuPanel = document.getElementById('mobile-menu-panel');
-  const menuOverlay = document.getElementById('mobile-menu-overlay');
-  
-  menuBtn.classList.remove('active');
-  menuBtn.setAttribute('aria-expanded', 'false');
-  menuPanel.classList.remove('active');
-  menuOverlay.classList.remove('active');
-  
-  // Restore body scroll
-  document.body.style.overflow = '';
-}
-
-// Initialize mobile menu event listeners
-document.addEventListener('DOMContentLoaded', function() {
-  const menuBtn = document.getElementById('mobile-menu-btn');
-  const menuOverlay = document.getElementById('mobile-menu-overlay');
-  const menuPdfBtn = document.getElementById('menu-pdf-btn');
-  const menuDlBtn = document.getElementById('menu-dl-btn');
-  
-  if (menuBtn) {
-    menuBtn.addEventListener('click', toggleMobileMenu);
-  }
-  
-  if (menuOverlay) {
-    menuOverlay.addEventListener('click', closeMobileMenu);
-  }
-  
-  // Connect menu PDF button to main PDF function
-  if (menuPdfBtn) {
-    menuPdfBtn.addEventListener('click', function() {
-      if (!activeCandidate) {
-        alert('Please select or create a candidate profile first!');
-        return;
-      }
-      const rawText = document.getElementById('resume-text').value.trim();
-      if (!rawText) {
-        alert('Please paste your resume content into the text box first!');
-        return;
-      }
-      setTimeout(() => {
-        window.print();
-      }, 100);
-    });
-  }
-  
-  // Connect menu DOCX button to main DOCX function
-  if (menuDlBtn) {
-    menuDlBtn.addEventListener('click', async function() {
-      if (!activeCandidate) {
-        alert('Please select or create a candidate profile first.');
-        return;
-      }
-      const raw = document.getElementById('resume-text').value.trim();
-      if (!raw) { 
-        alert('Please paste your resume content first.'); 
-        return; 
-      }
-
-      const { summary, skills, experience } = parseContent(raw);
-      const btn = document.getElementById('dl-btn');
-      const menuBtn = document.getElementById('menu-dl-btn');
-      
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '⏳ Generating...';
-      }
-      if (menuBtn) {
-        menuBtn.disabled = true;
-        const originalLabel = menuBtn.querySelector('.menu-item-label').textContent;
-        menuBtn.querySelector('.menu-item-label').textContent = 'Generating...';
-      }
-
-      try {
-        const { Document, Packer, Paragraph, TextRun, ExternalHyperlink,
-                AlignmentType, BorderStyle, LevelFormat, TabStopType } = docx;
-
-        const P = PROFILE;
-
-        function sectionHead(text) {
-          return new Paragraph({
-            spacing: { before: 240, after: 80 },
-            border: { bottom: { style: BorderStyle.SINGLE, size: 4, color: '000000', space: 2 } },
-            children: [new TextRun({ text: text.toUpperCase(), bold: true, size: 22, font: 'Times New Roman', color: '000000' })]
-          });
-        }
-
-        function bullet(text) {
-          return new Paragraph({
-            numbering: { reference: 'bullets', level: 0 },
-            spacing: { before: 30, after: 30 },
-            indent: { right: 360 },
-            children: [new TextRun({ text, font: 'Times New Roman', size: 22, color: '000000' })]
-          });
-        }
-
-        function skillsDocx(raw) {
-          if (!raw) return [];
-          return raw.split('\n').filter(l => l.trim()).map(line => {
-            const cleanLine = line.trim().replace(/^[-•*]\s*/, '');
-            const idx = cleanLine.indexOf(':');
-            if (idx > -1) {
-              return new Paragraph({
-                numbering: { reference: 'bullets', level: 0 },
-                spacing: { before: 30, after: 30 },
-                indent: { right: 360 },
-                children: [
-                  new TextRun({ text: cleanLine.substring(0, idx+1), bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
-                  new TextRun({ text: cleanLine.substring(idx+1), font: 'Times New Roman', size: 22, color: '000000' })
-                ]
-              });
-            } else {
-              return bullet(cleanLine);
-            }
-          });
-        }
-
-        function experienceDocx(raw) {
-          if (!raw) return [];
-          const lines = raw.split('\n').filter(l => l.trim());
-          const res = [];
-          lines.forEach(line => {
-            const t = line.trim();
-            if (/^[-•*]/.test(t)) {
-              res.push(bullet(t.replace(/^[-•*]\s*/, '')));
-            } else if (t.includes('|')) {
-              const parts = t.split('|').map(p => p.trim());
-              if (parts.length >= 4) {
-                res.push(new Paragraph({
-                  spacing: { before: 200, after: 40 },
-                  children: [
-                    new TextRun({ text: `${parts[0]}, ${parts[1]}`, bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
-                    new TextRun({ text: '\t', font: 'Times New Roman', size: 22 }),
-                    new TextRun({ text: parts[3], bold: true, font: 'Times New Roman', size: 22, color: '000000' })
-                  ],
-                  tabStops: [{ type: TabStopType.RIGHT, position: 9360 }]
-                }));
-                res.push(new Paragraph({
-                  spacing: { before: 40, after: 80 },
-                  children: [new TextRun({ text: parts[2], font: 'Times New Roman', size: 22, color: '000000' })]
-                }));
-              } else if (parts.length === 3) {
-                res.push(new Paragraph({
-                  spacing: { before: 200, after: 40 },
-                  children: [
-                    new TextRun({ text: parts[0], bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
-                    new TextRun({ text: '\t', font: 'Times New Roman', size: 22 }),
-                    new TextRun({ text: parts[2], bold: true, font: 'Times New Roman', size: 22, color: '000000' })
-                  ],
-                  tabStops: [{ type: TabStopType.RIGHT, position: 9360 }]
-                }));
-                res.push(new Paragraph({
-                  spacing: { before: 40, after: 80 },
-                  children: [new TextRun({ text: parts[1], font: 'Times New Roman', size: 22, color: '000000' })]
-                }));
-              } else {
-                res.push(new Paragraph({
-                  spacing: { before: 200, after: 40 },
-                  children: [new TextRun({ text: t, bold: true, font: 'Times New Roman', size: 22, color: '000000' })]
-                }));
-              }
-            } else {
-              res.push(new Paragraph({
-                spacing: { before: 60, after: 60 },
-                children: [new TextRun({ text: t, font: 'Times New Roman', size: 22, color: '000000' })]
-              }));
-            }
-          });
-          return res;
-        }
-
-        const displayLinkedin = P.linkedin.replace(/-[a-zA-Z0-9]*\d+[a-zA-Z0-9]*$/, '');
-        
-        const sections = [];
-
-        sections.push(new Paragraph({
-          alignment: AlignmentType.CENTER,
-          spacing: { before: 80, after: 80 },
-          children: [new TextRun({ text: P.name, bold: true, size: 28, font: 'Times New Roman', color: '000000' })]
-        }));
-
-        sections.push(new Paragraph({
-          alignment: AlignmentType.CENTER,
-          spacing: { after: 120 },
-          children: [new TextRun({ text: P.subtitle, bold: true, size: 22, font: 'Times New Roman', color: '000000' })]
-        }));
-
-        sections.push(new Paragraph({
-          alignment: AlignmentType.CENTER,
-          spacing: { after: 240 },
-          children: [
-            new TextRun({ text: `${P.location} | ${P.phone} | `, font: 'Times New Roman', size: 22, color: '000000' }),
-            new ExternalHyperlink({
-              link: `mailto:${P.email}`,
-              children: [new TextRun({ text: P.email, font: 'Times New Roman', size: 22, color: '0000FF', underline: {} })]
-            }),
-            new TextRun({ text: ' | ', font: 'Times New Roman', size: 22, color: '000000' }),
-            new ExternalHyperlink({
-              link: `https://${P.linkedin}`,
-              children: [new TextRun({ text: displayLinkedin, font: 'Times New Roman', size: 22, color: '0000FF', underline: {} })]
-            })
-          ]
-        }));
-
-        if (summary) {
-          sections.push(sectionHead('PROFESSIONAL SUMMARY:'));
-          sections.push(new Paragraph({
-            spacing: { before: 60, after: 120 },
-            alignment: AlignmentType.JUSTIFIED,
-            children: [new TextRun({ text: summary, font: 'Times New Roman', size: 22, color: '000000' })]
-          }));
-        }
-
-        if (skills) {
-          sections.push(sectionHead('TECHNICAL SKILLS:'));
-          sections.push(...skillsDocx(skills));
-        }
-
-        if (experience) {
-          sections.push(sectionHead('PROFESSIONAL EXPERIENCE:'));
-          sections.push(...experienceDocx(experience));
-        }
-
-        sections.push(sectionHead('EDUCATION:'));
-        P.education.forEach(e => {
-          sections.push(new Paragraph({
-            spacing: { before: 200, after: 40 },
-            children: [
-              new TextRun({ text: e.degree, bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
-              new TextRun({ text: '\t', font: 'Times New Roman', size: 22 }),
-              new TextRun({ text: e.dates, bold: true, font: 'Times New Roman', size: 22, color: '000000' })
-            ],
-            tabStops: [{ type: TabStopType.RIGHT, position: 9360 }]
-          }));
-          sections.push(new Paragraph({
-            spacing: { before: 40, after: 80 },
-            children: [new TextRun({ text: `${e.school}${e.location ? ', ' + e.location : ''}`, font: 'Times New Roman', size: 22, color: '000000' })]
-          }));
-        });
-
-        const activeCerts = (P.certs || []).map(c => c.trim()).filter(Boolean);
-        if (activeCerts.length) {
-          sections.push(sectionHead('CERTIFICATIONS:'));
-          activeCerts.forEach(c => sections.push(bullet(c)));
-        }
-
-        const doc = new Document({
-          numbering: {
-            config: [{
-              reference: 'bullets',
-              levels: [{
-                level: 0,
-                format: LevelFormat.BULLET,
-                text: '•',
-                alignment: AlignmentType.LEFT,
-                style: { paragraph: { indent: { left: 720, hanging: 360 } } }
-              }]
-            }]
-          },
-          sections: [{
-            properties: {
-              page: {
-                margin: { top: 576, right: 576, bottom: 576, left: 576 }
-              }
-            },
-            children: sections
-          }]
-        });
-
-        const blob = await Packer.toBlob(doc);
-        const filename = `${P.name.replace(/\s+/g, '_')}_Resume.docx`;
-        saveAs(blob, filename);
-
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = '<span>Download DOCX</span><span class="btn-icon-circle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></span>';
-        }
-        if (menuBtn) {
-          menuBtn.disabled = false;
-          menuBtn.querySelector('.menu-item-label').textContent = 'Download DOCX';
-        }
-      } catch (err) {
-        console.error('DOCX generation error:', err);
-        alert('Failed to generate DOCX. Please try again.');
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = '<span>Download DOCX</span><span class="btn-icon-circle"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></span>';
-        }
-        if (menuBtn) {
-          menuBtn.disabled = false;
-          menuBtn.querySelector('.menu-item-label').textContent = 'Download DOCX';
-        }
-      }
-    });
-  }
-  
-  // Update mobile menu profile button visibility based on active profile
-  function updateMobileMenuButtons() {
-    const menuEditBtn = document.getElementById('menu-edit-profile');
-    const menuDeleteBtn = document.getElementById('menu-delete-profile');
-    
-    if (activeCandidate && PROFILES[activeCandidate]) {
-      if (menuEditBtn) menuEditBtn.style.display = 'flex';
-      if (menuDeleteBtn) menuDeleteBtn.style.display = 'flex';
-    } else {
-      if (menuEditBtn) menuEditBtn.style.display = 'none';
-      if (menuDeleteBtn) menuDeleteBtn.style.display = 'none';
-    }
-  }
-  
-  // Override switchCandidate to also update mobile menu buttons
-  const originalSwitchCandidate = switchCandidate;
-  switchCandidate = function(key) {
-    originalSwitchCandidate(key);
-    updateMobileMenuButtons();
-  };
-  
-  // Initial update
-  updateMobileMenuButtons();
+  initProfiles();
 });
