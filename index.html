@@ -1,326 +1,444 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Professional Resume Builder</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='logoGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='24' height='24' rx='6' fill='url(%23logoGrad)'/%3E%3Cpath d='M7 5h6.5l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 7 19V5z' fill='%23ffffff'/%3E%3Cpath d='M13.5 5v4.5H18L13.5 5z' fill='%2393c5fd' opacity='0.85'/%3E%3Crect x='9' y='12' width='6' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3Crect x='9' y='14.5' width='6' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3Crect x='9' y='17' width='4' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Cambria&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Free Resume Builder | Create AI-Tailored & Recruiter-Ready Resumes</title>
+  <meta name="description" content="Build an interview-ready, recruiter-approved resume in minutes. Optimize your bullet points using our AI Tailoring Assistant, ATS checks, and clean document layouts.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='logoGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%231a91f0'/%3E%3Cstop offset='100%25' stop-color='%23016fd0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='24' height='24' rx='6' fill='url(%23logoGrad)'/%3E%3Cpath d='M7 5h6.5l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 7 19V5z' fill='%23ffffff'/%3E%3Cpath d='M13.5 5v4.5H18L13.5 5z' fill='%2393c5fd' opacity='0.85'/%3E%3Crect x='9' y='12' width='6' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3Crect x='9' y='14.5' width='6' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3Crect x='9' y='17' width='4' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="landing-page">
 
-<header>
-  <div class="logo">
-    <svg width="20" height="20" viewBox="0 0 24 24" style="flex-shrink: 0;">
-      <defs>
-        <linearGradient id="headerLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#3b82f6" />
-          <stop offset="100%" stop-color="#1d4ed8" />
-        </linearGradient>
-      </defs>
-      <rect width="24" height="24" rx="6" fill="url(#headerLogoGrad)" />
-      <path d="M7 5h6.5l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 7 19V5z" fill="#ffffff" />
-      <path d="M13.5 5v4.5H18L13.5 5z" fill="#93c5fd" opacity="0.85" />
-      <rect x="9" y="12" width="6" height="1.2" rx="0.6" fill="#1e3a8a" />
-      <rect x="9" y="14.5" width="6" height="1.2" rx="0.6" fill="#1e3a8a" />
-      <rect x="9" y="17" width="4" height="1.2" rx="0.6" fill="#1e3a8a" />
-    </svg>
-    <span>Resume Builder</span>
-  </div>
-  
-  <div class="header-profile-section">
-    <span class="hdr-label">Profile:</span>
-    <select id="profile-select" onchange="switchProfile(this.value)" aria-label="Active Profile">
-      <!-- Populated dynamically -->
-    </select>
-    <button class="btn-hdr-action btn-hdr-primary" onclick="toggleDetailsForm()" id="toggle-details-btn" title="Edit Profile Details" aria-label="Edit Profile Details">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Info
-    </button>
-    <button class="btn-hdr-action" onclick="createNewProfile()" title="Create Blank Profile" aria-label="Create Blank Profile">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg> New
-    </button>
-    <button class="btn-hdr-action" onclick="renameCurrentProfile()" title="Rename Current Profile" aria-label="Rename Current Profile">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg>
-    </button>
-    <button class="btn-hdr-action btn-hdr-danger" onclick="deleteCurrentProfile()" title="Delete Current Profile" aria-label="Delete Current Profile">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
-    </button>
-    <div class="hdr-divider"></div>
-    <button class="btn-hdr-action" onclick="triggerImport()" title="Import JSON Profiles" aria-label="Import JSON Profiles">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75Z" /></svg> Import
-    </button>
-    <button class="btn-hdr-action" onclick="exportProfiles()" title="Export JSON Backup" aria-label="Export JSON Backup">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6.75m0 0l-3-3m3 3l3-3m2.25 5.25v.75A2.25 2.25 0 0115 18H9a2.25 2.25 0 01-2.25-2.25v-.75" /></svg> Export
-    </button>
-    <input type="file" id="import-file-input" style="display: none;" accept=".json" onchange="importProfiles(event)">
-  </div>
-  
-  <div class="header-actions">
-    <button class="btn-dl" id="pdf-btn">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14m0 0l-4-4m4 4l-4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Download PDF
-    </button>
-    <button class="btn-dl" id="dl-btn">
-      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l4-4m-4 4l-4-4"/></svg>
-      Download DOCX
-    </button>
-  </div>
-
-  <!-- Mobile Hamburger Menu Button -->
-  <button class="mobile-menu-toggle" id="mobile-menu-btn" onclick="toggleMobileMenu(true)" title="Menu" aria-label="Open menu">
-    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-    </svg>
-  </button>
-</header>
-
-<!-- Mobile Drawer and Overlay -->
-<div class="mobile-menu-overlay" id="mobile-menu-overlay" onclick="toggleMobileMenu(false)"></div>
-<div class="mobile-menu-drawer" id="mobile-menu-drawer">
-  <div class="drawer-title-row">
-    <h3>Settings & Actions</h3>
-    <button class="drawer-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close menu">✕</button>
-  </div>
-  
-  <div class="drawer-card">
-    <div class="drawer-card-title">Profile Management</div>
-    <div class="drawer-select-wrapper">
-      <label for="mobile-profile-select">Active Profile</label>
-      <select id="mobile-profile-select" onchange="switchProfile(this.value)" aria-label="Active Profile Mobile">
-        <!-- Populated dynamically -->
-      </select>
-    </div>
+  <!-- Navigation Bar -->
+  <header class="landing-header">
+    <a href="index.html" class="logo" style="text-decoration: none;" id="logo-link">
+      <svg width="20" height="20" viewBox="0 0 24 24" style="flex-shrink: 0;" aria-hidden="true">
+        <defs>
+          <linearGradient id="landingLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#1a91f0" />
+            <stop offset="100%" stop-color="#016fd0" />
+          </linearGradient>
+        </defs>
+        <rect width="24" height="24" rx="6" fill="url(#landingLogoGrad)" />
+        <path d="M7 5h6.5l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 7 19V5z" fill="#ffffff" />
+        <path d="M13.5 5v4.5H18L13.5 5z" fill="#93c5fd" opacity="0.85" />
+        <rect x="9" y="12" width="6" height="1.2" rx="0.6" fill="#1e3a8a" />
+        <rect x="9" y="14.5" width="6" height="1.2" rx="0.6" fill="#1e3a8a" />
+        <rect x="9" y="17" width="4" height="1.2" rx="0.6" fill="#1e3a8a" />
+      </svg>
+      <span>Resume Builder</span>
+    </a>
     
-    <button class="drawer-action-btn" onclick="toggleDetailsForm(); toggleMobileMenu(false);">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>Edit Profile Info
-    </button>
-    <button class="drawer-action-btn" onclick="createNewProfile(); toggleMobileMenu(false);">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>New Profile
-    </button>
+    <nav class="nav-links" aria-label="Main Navigation">
+      <a href="#features">Features</a>
+      <a href="#how-it-works">How It Works</a>
+      <a href="#bento-tools">Bento Grid</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    
+    <div class="header-actions">
+      <a href="builder.html" class="btn-primary-cta" id="nav-cta-btn">Build My Resume</a>
+    </div>
 
-    <button class="drawer-action-btn btn-danger" onclick="deleteCurrentProfile(); toggleMobileMenu(false);">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>Delete Profile
+    <!-- Mobile Hamburger Menu Button -->
+    <button class="mobile-menu-toggle" id="landing-mobile-menu-btn" onclick="toggleLandingMenu(true)" title="Menu" aria-label="Open navigation menu">
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+      </svg>
     </button>
-  </div>
-  
-  <div class="drawer-card">
-    <div class="drawer-card-title">Export Options</div>
-    <button class="drawer-action-btn" onclick="triggerMobilePDF();">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px;"><path d="M12 5v14m0 0l-4-4m4 4l-4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      Download PDF
-    </button>
-    <button class="drawer-action-btn" onclick="triggerMobileDOCX();">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px;"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l4-4m-4 4l-4-4"/></svg>
-      Download DOCX
-    </button>
-  </div>
+  </header>
 
-  <div class="drawer-card">
-    <div class="drawer-card-title">Backup & Migration</div>
-    <button class="drawer-action-btn" onclick="triggerMobileImport();" style="background: var(--app-surface); border-color: var(--app-border); color: #fff;">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75Z" /></svg>Import JSON Profiles
-    </button>
-    <button class="drawer-action-btn" onclick="triggerMobileExport();" style="background: var(--app-surface); border-color: var(--app-border); color: #fff;">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6.75m0 0l-3-3m3 3l3-3m2.25 5.25v.75A2.25 2.25 0 0115 18H9a2.25 2.25 0 01-2.25-2.25v-.75" /></svg>Export JSON Backup
-    </button>
-  </div>
-</div>
-
-<!-- Mobile Floating Navigation Bar -->
-<div class="mobile-floating-nav" id="mobile-floating-nav">
-  <button class="mobile-nav-item active" id="mobile-nav-edit" onclick="setMobileView('edit')">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
-    </svg>
-    <span>Editor</span>
-  </button>
-  <button class="mobile-nav-item" id="mobile-nav-preview" onclick="setMobileView('preview')">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.43 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
-    <span>Preview</span>
-  </button>
-</div>
-
-<div class="app-workspace">
-  <div class="editor-pane">
-    <div class="input-zone">
-      <div class="zone-label">Paste Professional Experience</div>
-      <div class="zone-sub">
-        Enter your work history (companies, roles, dates, and bullet points) below. Summary, skills, and contact details can be edited in the <strong style="display:inline-flex; align-items:center; gap:3px;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Info</strong> drawer.
+  <!-- Mobile Drawer and Overlay -->
+  <div class="mobile-menu-overlay" id="landing-menu-overlay" onclick="toggleLandingMenu(false)"></div>
+  <div class="mobile-menu-drawer" id="landing-menu-drawer">
+    <div class="drawer-title-row">
+      <h3>Navigation</h3>
+      <button class="drawer-close-btn" onclick="toggleLandingMenu(false)" aria-label="Close navigation menu">✕</button>
+    </div>
+    <div class="drawer-card">
+      <nav class="mobile-nav-stack" aria-label="Mobile Navigation">
+        <a href="#features" onclick="toggleLandingMenu(false)">Features</a>
+        <a href="#how-it-works" onclick="toggleLandingMenu(false)">How It Works</a>
+        <a href="#bento-tools" onclick="toggleLandingMenu(false)">Bento Grid</a>
+        <a href="#faq" onclick="toggleLandingMenu(false)">FAQ</a>
+      </nav>
+      <div style="margin-top: 24px;">
+        <a href="builder.html" class="btn-primary-cta" style="display: block; text-align: center; width: 100%; text-decoration: none;">Build My Resume</a>
       </div>
+    </div>
+  </div>
 
-      <!-- ✨ AI Tailoring Assistant Accordion Panel -->
-      <div class="ai-assistant-container">
-        <button class="ai-assistant-header" id="ai-assistant-toggle" onclick="toggleAIAssistant()" aria-expanded="false" aria-controls="ai-assistant-content">
-          <span class="header-title">✨ AI Tailoring Assistant</span>
-          <svg class="chevron-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-          </svg>
-        </button>
+  <main>
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="landing-container grid-2-col">
+        <div class="hero-text-col">
+          <h1>Create <span class="highlight-blue">an interview-ready resume</span> in minutes.</h1>
+          <p class="hero-subtext">Write a professional resume with recruiter-approved formatting and AI-tailored suggestions. Optimize your experiences to match job requirements and bypass automated ATS screeners.</p>
+          
+          <div class="hero-actions-row">
+            <a href="builder.html" class="btn-primary-cta" id="hero-cta-btn">Build My Resume</a>
+            <a href="builder.html" class="btn-ghost-cta" id="hero-ghost-btn">Upload existing resume</a>
+          </div>
+
+          <!-- Trustpilot Rating Row -->
+          <div class="trustpilot-rating">
+            <div class="stars" aria-label="5 stars rating">
+              <span class="star-filled">★</span>
+              <span class="star-filled">★</span>
+              <span class="star-filled">★</span>
+              <span class="star-filled">★</span>
+              <span class="star-filled">★</span>
+            </div>
+            <span class="rating-text"><strong>Trustpilot</strong> score <strong>4.4 out of 5</strong> | 37,389 reviews</span>
+          </div>
+        </div>
+
+        <div class="hero-visual-col">
+          <!-- Tilted Resume Preview Card -->
+          <div class="tilted-preview-container">
+            <div class="resume-preview-card">
+              <div class="resume-card-header">
+                <div class="card-circle-red"></div>
+                <div class="card-circle-yellow"></div>
+                <div class="card-circle-green"></div>
+              </div>
+              <div class="resume-card-body">
+                <div class="resume-mock-header">
+                  <div class="mock-line-title"></div>
+                  <div class="mock-line-sub"></div>
+                </div>
+                <div class="resume-mock-section">
+                  <div class="mock-line-sec-title"></div>
+                  <div class="mock-line-body"></div>
+                  <div class="mock-line-body"></div>
+                  <div class="mock-line-body short"></div>
+                </div>
+                <div class="resume-mock-section">
+                  <div class="mock-line-sec-title"></div>
+                  <div class="mock-line-body"></div>
+                  <div class="mock-line-body"></div>
+                </div>
+              </div>
+              
+              <!-- Floating ATS Badge inside preview -->
+              <div class="floating-ats-badge">
+                <span class="badge-icon">✓</span>
+                <span class="badge-text">ATS Score: 98%</span>
+              </div>
+            </div>
+
+            <!-- Floating Skill Chips Container -->
+            <div class="floating-skills-card">
+              <div class="skills-card-title">Tailored Core Skills</div>
+              <div class="skills-grid">
+                <span class="skill-tag-pill active">Python</span>
+                <span class="skill-tag-pill active">DevOps</span>
+                <span class="skill-tag-pill">Docker</span>
+                <span class="skill-tag-pill active">CI/CD Pipelines</span>
+                <span class="skill-tag-pill">Kubernetes</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Social Proof Logo Bar -->
+    <section class="social-proof-logo-bar">
+      <div class="landing-container logo-bar-wrapper">
+        <span class="logo-bar-label">Our candidates have been hired at:</span>
+        <div class="logos-container">
+          <img src="https://cdn.simpleicons.org/google/828ba2" alt="Google" height="22" style="opacity: 0.85; filter: grayscale(1);">
+          <img src="https://cdn.simpleicons.org/microsoft/828ba2" alt="Microsoft" height="22" style="opacity: 0.85; filter: grayscale(1);">
+          <img src="https://cdn.simpleicons.org/amazon/828ba2" alt="Amazon" height="22" style="opacity: 0.85; filter: grayscale(1);">
+          <img src="https://cdn.simpleicons.org/meta/828ba2" alt="Meta" height="22" style="opacity: 0.85; filter: grayscale(1);">
+          <img src="https://cdn.simpleicons.org/netflix/828ba2" alt="Netflix" height="22" style="opacity: 0.85; filter: grayscale(1);">
+        </div>
+      </div>
+    </section>
+
+    <!-- Step List / How it works Section -->
+    <section class="how-it-works-section" id="how-it-works">
+      <div class="landing-container">
+        <h2 class="section-title">Build Your Resume in 3 Simple Steps</h2>
         
-        <div class="ai-assistant-content" id="ai-assistant-content">
-          <div class="ai-step">
-            <div class="step-num">Step 1</div>
-            <div class="step-label">Select Target Role</div>
-            <div class="custom-select-wrapper">
-              <select id="ai-role-select" onchange="loadSelectedPrompt()" aria-label="Target Role">
-                <option value="">-- Choose a Role --</option>
-                <option value="software_engineer">Software Engineer</option>
-                <option value="python_developer">Python Developer</option>
-                <option value="java_developer">Java Developer</option>
-                <option value="dotnet_developer">.NET Developer</option>
-                <option value="devops_engineer">DevOps Engineer</option>
-                <option value="data_engineer">Data Engineer</option>
-                <option value="data_analyst">Data Analyst</option>
-                <option value="business_analyst">Business Analyst</option>
-                <option value="automation_engineer">Automation Engineer</option>
-                <option value="controls_engineer">Controls Engineer</option>
-                <option value="plc_controls_engineer">PLC Controls Engineer</option>
-                <option value="universal_resume">Universal Resume Helper</option>
-              </select>
+        <div class="grid-2-col" style="align-items: center; margin-top: 40px;">
+          <!-- Left Column step list -->
+          <div class="steps-list-wrapper">
+            
+            <div class="step-list-card active" onclick="activateStep(1)" id="step-card-1">
+              <div class="step-indicator-wrapper">
+                <span class="step-num">01</span>
+                <div class="step-content">
+                  <h3>Paste Your Experience</h3>
+                  <p>Drop your work history, companies, dates, and bullet points directly into the comfortable editor panel.</p>
+                </div>
+              </div>
+              <svg class="step-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
+
+            <div class="step-list-card" onclick="activateStep(2)" id="step-card-2">
+              <div class="step-indicator-wrapper">
+                <span class="step-num">02</span>
+                <div class="step-content">
+                  <h3>Select Target Role & AI Tailor</h3>
+                  <p>Pick from 11 specialized engineering and analyst roles. The AI Tailoring Assistant guides the metric-proof generation.</p>
+                </div>
+              </div>
+              <svg class="step-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
+            <div class="step-list-card" onclick="activateStep(3)" id="step-card-3">
+              <div class="step-indicator-wrapper">
+                <span class="step-num">03</span>
+                <div class="step-content">
+                  <h3>Export Recruiter-Ready PDF</h3>
+                  <p>Choose your typography and download a clean, ATS-compliant PDF or DOCX file instantly.</p>
+                </div>
+              </div>
+              <svg class="step-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+
           </div>
 
-          <div class="ai-step">
-            <div class="step-num">Step 2</div>
-            <div class="step-label">Generated Combined Prompt Preview</div>
-            <div class="prompt-preview-container">
-              <textarea id="ai-prompt-preview" readonly placeholder="Select a role above to generate the AI prompt…" aria-label="Generated AI Prompt Preview"></textarea>
+          <!-- Right Column Preview Graphics -->
+          <div class="steps-visual-wrapper">
+            <div class="workspace-mock-display" id="step-visual-box">
+              <!-- Dynamically Switched Content -->
+              <div class="mock-graphic active" id="step-graphic-1">
+                <div class="mock-bar-header">Paste Experience</div>
+                <div class="mock-input-textarea">
+                  <div class="mock-text-row">Company: Tech Solutions Inc. | Location: Dallas, TX</div>
+                  <div class="mock-text-row">- Led a team to build a secure Python API.</div>
+                  <div class="mock-text-row">- Optimized database queries to improve load time.</div>
+                </div>
+              </div>
+              <div class="mock-graphic" id="step-graphic-2">
+                <div class="mock-bar-header">AI Assistant Integration</div>
+                <div class="mock-selection-row">
+                  <div class="mock-dropdown">Software Engineer</div>
+                  <div class="mock-btn">✨ Tailor</div>
+                </div>
+                <div class="mock-input-textarea prompt-box">
+                  <div class="mock-text-row color-blue">Verification Proof Block:</div>
+                  <div class="mock-text-row">- [Metric] 40% query optimization -> verified by Prometheus</div>
+                  <div class="mock-text-row">- [Metric] 8 software engineers led -> headcount proof</div>
+                </div>
+              </div>
+              <div class="mock-graphic" id="step-graphic-3">
+                <div class="mock-bar-header">Download Layout</div>
+                <div class="mock-export-buttons">
+                  <div class="mock-download-pill blue">PDF Download</div>
+                  <div class="mock-download-pill outline">DOCX Download</div>
+                </div>
+                <div class="resume-sheet-mini">
+                  <div class="mini-line header"></div>
+                  <div class="mini-line body"></div>
+                  <div class="mini-line body"></div>
+                </div>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div class="ai-step">
-            <div class="step-num">Step 3</div>
-            <div class="step-label">Copy & Open Preferred AI Tool</div>
-            <div class="ai-actions-row">
-              <button class="btn-copy-prompt" id="btn-copy-prompt" onclick="copyAIPrompt()">
-                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0A2.25 2.25 0 0113.5 4.75h-3a2.25 2.25 0 01-2.166-1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.346.102.637.318.806.622L18 7.5V19.5a2.25 2.25 0 01-2.25 2.25H8.25A2.25 2.25 0 016 19.5V7.5l1.112-2.012a1.125 1.125 0 01.806-.622" />
-                </svg>
-                <span>Copy AI Prompt</span>
-              </button>
-              <div class="ai-shortcuts">
-                <a href="https://chatgpt.com" target="_blank" class="ai-shortcut-link" title="Open ChatGPT">ChatGPT</a>
-                <a href="https://claude.ai" target="_blank" class="ai-shortcut-link" title="Open Claude">Claude</a>
-                <a href="https://gemini.google.com" target="_blank" class="ai-shortcut-link" title="Open Gemini">Gemini</a>
+      </div>
+    </section>
+
+    <!-- Bento Grid Section -->
+    <section class="bento-grid-section" id="bento-tools">
+      <div class="landing-container">
+        <h2 class="section-title">Designed for Visual Utility & Compliance</h2>
+        
+        <div class="bento-grid-container" id="features">
+          
+          <!-- Large AI Card (Lavender Wash) -->
+          <div class="bento-card bg-lavender-wash col-span-2">
+            <div class="bento-card-header">
+              <span class="icon-circle border-iris" style="color: var(--color-iris);">✨</span>
+              <h3>AI Resume Tailoring Assistant</h3>
+            </div>
+            <p class="bento-desc">Copy specialized prompts scoped to your exact engineering or analyst role. Guided verification loops eliminate hallucinated metrics and secure your bullet points.</p>
+            <div class="bento-preview-image">
+              <div class="mini-ai-accordion">
+                <div class="mini-accordion-hdr">✨ AI Tailoring Assistant (DevOps)</div>
+                <div class="mini-accordion-body">
+                  <div class="line-ph">Select Target Role: <strong>DevOps Engineer</strong></div>
+                  <div class="line-ph color-grey">Prompts closing all derivation loopholes...</div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div class="ai-step">
-            <div class="step-num">Step 4</div>
-            <div class="step-label">Paste refined resume text back into the editor below.</div>
+          <!-- Recruiter flows card (Mint Whisper) -->
+          <div class="bento-card bg-mint-whisper">
+            <div class="bento-card-header">
+              <span class="icon-circle" style="color: #10b981; border-color: #a7f3d0;">✓</span>
+              <h3>Recruiter Proof</h3>
+            </div>
+            <p class="bento-desc">Standardized layouts configured exactly how engineering recruiters evaluate resumes: impact first, tools verified.</p>
+            <div class="bento-badge-group">
+              <span class="badge-label green">100% Impact Driven</span>
+              <span class="badge-label green">Falsifiable Self-Audit</span>
+            </div>
           </div>
+
+          <!-- ATS card (Blush Whisper) -->
+          <div class="bento-card bg-blush-whisper">
+            <div class="bento-card-header">
+              <span class="icon-circle" style="color: #f97316; border-color: #fed7aa;">⚡</span>
+              <h3>ATS Scorable</h3>
+            </div>
+            <p class="bento-desc">Bypass modern ATS parsers with raw clean markup text and clean margins. Zero complex HTML tables or floating text boxes.</p>
+            <div class="bento-badge-group">
+              <span class="badge-label orange">Zero Layout Blocks</span>
+              <span class="badge-label orange">Standard Fonts Only</span>
+            </div>
+          </div>
+
         </div>
       </div>
+    </section>
 
-      <div class="drop-area">
-        <div class="drop-hint-wrapper" style="flex-direction: column; gap: 4px;">
-          <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="color: var(--app-ink-muted);"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-          <div class="drop-hint">Drop your experience text file here or <strong>paste directly</strong></div>
+    <!-- Social Proof Band (Statistics Counter) -->
+    <section class="statistics-section">
+      <div class="landing-container grid-3-col">
+        <div class="stat-counter-item">
+          <span class="stat-icon">📈</span>
+          <span class="stat-number">3M+</span>
+          <span class="stat-label">Resumes Created</span>
         </div>
-        <textarea id="resume-text" spellcheck="false" placeholder="Company | Location | Role | Dates&#10;- Bullet point 1&#10;- Bullet point 2" aria-label="Resume experience and details editor"></textarea>
-      </div>
-
-      <div style="margin-top: 10px; font-size: 11px; color: var(--app-ink-muted); text-align: center; display: flex; align-items: center; justify-content: center; gap: 4px;">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: #eab308; flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-3m0 0a8.12 8.12 0 0 0 8-8.12c0-2.378-1.03-4.514-2.686-6A9.08 9.08 0 0 0 12 0a9.08 9.08 0 0 0-5.314 1.88C5.03 3.366 4 5.502 4 7.88A8.12 8.12 0 0 0 12 15Zm0 3H9m3 0h3m-6 3h6" /></svg>
-        <span>Press <strong>Ctrl+V</strong> (or <strong>Cmd+V</strong>) to paste your resume content directly.</span>
-      </div>
-
-      <!-- Company Experience Copy (appears after paste) -->
-      <div class="company-section" id="company-section">
-        <div class="company-section-title">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-19.5 0A2.25 2.25 0 0 0 4.5 15h15a2.25 2.25 0 0 0 2.25-2.25m-19.5 0v.228c0 .265.112.518.307.702l1.562 1.476a1.125 1.125 0 0 0 .762.306h11.82c.29 0 .57-.108.79-.306l1.562-1.477a1.125 1.125 0 0 0 .307-.702V12.75m-18.75-3-1.593-3.186a2.25 2.25 0 0 1 2.012-3.256h3.692c.602 0 1.173.24 1.593.667l1.792 1.792a1.125 1.125 0 0 0 .796.33h4.568a2.25 2.25 0 0 1 2.25 2.25v1.314" /></svg>Copy Experience by Company
+        <div class="stat-counter-item">
+          <span class="stat-icon">🎯</span>
+          <span class="stat-number">45%</span>
+          <span class="stat-label">Callback Increase</span>
         </div>
-        <div class="company-btns" id="company-btns"></div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="divider"><span>Resume Preview</span></div>
-  
-  <div class="preview-pane">
-    <div class="preview-wrap">
-      <div id="resume-mockup">
-        <div class="empty-state" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-          <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--app-ink-muted); margin-bottom: 8px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0A2.25 2.25 0 0 1 13.5 4.75h-3a2.25 2.25 0 0 1-2.166-1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.346.102.637.318.806.622L18 7.5V19.5a2.25 2.25 0 0 1-2.25 2.25H8.25A2.25 2.25 0 0 1 6 19.5V7.5l1.112-2.012a1.125 1.125 0 0 1 .806-.622" /></svg>
-          <p>Paste your resume content above to see a live preview here</p>
+        <div class="stat-counter-item">
+          <span class="stat-icon">📄</span>
+          <span class="stat-number">100%</span>
+          <span class="stat-label">ATS Compliance Rate</span>
         </div>
       </div>
-    </div>
-  </div>
-</div>
+    </section>
 
-<!-- ── SLIDING DRAWER MODAL FOR EDITING PROFILE DETAILS ── -->
-<div class="drawer-overlay" id="drawer-overlay" onclick="toggleDetailsForm()"></div>
-<div class="profile-drawer" id="profile-drawer">
-  <div class="drawer-header">
-    <div class="drawer-title" style="display:flex; align-items:center; gap:6px;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Profile Details</div>
-    <button class="btn-drawer-close" onclick="toggleDetailsForm()" aria-label="Close details drawer">&times;</button>
-  </div>
-  <div class="drawer-body">
-    <div class="form-section-title">Personal Information</div>
-    <div class="form-grid">
-      <div class="form-group">
-        <label for="prof-name">Full Name</label>
-        <input type="text" id="prof-name" oninput="updateProfileField('name', this.value)" placeholder="e.g. Pravallika Boyapati">
-      </div>
-      <div class="form-group">
-        <label for="prof-subtitle">Professional Title</label>
-        <input type="text" id="prof-subtitle" oninput="updateProfileField('subtitle', this.value)" placeholder="e.g. Controls Engineer">
-      </div>
-      <div class="form-group">
-        <label for="prof-email">Email</label>
-        <input type="email" id="prof-email" oninput="updateProfileField('email', this.value)" placeholder="e.g. name@email.com">
-      </div>
-      <div class="form-group">
-        <label for="prof-phone">Phone</label>
-        <input type="text" id="prof-phone" oninput="updateProfileField('phone', this.value)" placeholder="e.g. +1 (123) 456-7890">
-      </div>
-      <div class="form-group">
-        <label for="prof-location">Location</label>
-        <input type="text" id="prof-location" oninput="updateProfileField('location', this.value)" placeholder="e.g. Dallas, USA">
-      </div>
-      <div class="form-group">
-        <label for="prof-linkedin">LinkedIn</label>
-        <input type="text" id="prof-linkedin" oninput="updateProfileField('linkedin', this.value)" placeholder="e.g. linkedin.com/in/username">
-      </div>
-    </div>
-    
-    <div class="form-divider"></div>
-    
-    <div class="form-section-title" style="display:flex; justify-content:space-between; align-items:center;">
-      <span>Education</span>
-      <button class="btn-small" onclick="addEducationRow()">+ Add Education</button>
-    </div>
-    <div id="education-fields-container" class="fields-list">
-      <!-- Populated dynamically -->
-    </div>
-    
-    <div class="form-divider"></div>
-    
-    <div class="form-section-title" style="display:flex; justify-content:space-between; align-items:center;">
-      <span>Certifications</span>
-      <button class="btn-small" onclick="addCertRow()">+ Add Certification</button>
-    </div>
-    <div id="certs-fields-container" class="fields-list">
-      <!-- Populated dynamically -->
-    </div>
-  </div>
-  <div class="drawer-footer">
-    <button class="btn-dl" onclick="toggleDetailsForm()" style="font-size:13px; padding: 8px 16px;">Done</button>
-  </div>
-</div>
+    <!-- FAQ Accordion Section -->
+    <section class="faq-section" id="faq">
+      <div class="landing-container">
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        
+        <div class="faq-accordion-container">
+          
+          <div class="faq-item" id="faq-1">
+            <button class="faq-header" onclick="toggleFaq(1)" aria-expanded="false" aria-controls="faq-answer-1">
+              <span>Is this resume builder completely free?</span>
+              <span class="faq-toggle-icon">+</span>
+            </button>
+            <div class="faq-answer" id="faq-answer-1">
+              <p>Yes. The Resume Builder is entirely client-side and free to use. All generated templates can be downloaded as PDF or DOCX without paywalls or watermark stamps.</p>
+            </div>
+          </div>
 
-<div class="toast-container" id="toast-container"></div>
+          <div class="faq-item" id="faq-2">
+            <button class="faq-header" onclick="toggleFaq(2)" aria-expanded="false" aria-controls="faq-answer-2">
+              <span>How does the AI Tailoring Assistant work?</span>
+              <span class="faq-toggle-icon">+</span>
+            </button>
+            <div class="faq-answer" id="faq-answer-2">
+              <p>The builder compiles a role-optimized prompt containing your resume profile text and specific role criteria. You copy and paste this prompt into Claude, ChatGPT, or Gemini. The prompt forces the LLM to output a metric-proof self-audit block before giving you back the optimized text, which you can paste right back in.</p>
+            </div>
+          </div>
 
-<script src="app.js"></script>
+          <div class="faq-item" id="faq-3">
+            <button class="faq-header" onclick="toggleFaq(3)" aria-expanded="false" aria-controls="faq-answer-3">
+              <span>Are my resumes saved securely?</span>
+              <span class="faq-toggle-icon">+</span>
+            </button>
+            <div class="faq-answer" id="faq-answer-3">
+              <p>Yes. Your resume data is saved directly in your browser's local storage. None of your data is sent to external servers, protecting your privacy completely.</p>
+            </div>
+          </div>
+
+          <div class="faq-item" id="faq-4">
+            <button class="faq-header" onclick="toggleFaq(4)" aria-expanded="false" aria-controls="faq-answer-4">
+              <span>What layout options do you support?</span>
+              <span class="faq-toggle-icon">+</span>
+            </button>
+            <div class="faq-answer" id="faq-answer-4">
+              <p>We support standard recruiter layouts, LaTeX (Jake's Resume) layouts, and highly structured single-page templates. You can customize margins, font families, and sizing controls dynamically.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Brand Mark & Details -->
+  <footer class="landing-footer">
+    <div class="landing-container footer-content-wrapper">
+      <div class="footer-left">
+        <span class="footer-brand">Resume Builder</span>
+        <p class="footer-tagline">Recruiter-approved, document-first, and metric-verified resumes.</p>
+      </div>
+      <div class="footer-right">
+        <div class="footer-nav">
+          <a href="#features">Features</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="builder.html">Editor App</a>
+        </div>
+        <p class="copyright-label">&copy; 2026 Resume Builder. Client-side utility. No rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Landing Page Script interactions -->
+  <script>
+    // Handle step activation switches
+    function activateStep(stepNum) {
+      // Deactivate all step cards
+      document.querySelectorAll('.step-list-card').forEach(card => card.classList.remove('active'));
+      // Deactivate all step graphics
+      document.querySelectorAll('.mock-graphic').forEach(graphic => graphic.classList.remove('active'));
+      
+      // Activate target step card
+      document.getElementById('step-card-' + stepNum).classList.add('active');
+      // Activate target step graphic
+      document.getElementById('step-graphic-' + stepNum).classList.add('active');
+    }
+
+    // Toggle FAQ Accordions
+    function toggleFaq(faqId) {
+      const faqItem = document.getElementById('faq-' + faqId);
+      const isExpanded = faqItem.classList.contains('active');
+      
+      // Close other items
+      document.querySelectorAll('.faq-item').forEach(item => {
+        item.classList.remove('active');
+        item.querySelector('.faq-header').setAttribute('aria-expanded', 'false');
+        item.querySelector('.faq-toggle-icon').textContent = '+';
+      });
+
+      if (!isExpanded) {
+        faqItem.classList.add('active');
+        faqItem.querySelector('.faq-header').setAttribute('aria-expanded', 'true');
+        faqItem.querySelector('.faq-toggle-icon').textContent = '−';
+      }
+    }
+
+    // Toggle Mobile Navigation Drawer
+    function toggleLandingMenu(open) {
+      const drawer = document.getElementById('landing-menu-drawer');
+      const overlay = document.getElementById('landing-menu-overlay');
+      if (open) {
+        drawer.classList.add('active');
+        overlay.classList.add('active');
+      } else {
+        drawer.classList.remove('active');
+        overlay.classList.remove('active');
+      }
+    }
+  </script>
 </body>
 </html>
-
-

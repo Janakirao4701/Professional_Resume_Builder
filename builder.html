@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Professional Resume Builder</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='logoGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%233b82f6'/%3E%3Cstop offset='100%25' stop-color='%231d4ed8'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='24' height='24' rx='6' fill='url(%23logoGrad)'/%3E%3Cpath d='M7 5h6.5l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 7 19V5z' fill='%23ffffff'/%3E%3Cpath d='M13.5 5v4.5H18L13.5 5z' fill='%2393c5fd' opacity='0.85'/%3E%3Crect x='9' y='12' width='6' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3Crect x='9' y='14.5' width='6' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3Crect x='9' y='17' width='4' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Cambria&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+
+<header>
+  <a href="index.html" class="logo" style="text-decoration: none;">
+    <svg width="20" height="20" viewBox="0 0 24 24" style="flex-shrink: 0;">
+      <defs>
+        <linearGradient id="headerLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#3b82f6" />
+          <stop offset="100%" stop-color="#1d4ed8" />
+        </linearGradient>
+      </defs>
+      <rect width="24" height="24" rx="6" fill="url(#headerLogoGrad)" />
+      <path d="M7 5h6.5l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 7 19V5z" fill="#ffffff" />
+      <path d="M13.5 5v4.5H18L13.5 5z" fill="#93c5fd" opacity="0.85" />
+      <rect x="9" y="12" width="6" height="1.2" rx="0.6" fill="#1e3a8a" />
+      <rect x="9" y="14.5" width="6" height="1.2" rx="0.6" fill="#1e3a8a" />
+      <rect x="9" y="17" width="4" height="1.2" rx="0.6" fill="#1e3a8a" />
+    </svg>
+    <span>Resume Builder</span>
+  </a>
+  
+  <div class="header-profile-section">
+    <span class="hdr-label">Profile:</span>
+    <select id="profile-select" onchange="switchProfile(this.value)" aria-label="Active Profile">
+      <!-- Populated dynamically -->
+    </select>
+    <button class="btn-hdr-action btn-hdr-primary" onclick="toggleDetailsForm()" id="toggle-details-btn" title="Edit Profile Details" aria-label="Edit Profile Details">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Info
+    </button>
+    <button class="btn-hdr-action" onclick="createNewProfile()" title="Create Blank Profile" aria-label="Create Blank Profile">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg> New
+    </button>
+    <button class="btn-hdr-action" onclick="renameCurrentProfile()" title="Rename Current Profile" aria-label="Rename Current Profile">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg>
+    </button>
+    <button class="btn-hdr-action btn-hdr-danger" onclick="deleteCurrentProfile()" title="Delete Current Profile" aria-label="Delete Current Profile">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+    </button>
+    <div class="hdr-divider"></div>
+    <button class="btn-hdr-action" onclick="triggerImport()" title="Import JSON Profiles" aria-label="Import JSON Profiles">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75Z" /></svg> Import
+    </button>
+    <button class="btn-hdr-action" onclick="exportProfiles()" title="Export JSON Backup" aria-label="Export JSON Backup">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6.75m0 0l-3-3m3 3l3-3m2.25 5.25v.75A2.25 2.25 0 0115 18H9a2.25 2.25 0 01-2.25-2.25v-.75" /></svg> Export
+    </button>
+    <input type="file" id="import-file-input" style="display: none;" accept=".json" onchange="importProfiles(event)">
+  </div>
+  
+  <div class="header-actions">
+    <button class="btn-dl" id="pdf-btn">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14m0 0l-4-4m4 4l-4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download PDF
+    </button>
+    <button class="btn-dl" id="dl-btn">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l4-4m-4 4l-4-4"/></svg>
+      Download DOCX
+    </button>
+  </div>
+
+  <!-- Mobile Hamburger Menu Button -->
+  <button class="mobile-menu-toggle" id="mobile-menu-btn" onclick="toggleMobileMenu(true)" title="Menu" aria-label="Open menu">
+    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+    </svg>
+  </button>
+</header>
+
+<!-- Mobile Drawer and Overlay -->
+<div class="mobile-menu-overlay" id="mobile-menu-overlay" onclick="toggleMobileMenu(false)"></div>
+<div class="mobile-menu-drawer" id="mobile-menu-drawer">
+  <div class="drawer-title-row">
+    <h3>Settings & Actions</h3>
+    <button class="drawer-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close menu">✕</button>
+  </div>
+  
+  <div class="drawer-card">
+    <div class="drawer-card-title">Profile Management</div>
+    <div class="drawer-select-wrapper">
+      <label for="mobile-profile-select">Active Profile</label>
+      <select id="mobile-profile-select" onchange="switchProfile(this.value)" aria-label="Active Profile Mobile">
+        <!-- Populated dynamically -->
+      </select>
+    </div>
+    
+    <button class="drawer-action-btn" onclick="toggleDetailsForm(); toggleMobileMenu(false);">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>Edit Profile Info
+    </button>
+    <button class="drawer-action-btn" onclick="createNewProfile(); toggleMobileMenu(false);">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>New Profile
+    </button>
+
+    <button class="drawer-action-btn btn-danger" onclick="deleteCurrentProfile(); toggleMobileMenu(false);">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>Delete Profile
+    </button>
+  </div>
+  
+  <div class="drawer-card">
+    <div class="drawer-card-title">Export Options</div>
+    <button class="drawer-action-btn" onclick="triggerMobilePDF();">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px;"><path d="M12 5v14m0 0l-4-4m4 4l-4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Download PDF
+    </button>
+    <button class="drawer-action-btn" onclick="triggerMobileDOCX();">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px;"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l4-4m-4 4l-4-4"/></svg>
+      Download DOCX
+    </button>
+  </div>
+
+  <div class="drawer-card">
+    <div class="drawer-card-title">Backup & Migration</div>
+    <button class="drawer-action-btn" onclick="triggerMobileImport();" style="background: var(--app-surface); border-color: var(--app-border); color: #fff;">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75Z" /></svg>Import JSON Profiles
+    </button>
+    <button class="drawer-action-btn" onclick="triggerMobileExport();" style="background: var(--app-surface); border-color: var(--app-border); color: #fff;">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6.75m0 0l-3-3m3 3l3-3m2.25 5.25v.75A2.25 2.25 0 0115 18H9a2.25 2.25 0 01-2.25-2.25v-.75" /></svg>Export JSON Backup
+    </button>
+  </div>
+</div>
+
+<!-- Mobile Floating Navigation Bar -->
+<div class="mobile-floating-nav" id="mobile-floating-nav">
+  <button class="mobile-nav-item active" id="mobile-nav-edit" onclick="setMobileView('edit')">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+    </svg>
+    <span>Editor</span>
+  </button>
+  <button class="mobile-nav-item" id="mobile-nav-preview" onclick="setMobileView('preview')">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.43 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+    <span>Preview</span>
+  </button>
+</div>
+
+<div class="app-workspace">
+  <div class="editor-pane">
+    <div class="input-zone">
+      <div class="zone-label">Paste Professional Experience</div>
+      <div class="zone-sub">
+        Enter your work history (companies, roles, dates, and bullet points) below. Summary, skills, and contact details can be edited in the <strong style="display:inline-flex; align-items:center; gap:3px;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Info</strong> drawer.
+      </div>
+
+      <!-- ✨ AI Tailoring Assistant Accordion Panel -->
+      <div class="ai-assistant-container">
+        <button class="ai-assistant-header" id="ai-assistant-toggle" onclick="toggleAIAssistant()" aria-expanded="false" aria-controls="ai-assistant-content">
+          <span class="header-title">✨ AI Tailoring Assistant</span>
+          <svg class="chevron-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+          </svg>
+        </button>
+        
+        <div class="ai-assistant-content" id="ai-assistant-content">
+          <div class="ai-step">
+            <div class="step-num">Step 1</div>
+            <div class="step-label">Select Target Role</div>
+            <div class="custom-select-wrapper">
+              <select id="ai-role-select" onchange="loadSelectedPrompt()" aria-label="Target Role">
+                <option value="">-- Choose a Role --</option>
+                <option value="software_engineer">Software Engineer</option>
+                <option value="python_developer">Python Developer</option>
+                <option value="java_developer">Java Developer</option>
+                <option value="dotnet_developer">.NET Developer</option>
+                <option value="devops_engineer">DevOps Engineer</option>
+                <option value="data_engineer">Data Engineer</option>
+                <option value="data_analyst">Data Analyst</option>
+                <option value="business_analyst">Business Analyst</option>
+                <option value="automation_engineer">Automation Engineer</option>
+                <option value="controls_engineer">Controls Engineer</option>
+                <option value="plc_controls_engineer">PLC Controls Engineer</option>
+                <option value="universal_resume">Universal Resume Helper</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="ai-step">
+            <div class="step-num">Step 2</div>
+            <div class="step-label">Generated Combined Prompt Preview</div>
+            <div class="prompt-preview-container">
+              <textarea id="ai-prompt-preview" readonly placeholder="Select a role above to generate the AI prompt…" aria-label="Generated AI Prompt Preview"></textarea>
+            </div>
+          </div>
+
+          <div class="ai-step">
+            <div class="step-num">Step 3</div>
+            <div class="step-label">Copy & Open Preferred AI Tool</div>
+            <div class="ai-actions-row">
+              <button class="btn-copy-prompt" id="btn-copy-prompt" onclick="copyAIPrompt()">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0A2.25 2.25 0 0113.5 4.75h-3a2.25 2.25 0 01-2.166-1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.346.102.637.318.806.622L18 7.5V19.5a2.25 2.25 0 01-2.25 2.25H8.25A2.25 2.25 0 016 19.5V7.5l1.112-2.012a1.125 1.125 0 01.806-.622" />
+                </svg>
+                <span>Copy AI Prompt</span>
+              </button>
+              <div class="ai-shortcuts">
+                <a href="https://chatgpt.com" target="_blank" class="ai-shortcut-link" title="Open ChatGPT">ChatGPT</a>
+                <a href="https://claude.ai" target="_blank" class="ai-shortcut-link" title="Open Claude">Claude</a>
+                <a href="https://gemini.google.com" target="_blank" class="ai-shortcut-link" title="Open Gemini">Gemini</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-step">
+            <div class="step-num">Step 4</div>
+            <div class="step-label">Paste refined resume text back into the editor below.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="drop-area">
+        <div class="drop-hint-wrapper" style="flex-direction: column; gap: 4px;">
+          <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="color: var(--app-ink-muted);"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+          <div class="drop-hint">Drop your experience text file here or <strong>paste directly</strong></div>
+        </div>
+        <textarea id="resume-text" spellcheck="false" placeholder="Company | Location | Role | Dates&#10;- Bullet point 1&#10;- Bullet point 2" aria-label="Resume experience and details editor"></textarea>
+      </div>
+
+      <div style="margin-top: 10px; font-size: 11px; color: var(--app-ink-muted); text-align: center; display: flex; align-items: center; justify-content: center; gap: 4px;">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="color: #eab308; flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-3m0 0a8.12 8.12 0 0 0 8-8.12c0-2.378-1.03-4.514-2.686-6A9.08 9.08 0 0 0 12 0a9.08 9.08 0 0 0-5.314 1.88C5.03 3.366 4 5.502 4 7.88A8.12 8.12 0 0 0 12 15Zm0 3H9m3 0h3m-6 3h6" /></svg>
+        <span>Press <strong>Ctrl+V</strong> (or <strong>Cmd+V</strong>) to paste your resume content directly.</span>
+      </div>
+
+      <!-- Company Experience Copy (appears after paste) -->
+      <div class="company-section" id="company-section">
+        <div class="company-section-title">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-19.5 0A2.25 2.25 0 0 0 4.5 15h15a2.25 2.25 0 0 0 2.25-2.25m-19.5 0v.228c0 .265.112.518.307.702l1.562 1.476a1.125 1.125 0 0 0 .762.306h11.82c.29 0 .57-.108.79-.306l1.562-1.477a1.125 1.125 0 0 0 .307-.702V12.75m-18.75-3-1.593-3.186a2.25 2.25 0 0 1 2.012-3.256h3.692c.602 0 1.173.24 1.593.667l1.792 1.792a1.125 1.125 0 0 0 .796.33h4.568a2.25 2.25 0 0 1 2.25 2.25v1.314" /></svg>Copy Experience by Company
+        </div>
+        <div class="company-btns" id="company-btns"></div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="divider"><span>Resume Preview</span></div>
+  
+  <div class="preview-pane">
+    <div class="preview-wrap">
+      <div id="resume-mockup">
+        <div class="empty-state" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--app-ink-muted); margin-bottom: 8px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0A2.25 2.25 0 0 1 13.5 4.75h-3a2.25 2.25 0 0 1-2.166-1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.346.102.637.318.806.622L18 7.5V19.5a2.25 2.25 0 0 1-2.25 2.25H8.25A2.25 2.25 0 0 1 6 19.5V7.5l1.112-2.012a1.125 1.125 0 0 1 .806-.622" /></svg>
+          <p>Paste your resume content above to see a live preview here</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SLIDING DRAWER MODAL FOR EDITING PROFILE DETAILS ── -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="toggleDetailsForm()"></div>
+<div class="profile-drawer" id="profile-drawer">
+  <div class="drawer-header">
+    <div class="drawer-title" style="display:flex; align-items:center; gap:6px;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Profile Details</div>
+    <button class="btn-drawer-close" onclick="toggleDetailsForm()" aria-label="Close details drawer">&times;</button>
+  </div>
+  <div class="drawer-body">
+    <div class="form-section-title">Personal Information</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="prof-name">Full Name</label>
+        <input type="text" id="prof-name" oninput="updateProfileField('name', this.value)" placeholder="e.g. Pravallika Boyapati">
+      </div>
+      <div class="form-group">
+        <label for="prof-subtitle">Professional Title</label>
+        <input type="text" id="prof-subtitle" oninput="updateProfileField('subtitle', this.value)" placeholder="e.g. Controls Engineer">
+      </div>
+      <div class="form-group">
+        <label for="prof-email">Email</label>
+        <input type="email" id="prof-email" oninput="updateProfileField('email', this.value)" placeholder="e.g. name@email.com">
+      </div>
+      <div class="form-group">
+        <label for="prof-phone">Phone</label>
+        <input type="text" id="prof-phone" oninput="updateProfileField('phone', this.value)" placeholder="e.g. +1 (123) 456-7890">
+      </div>
+      <div class="form-group">
+        <label for="prof-location">Location</label>
+        <input type="text" id="prof-location" oninput="updateProfileField('location', this.value)" placeholder="e.g. Dallas, USA">
+      </div>
+      <div class="form-group">
+        <label for="prof-linkedin">LinkedIn</label>
+        <input type="text" id="prof-linkedin" oninput="updateProfileField('linkedin', this.value)" placeholder="e.g. linkedin.com/in/username">
+      </div>
+    </div>
+    
+    <div class="form-divider"></div>
+    
+    <div class="form-section-title" style="display:flex; justify-content:space-between; align-items:center;">
+      <span>Education</span>
+      <button class="btn-small" onclick="addEducationRow()">+ Add Education</button>
+    </div>
+    <div id="education-fields-container" class="fields-list">
+      <!-- Populated dynamically -->
+    </div>
+    
+    <div class="form-divider"></div>
+    
+    <div class="form-section-title" style="display:flex; justify-content:space-between; align-items:center;">
+      <span>Certifications</span>
+      <button class="btn-small" onclick="addCertRow()">+ Add Certification</button>
+    </div>
+    <div id="certs-fields-container" class="fields-list">
+      <!-- Populated dynamically -->
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button class="btn-dl" onclick="toggleDetailsForm()" style="font-size:13px; padding: 8px 16px;">Done</button>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
+
+
