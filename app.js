@@ -1348,8 +1348,13 @@ async function loadSelectedPrompt() {
     updateCombinedPromptPreview();
   } catch (err) {
     console.error(err);
-    showToast("Error loading prompt template.");
-    preview.value = "Error loading template: " + err.message;
+    if (window.location.protocol === 'file:') {
+      showToast("CORS Restriction: Cannot fetch templates on file:// protocol.");
+      preview.value = "CORS Restriction:\nBrowsers block fetching local files (file://) due to security policies.\n\nTo load templates successfully, please run a local development server:\n1. Open your terminal in this directory\n2. Run: python -m http.server 8000\n3. Navigate to: http://localhost:8000/";
+    } else {
+      showToast("Error loading prompt template.");
+      preview.value = "Error loading template: " + err.message + "\n\nPlease ensure the file exists at: " + filePath;
+    }
   }
 }
 
