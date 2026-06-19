@@ -333,7 +333,7 @@
           <div class="faq-item" id="faq-1">
             <button class="faq-header" onclick="toggleFaq(1)" aria-expanded="false" aria-controls="faq-answer-1">
               <span>Is this resume builder completely free?</span>
-              <span class="faq-toggle-icon">+</span>
+              <svg class="faq-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
             </button>
             <div class="faq-answer" id="faq-answer-1">
               <p>Yes. The Resume Builder is entirely client-side and free to use. All generated templates can be downloaded as PDF or DOCX without paywalls or watermark stamps.</p>
@@ -343,7 +343,7 @@
           <div class="faq-item" id="faq-2">
             <button class="faq-header" onclick="toggleFaq(2)" aria-expanded="false" aria-controls="faq-answer-2">
               <span>How does the AI Tailoring Assistant work?</span>
-              <span class="faq-toggle-icon">+</span>
+              <svg class="faq-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
             </button>
             <div class="faq-answer" id="faq-answer-2">
               <p>The builder compiles a role-optimized prompt containing your resume profile text and specific role criteria. You copy and paste this prompt into Claude, ChatGPT, or Gemini. The prompt forces the LLM to output a metric-proof self-audit block before giving you back the optimized text, which you can paste right back in.</p>
@@ -353,7 +353,7 @@
           <div class="faq-item" id="faq-3">
             <button class="faq-header" onclick="toggleFaq(3)" aria-expanded="false" aria-controls="faq-answer-3">
               <span>Are my resumes saved securely?</span>
-              <span class="faq-toggle-icon">+</span>
+              <svg class="faq-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
             </button>
             <div class="faq-answer" id="faq-answer-3">
               <p>Yes. Your resume data is saved directly in your browser's local storage. None of your data is sent to external servers, protecting your privacy completely.</p>
@@ -363,7 +363,7 @@
           <div class="faq-item" id="faq-4">
             <button class="faq-header" onclick="toggleFaq(4)" aria-expanded="false" aria-controls="faq-answer-4">
               <span>What layout options do you support?</span>
-              <span class="faq-toggle-icon">+</span>
+              <svg class="faq-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
             </button>
             <div class="faq-answer" id="faq-answer-4">
               <p>We support standard recruiter layouts, LaTeX (Jake's Resume) layouts, and highly structured single-page templates. You can customize margins, font families, and sizing controls dynamically.</p>
@@ -417,13 +417,11 @@
       document.querySelectorAll('.faq-item').forEach(item => {
         item.classList.remove('active');
         item.querySelector('.faq-header').setAttribute('aria-expanded', 'false');
-        item.querySelector('.faq-toggle-icon').textContent = '+';
       });
 
       if (!isExpanded) {
         faqItem.classList.add('active');
         faqItem.querySelector('.faq-header').setAttribute('aria-expanded', 'true');
-        faqItem.querySelector('.faq-toggle-icon').textContent = '−';
       }
     }
 
