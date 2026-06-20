@@ -50,11 +50,24 @@ function saveToStorage() {
 }
 
 function upgradeAllProfiles() {
+  if (!profiles || typeof profiles !== 'object') {
+    profiles = { default: JSON.parse(JSON.stringify(DEFAULT_PROFILE_DATA)) };
+  }
   Object.keys(profiles).forEach(id => {
-    const p = profiles[id];
-    if (!p.profile) p.profile = {};
-    if (!p.profile.education) p.profile.education = [];
-    if (!p.profile.certs) p.profile.certs = [];
+    let p = profiles[id];
+    if (!p || typeof p !== 'object') {
+      profiles[id] = { profile: {}, text: '' };
+      p = profiles[id];
+    }
+    if (!p.profile || typeof p.profile !== 'object') {
+      p.profile = {};
+    }
+    if (!p.profile.education || !Array.isArray(p.profile.education)) {
+      p.profile.education = [];
+    }
+    if (!p.profile.certs || !Array.isArray(p.profile.certs)) {
+      p.profile.certs = [];
+    }
     
     // Reconstruct tags text from drawer summary/skills if the text box doesn't have the tags yet
     const rawText = p.text || '';
@@ -92,10 +105,14 @@ function initProfiles() {
       profiles = JSON.parse(stored);
     } catch(e) {
       console.error("Failed to parse profiles from localStorage, using default.");
-      profiles = { default: DEFAULT_PROFILE_DATA };
+      profiles = { default: JSON.parse(JSON.stringify(DEFAULT_PROFILE_DATA)) };
     }
   } else {
-    profiles = { default: DEFAULT_PROFILE_DATA };
+    profiles = { default: JSON.parse(JSON.stringify(DEFAULT_PROFILE_DATA)) };
+  }
+  
+  if (!profiles || typeof profiles !== 'object' || Object.keys(profiles).length === 0) {
+    profiles = { default: JSON.parse(JSON.stringify(DEFAULT_PROFILE_DATA)) };
   }
   
   // Migrate profiles to tagless format
@@ -111,10 +128,17 @@ function initProfiles() {
     currentProfileId = Object.keys(profiles)[0] || 'default';
   }
   
+  if (!profiles[currentProfileId]) {
+    profiles[currentProfileId] = JSON.parse(JSON.stringify(DEFAULT_PROFILE_DATA));
+  }
+  
   PROFILE = profiles[currentProfileId].profile;
   
   // Set textarea content
-  document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
+  const textarea = document.getElementById('resume-text');
+  if (textarea) {
+    textarea.value = profiles[currentProfileId].text || '';
+  }
   
   updateProfileSelectDropdown();
   renderFormFields();
@@ -377,7 +401,7 @@ function renderFormFields() {
   const certsContainer = document.getElementById('certs-fields-container');
   certsContainer.innerHTML = (p.certs || []).map((c, index) => `
     <div class="cert-item-row" style="display:flex; gap:8px; margin-bottom:6px;">
-      <input type="text" placeholder="Certification Name" value="${escHtml(c || '')}" oninput="updateCertField(${index}, this.value)" style="flex:1; background:#0f172a; border:1px solid var(--app-border); border-radius:6px; padding:8px 10px; color:#fff; font-size:12px; outline:none;">
+      <input type="text" placeholder="Certification Name" value="${escHtml(c || '')}" oninput="updateCertField(${index}, this.value)" class="cert-input" style="flex:1;">
       <button class="btn-remove-icon" onclick="removeCertRow(${index})">✕</button>
     </div>
   `).join('');
@@ -716,7 +740,7 @@ async function pasteFromClipboard() {
     }
     text = text.replace(/^(\d+\.)(?!\d)\s*/gm, '- ');
     document.getElementById('resume-text').value = text;
-    detectSections();
+    detectSectionsAndCompanies();
     updatePreview();
     parseCompanies(text);
 

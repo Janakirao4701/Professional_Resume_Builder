@@ -12,3 +12,5 @@ Thumbs.db
 
 # Local agents and temp files
 .agents/
+.gemini/
+.planning/

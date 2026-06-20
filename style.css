@@ -36,7 +36,7 @@
   --ink: var(--color-ink);
 
   /* Typography — Fonts */
-  --font-tt-commons: 'Inter', 'Outfit', 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-tt-commons: 'Plus Jakarta Sans', 'Outfit', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   /* Typography — Scale */
   --text-caption: 14px;
@@ -207,7 +207,7 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    transition: all 0.15s ease;
+    transition: all 0.15s ease, transform 0.1s ease;
     height: 30px;
   }
   
@@ -215,6 +215,10 @@
     border-color: var(--color-chalk);
     background: var(--color-mist);
     color: var(--color-ink);
+  }
+
+  .btn-hdr-action:active {
+    transform: scale(0.97);
   }
   
   .btn-hdr-action.btn-hdr-primary {
@@ -262,13 +266,16 @@
     border: 1px solid var(--color-signal-blue);
     cursor: pointer;
     display: flex; align-items: center; gap: 6px;
-    transition: all 0.15s ease;
+    transition: all 0.15s ease, transform 0.1s ease;
     height: 32px;
   }
   .btn-dl:hover {
     background: var(--color-lavender-wash);
     border-color: var(--color-deep-signal);
     color: var(--color-deep-signal);
+  }
+  .btn-dl:active {
+    transform: scale(0.97);
   }
   .btn-dl:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -508,7 +515,7 @@
     color: var(--color-ink);
     cursor: pointer;
     text-align: left;
-    transition: all 0.15s ease;
+    transition: all 0.15s ease, transform 0.1s ease;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -517,6 +524,9 @@
     border-color: var(--color-haze);
     background: var(--color-mist);
     transform: translateX(2px);
+  }
+  .company-copy-btn:active {
+    transform: translateX(2px) scale(0.98);
   }
   .company-copy-btn .copy-label { font-size: 10px; color: var(--color-pencil); font-weight: 400; }
   .company-copy-btn.copied {
@@ -910,8 +920,25 @@
   .btn-remove-icon {
     background: var(--color-paper); border: 1px solid var(--color-chalk); color: #ff3333; border-radius: 6px;
     width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: transform 0.1s ease;
   }
   .btn-remove-icon:hover { border-color: #ff3333; background: rgba(255,51,51,0.05); }
+  .btn-remove-icon:active { transform: scale(0.95); }
+  
+  .cert-input {
+    background: var(--color-paper);
+    border: 1px solid var(--color-chalk);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--color-ink);
+    font-size: 12px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .cert-input:focus {
+    border-color: var(--color-signal-blue);
+    box-shadow: 0 0 0 3px rgba(26, 145, 240, 0.12);
+  }
   
   .btn-small {
     background: var(--color-paper);
@@ -923,9 +950,10 @@
     border-radius: 36px;
     cursor: pointer;
     font-family: var(--font-tt-commons);
-    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s, transform 0.1s ease;
   }
   .btn-small:hover { border-color: var(--color-haze); color: var(--color-carbon); background: var(--color-mist); }
+  .btn-small:active { transform: scale(0.97); }
 
   /* ── TOAST NOTIFICATION CONTAINER ── */
   .toast-container {
@@ -1231,11 +1259,14 @@
       justify-content: center;
       gap: 8px;
       margin-top: 8px;
-      transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+      transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.1s ease;
     }
     .drawer-action-btn:hover {
       border-color: var(--color-haze);
       background: var(--color-mist);
+    }
+    .drawer-action-btn:active {
+      transform: scale(0.98);
     }
     
     .drawer-action-btn.btn-danger {
