@@ -81,6 +81,8 @@
   --spacing-48: 48px;
   --spacing-60: 60px;
   --spacing-64: 64px;
+  --spacing-80: 80px;
+  --spacing-96: 96px;
   --spacing-120: 120px;
   --spacing-144: 144px;
 
@@ -1868,41 +1870,60 @@
   .social-proof-logo-bar {
     background: var(--color-paper);
     border-bottom: 1px solid var(--color-chalk);
-    padding: var(--spacing-24) 0;
+    padding: var(--spacing-64) 0;
   }
 
-  .logo-bar-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--spacing-20);
-  }
-
-  .logo-bar-label {
+  .logo-bar-title {
     font-size: var(--text-caption);
+    text-transform: uppercase;
+    font-weight: var(--font-weight-semibold);
     color: var(--color-pencil);
-    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.129em;
+    text-align: center;
+    margin-bottom: var(--spacing-32);
   }
 
-  .logos-container {
+  .logos-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--spacing-24);
+    width: 100%;
+  }
+
+  .logo-card {
+    background: var(--color-paper);
+    border: 1px solid var(--color-chalk);
+    border-radius: var(--radius-xl);
+    height: 80px;
     display: flex;
     align-items: center;
-    gap: var(--spacing-40);
-    flex-wrap: wrap;
+    justify-content: center;
+    padding: var(--spacing-16);
+    box-shadow: 0 4px 12px rgba(15, 20, 30, 0.02);
+    transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: default;
   }
 
-  .mock-logo {
-    font-size: var(--text-subheading);
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-haze);
-    letter-spacing: -0.5px;
-    user-select: none;
+  .logo-card:hover {
+    border-color: var(--color-haze);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px -8px rgba(15, 20, 30, 0.08);
+  }
+
+  .logo-card svg {
+    max-width: 100%;
+    max-height: 28px;
+    color: var(--color-fog);
+    transition: color 0.2s ease;
+  }
+
+  .logo-card:hover svg {
+    color: var(--color-ink);
   }
 
   /* Steps Section / How It Works */
   .how-it-works-section {
-    padding: var(--spacing-80) 0;
+    padding: var(--spacing-96) 0;
     background: var(--color-paper);
     border-bottom: 1px solid var(--color-chalk);
   }
@@ -1913,6 +1934,11 @@
     color: var(--color-carbon);
     margin-bottom: var(--spacing-12);
     font-weight: var(--font-weight-semibold);
+  }
+
+  .steps-grid-content {
+    margin-top: var(--spacing-48);
+    align-items: center;
   }
 
   .steps-list-wrapper {
@@ -2118,7 +2144,7 @@
   /* Bento Grid / Feature Section */
   .bento-grid-section {
     background: var(--color-mist);
-    padding: var(--spacing-80) 0;
+    padding: var(--spacing-96) 0;
     border-bottom: 1px solid var(--color-chalk);
   }
 
@@ -2424,7 +2450,7 @@
 
   /* FAQ Accordions */
   .faq-section {
-    padding: var(--spacing-80) 0;
+    padding: var(--spacing-96) 0;
     background: var(--color-paper);
     border-bottom: 1px solid var(--color-chalk);
   }
@@ -2645,13 +2671,13 @@
       right: 0;
     }
 
-    .logo-bar-wrapper {
-      flex-direction: column;
-      align-items: flex-start;
+    .logos-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--spacing-16);
     }
 
-    .logos-container {
-      gap: var(--spacing-20);
+    .logo-card {
+      height: 70px;
     }
 
     .footer-content-wrapper {
@@ -2671,5 +2697,11 @@
 
     .footer-nav {
       flex-wrap: wrap;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .logos-grid {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
