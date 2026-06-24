@@ -8,6 +8,14 @@
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='logoGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%231a91f0'/%3E%3Cstop offset='100%25' stop-color='%23016fd0'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='24' height='24' rx='6' fill='url(%23logoGrad)'/%3E%3Cpath d='M7 5h6.5l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 7 19V5z' fill='%23ffffff'/%3E%3Cpath d='M13.5 5v4.5H18L13.5 5z' fill='%2393c5fd' opacity='0.85'/%3E%3Crect x='9' y='12' width='6' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3Crect x='9' y='14.5' width='6' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3Crect x='9' y='17' width='4' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3C/svg%3E">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <noscript>
+    <style>
+      .reveal-on-scroll {
+        opacity: 1 !important;
+        transform: none !important;
+      }
+    </style>
+  </noscript>
 </head>
 <body class="landing-page">
 
@@ -217,7 +225,7 @@
           <!-- Left Column step list -->
           <div class="steps-list-wrapper">
             
-            <div class="step-list-card active" onclick="activateStep(1)" id="step-card-1">
+            <div class="step-list-card active" onclick="activateStep(1)" onkeydown="if(event.key === 'Enter') activateStep(1)" tabindex="0" id="step-card-1">
               <div class="step-indicator-wrapper">
                 <span class="step-num">01</span>
                 <div class="step-content">
@@ -228,7 +236,7 @@
               <svg class="step-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
 
-            <div class="step-list-card" onclick="activateStep(2)" id="step-card-2">
+            <div class="step-list-card" onclick="activateStep(2)" onkeydown="if(event.key === 'Enter') activateStep(2)" tabindex="0" id="step-card-2">
               <div class="step-indicator-wrapper">
                 <span class="step-num">02</span>
                 <div class="step-content">
@@ -239,7 +247,7 @@
               <svg class="step-arrow" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
             </div>
 
-            <div class="step-list-card" onclick="activateStep(3)" id="step-card-3">
+            <div class="step-list-card" onclick="activateStep(3)" onkeydown="if(event.key === 'Enter') activateStep(3)" tabindex="0" id="step-card-3">
               <div class="step-indicator-wrapper">
                 <span class="step-num">03</span>
                 <div class="step-content">

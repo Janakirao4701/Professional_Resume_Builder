@@ -563,12 +563,32 @@ function toggleDetailsForm() {
     drawer.classList.add('active');
     overlay.classList.add('active');
     btn.classList.add('active');
+    drawer.setAttribute('aria-hidden', 'false');
+    if (window.location.hash !== '#profile-details') {
+      window.history.pushState({ drawerOpen: true }, '', '#profile-details');
+    }
   } else {
     drawer.classList.remove('active');
     overlay.classList.remove('active');
     btn.classList.remove('active');
+    drawer.setAttribute('aria-hidden', 'true');
+    if (window.location.hash === '#profile-details') {
+      window.history.back();
+    }
   }
 }
+
+window.addEventListener('popstate', () => {
+  const drawer = document.getElementById('profile-drawer');
+  if (drawer && drawer.classList.contains('active')) {
+    drawer.classList.remove('active');
+    const overlay = document.getElementById('drawer-overlay');
+    if (overlay) overlay.classList.remove('active');
+    const btn = document.getElementById('toggle-details-btn');
+    if (btn) btn.classList.remove('active');
+    drawer.setAttribute('aria-hidden', 'true');
+  }
+});
 
 function updateProfileField(field, value) {
   const errSpan = document.getElementById(`error-prof-${field}`);
@@ -830,11 +850,22 @@ let currentZoomScale = 'auto';
 function setZoomScale(scale) {
   currentZoomScale = scale;
   
+  const pane = document.querySelector('.preview-pane');
+  if (pane) {
+    if (scale === 'scroll') {
+      pane.classList.add('scrollable-mode');
+    } else {
+      pane.classList.remove('scrollable-mode');
+    }
+  }
+  
   // Update zoom active buttons styling
   const buttons = document.querySelectorAll('.btn-zoom');
   buttons.forEach(btn => {
     btn.classList.remove('active');
     if (scale === 'auto' && btn.id === 'btn-zoom-auto') {
+      btn.classList.add('active');
+    } else if (scale === 'scroll' && btn.id === 'btn-zoom-scroll') {
       btn.classList.add('active');
     } else if (scale === 0.75 && btn.id === 'btn-zoom-75') {
       btn.classList.add('active');
@@ -850,6 +881,15 @@ function setZoomScale(scale) {
 
 function adjustPreviewScale() {
   if (isScaling) return;
+  if (currentZoomScale === 'scroll') {
+    const mockup = document.getElementById('resume-mockup');
+    if (mockup) {
+      mockup.style.transform = 'none';
+      mockup.style.transformOrigin = 'initial';
+      mockup.style.marginBottom = '0';
+    }
+    return;
+  }
   
   const pane = document.querySelector('.preview-pane');
   const mockup = document.getElementById('resume-mockup');
@@ -894,7 +934,16 @@ function adjustPreviewScale() {
     isScaling = false;
   });
 }
-window.addEventListener('resize', adjustPreviewScale);
+
+let cachedWidth = window.innerWidth;
+window.addEventListener('resize', () => {
+  const currentWidth = window.innerWidth;
+  if (Math.abs(currentWidth - cachedWidth) < 12) {
+    return;
+  }
+  cachedWidth = currentWidth;
+  adjustPreviewScale();
+});
 
 // ── PREVIEW BUILDER ──
 function updatePreviewRaw() {
@@ -1318,6 +1367,21 @@ document.addEventListener('paste', (e) => {
 });
 
 // ── DRAG AND DROP TEXT FILES ──
+function handleMobileFileImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    document.getElementById('resume-text').value = evt.target.result;
+    detectSectionsAndCompanies();
+    updatePreviewImmediate();
+    showToast("Imported resume text file");
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   const dropArea = document.querySelector('.drop-area');
   if (dropArea) {
@@ -1350,6 +1414,17 @@ window.addEventListener('DOMContentLoaded', () => {
         reader.readAsText(file);
       }
     });
+
+    const hintWrapper = document.querySelector('.drop-hint-wrapper');
+    if (hintWrapper) {
+      hintWrapper.addEventListener('click', (e) => {
+        if (e.target.id === 'paste-btn' || e.target.closest('#paste-btn')) {
+          return;
+        }
+        const fileInput = document.getElementById('mobile-text-import');
+        if (fileInput) fileInput.click();
+      });
+    }
   }
 });
 
