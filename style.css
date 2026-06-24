@@ -3054,11 +3054,15 @@
   }
   
   .kw-tag {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 600;
-    padding: 2px 6px;
+    padding: 3px 8px;
     border-radius: 4px;
-    font-family: monospace;
+    font-family: 'Outfit', sans-serif;
+    line-height: 1.3;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   
   .kw-tag.match {
@@ -3181,22 +3185,26 @@
   .group-title.weaknesses { color: #991b1b; }
   .group-title.improvements { color: var(--color-carbon); }
 
-  /* Keyword Tag Categories */
-  .kw-tag.critical {
-    background: #fef2f2;
+  /* Keyword Tag Categories — matched tags stay green, missing stay red.
+     Category badge (C)/(I)/(P) inside the tag gets a subtle colored dot. */
+  .kw-tag.match.critical,
+  .kw-tag.match.important,
+  .kw-tag.match.preferred {
+    background: var(--color-pale-green);
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+  .kw-tag.missing.critical,
+  .kw-tag.missing.important,
+  .kw-tag.missing.preferred {
+    background: var(--color-pale-red);
     color: #991b1b;
     border: 1px solid #fecaca;
   }
-  .kw-tag.important {
-    background: #fffbeb;
-    color: #92400e;
-    border: 1px solid #fde68a;
-  }
-  .kw-tag.preferred {
-    background: #eff6ff;
-    color: #1e40af;
-    border: 1px solid #bfdbfe;
-  }
+  /* Subtle left-accent to differentiate priority within each column */
+  .kw-tag.critical  { border-left: 3px solid #ef4444; }
+  .kw-tag.important { border-left: 3px solid #f59e0b; }
+  .kw-tag.preferred { border-left: 3px solid #3b82f6; }
 
   /* Scoring Loading Overlay & Spinner */
   .scoring-loading-overlay {
