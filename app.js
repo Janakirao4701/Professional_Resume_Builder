@@ -86,11 +86,15 @@ window.triggerMobilePDF = triggerMobilePDF;
 window.triggerMobileDOCX = triggerMobileDOCX;
 window.triggerMobileImport = triggerMobileImport;
 window.triggerMobileExport = triggerMobileExport;
-window.toggleAIAssistant = toggleAIAssistant;
+window.toggleAccordion = toggleAccordion;
 window.loadSelectedPrompt = loadSelectedPrompt;
 window.copyAIPrompt = copyAIPrompt;
-window.toggleJDPane = toggleJDPane;
 window.setZoomScale = setZoomScale;
+window.updateEditorWordCount = updateEditorWordCount;
+window.updateSectionTags = updateSectionTags;
+window.insertSectionTemplate = insertSectionTemplate;
+window.pasteRefinedText = pasteRefinedText;
+window.toggleFullscreenPreview = toggleFullscreenPreview;
 window.undoEdit = undoEdit;
 window.redoEdit = redoEdit;
 window.toggleTheme = toggleTheme;
@@ -127,6 +131,10 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'Tab') {
     trapFocusInDrawer(e);
   } else if (e.key === 'Escape') {
+    const pane = document.querySelector('.preview-pane');
+    if (pane && pane.classList.contains('fullscreen-preview')) {
+      toggleFullscreenPreview();
+    }
     const drawer = document.getElementById('profile-drawer');
     if (drawer && drawer.classList.contains('active')) {
       toggleDetailsForm();
@@ -187,7 +195,11 @@ function switchProfile(profileId) {
   const mobileSelect = document.getElementById('mobile-profile-select');
   if (mobileSelect) mobileSelect.value = currentProfileId;
   
+  document.title = `${currentProfileId} — Resume Builder`;
+  
   document.getElementById('resume-text').value = activeProfile.text;
+  updateEditorWordCount();
+  updateSectionTags();
   renderFormFields();
   detectSectionsAndCompanies();
   updatePreviewImmediate();
@@ -228,6 +240,8 @@ async function createNewProfile() {
   updateProfileSelectDropdown();
   
   document.getElementById('resume-text').value = activeProfile.text;
+  updateEditorWordCount();
+  updateSectionTags();
   renderFormFields();
   detectSectionsAndCompanies();
   updatePreviewImmediate();
@@ -260,6 +274,8 @@ async function duplicateCurrentProfile() {
   updateProfileSelectDropdown();
   
   document.getElementById('resume-text').value = activeProfile.text;
+  updateEditorWordCount();
+  updateSectionTags();
   renderFormFields();
   detectSectionsAndCompanies();
   updatePreviewImmediate();
@@ -387,6 +403,13 @@ function toggleDetailsForm() {
     overlay.classList.add('active');
     btn.classList.add('active');
     drawer.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('fullscreen-lock');
+    
+    const drawerTitle = document.getElementById('drawer-title');
+    if (drawerTitle) {
+      drawerTitle.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Profile Details (${currentProfileId})`;
+    }
+    
     if (window.location.hash !== '#profile-details') {
       window.history.pushState({ drawerOpen: true }, '', '#profile-details');
     }
@@ -395,6 +418,15 @@ function toggleDetailsForm() {
     overlay.classList.remove('active');
     btn.classList.remove('active');
     drawer.setAttribute('aria-hidden', 'true');
+    
+    const mobileMenu = document.getElementById('mobile-menu-drawer');
+    const pane = document.querySelector('.preview-pane');
+    const isMobileMenu = mobileMenu && mobileMenu.classList.contains('active');
+    const isFullscreen = pane && pane.classList.contains('fullscreen-preview');
+    if (!isMobileMenu && !isFullscreen) {
+      document.body.classList.remove('fullscreen-lock');
+    }
+    
     if (window.location.hash === '#profile-details') {
       window.history.back();
     }
@@ -410,6 +442,14 @@ window.addEventListener('popstate', () => {
     const btn = document.getElementById('toggle-details-btn');
     if (btn) btn.classList.remove('active');
     drawer.setAttribute('aria-hidden', 'true');
+    
+    const mobileMenu = document.getElementById('mobile-menu-drawer');
+    const pane = document.querySelector('.preview-pane');
+    const isMobileMenu = mobileMenu && mobileMenu.classList.contains('active');
+    const isFullscreen = pane && pane.classList.contains('fullscreen-preview');
+    if (!isMobileMenu && !isFullscreen) {
+      document.body.classList.remove('fullscreen-lock');
+    }
   }
 });
 
@@ -614,7 +654,8 @@ async function pasteFromClipboard() {
     text = text.replace(/^(\d+\.)(?!\d)\s*/gm, '- ');
     document.getElementById('resume-text').value = text;
     activeProfile.text = text;
-    
+    updateEditorWordCount();
+    updateSectionTags();
     detectSectionsAndCompanies();
     updatePreview();
     
@@ -702,9 +743,18 @@ function toggleMobileMenu(show) {
   if (show) {
     overlay.classList.add('active');
     drawer.classList.add('active');
+    document.body.classList.add('fullscreen-lock');
   } else {
     overlay.classList.remove('active');
     drawer.classList.remove('active');
+    
+    const detailsDrawer = document.getElementById('profile-drawer');
+    const pane = document.querySelector('.preview-pane');
+    const isDetailsActive = detailsDrawer && detailsDrawer.classList.contains('active');
+    const isFullscreenActive = pane && pane.classList.contains('fullscreen-preview');
+    if (!isDetailsActive && !isFullscreenActive) {
+      document.body.classList.remove('fullscreen-lock');
+    }
   }
 }
 
@@ -728,14 +778,18 @@ function triggerMobileExport() {
   exportProfiles();
 }
 
-function toggleAIAssistant() {
-  const container = document.querySelector('.ai-assistant-container');
-  const btn = document.getElementById('ai-assistant-toggle');
-  if (container) {
-    container.classList.toggle('expanded');
-    const isExpanded = container.classList.contains('expanded');
-    if (btn) {
-      btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+function toggleAccordion(contentId, btnId) {
+  const content = document.getElementById(contentId);
+  const btn = document.getElementById(btnId);
+  if (!content || !btn) return;
+
+  const isExpanded = content.classList.toggle('expanded');
+  btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+
+  if (contentId === 'ai-assistant-content') {
+    const container = document.querySelector('.ai-assistant-container');
+    if (container) {
+      container.classList.toggle('expanded', isExpanded);
     }
     if (isExpanded) {
       const select = document.getElementById('ai-role-select');
@@ -743,16 +797,126 @@ function toggleAIAssistant() {
         loadSelectedPrompt();
       }
     }
+  } else if (contentId === 'jd-content') {
+    const container = document.querySelector('.jd-accordion');
+    if (container) {
+      container.classList.toggle('expanded', isExpanded);
+    }
   }
 }
 
-function toggleJDPane() {
-  const pane = document.getElementById('jd-content');
-  const btn = document.getElementById('jd-toggle-btn');
-  if (pane && btn) {
-    const isExpanded = pane.classList.toggle('expanded');
-    btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+function updateEditorWordCount() {
+  const textarea = document.getElementById('resume-text');
+  const countEl = document.getElementById('editor-word-count');
+  if (!textarea || !countEl) return;
+  const text = textarea.value.trim();
+  const words = text ? text.split(/\s+/).length : 0;
+  const chars = textarea.value.length;
+  countEl.textContent = `${words} word${words !== 1 ? 's' : ''} | ${chars} char${chars !== 1 ? 's' : ''}`;
+}
+
+function updateSectionTags() {
+  const container = document.getElementById('section-tags-container');
+  const textarea = document.getElementById('resume-text');
+  if (!container || !textarea) return;
+
+  const text = textarea.value;
+  const sections = [
+    { id: 'summary', label: 'Summary', pattern: /(?:^|\n)\s*\[?(?:SUMMARY|PROFESSIONAL SUMMARY)\]?:?/i },
+    { id: 'skills', label: 'Skills', pattern: /(?:^|\n)\s*\[?(?:SKILLS|TECHNICAL SKILLS)\]?:?/i },
+    { id: 'experience', label: 'Experience', pattern: /(?:^|\n)\s*\[?(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]?:?/i }
+  ];
+
+  let html = '';
+  sections.forEach(sec => {
+    const found = sec.pattern.test(text);
+    if (found) {
+      html += `<span class="tag-pill found">✓ ${sec.label}</span>`;
+    } else {
+      html += `<button class="tag-pill missing" onclick="insertSectionTemplate('${sec.id}')">+ Add ${sec.label}</button>`;
+    }
+  });
+
+  container.innerHTML = html;
+}
+
+function insertSectionTemplate(id) {
+  const textarea = document.getElementById('resume-text');
+  if (!textarea) return;
+
+  const sections = {
+    summary: '\n\n[SUMMARY]\nA results-driven professional with expertise in...',
+    skills: '\n\n[SKILLS]\n- Skill 1\n- Skill 2\n- Skill 3',
+    experience: '\n\n[EXPERIENCE]\nCompany | Location | Role | Dates\n- Bullet point 1\n- Bullet point 2'
+  };
+
+  const template = sections[id];
+  if (!template) return;
+
+  const appendVal = textarea.value.trim() ? template : template.trim();
+  textarea.value += appendVal;
+  
+  textarea.dispatchEvent(new Event('input'));
+  textarea.focus();
+}
+
+async function pasteRefinedText() {
+  const textarea = document.getElementById('resume-text');
+  if (!textarea) return;
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text && text.trim()) {
+      textarea.value = text;
+      activeProfile.text = text;
+      updateEditorWordCount();
+      updateSectionTags();
+      detectSectionsAndCompanies();
+      updatePreviewImmediate();
+      scanKeywordsRealtime();
+      showToast("Pasted refined resume text");
+      recordStateChange(text);
+    } else {
+      showToast("Clipboard is empty or contains no text");
+    }
+  } catch (err) {
+    console.error("Clipboard read failed: ", err);
+    showToast("Could not access clipboard. Please paste manually into the editor.");
   }
+}
+
+function toggleFullscreenPreview() {
+  const pane = document.querySelector('.preview-pane');
+  const btn = document.getElementById('btn-zoom-full');
+  if (!pane) return;
+
+  const isFullscreen = pane.classList.toggle('fullscreen-preview');
+  
+  if (isFullscreen) {
+    document.body.classList.add('fullscreen-lock');
+    if (btn) {
+      btn.classList.add('active');
+      btn.innerHTML = `
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 9V3.75m0 0H3.75m5.25 0l-6.3 6.3M15 9V3.75m0 0h5.25M15 3.75l6.3 6.3M9 15v5.25m0 0H3.75M9 20.25l-6.3-6.3M15 15v5.25m0 0h5.25M15 20.25l6.3-6.3"/></svg>
+        <span>Exit Full</span>
+      `;
+    }
+  } else {
+    const drawer = document.getElementById('profile-drawer');
+    const mobileMenu = document.getElementById('mobile-menu-drawer');
+    const isDrawerOpen = drawer && drawer.classList.contains('active');
+    const isMobileMenuOpen = mobileMenu && mobileMenu.classList.contains('active');
+    if (!isDrawerOpen && !isMobileMenuOpen) {
+      document.body.classList.remove('fullscreen-lock');
+    }
+    if (btn) {
+      btn.classList.remove('active');
+      btn.innerHTML = `
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9V3.75m0 0h5.25m-5.25 0l6.3 6.3M20.25 9V3.75m0 0h-5.25m5.25 0l-6.3 6.3M3.75 15v5.25m0 0h5.25m-5.25 0l6.3-6.3M20.25 15v5.25m0 0h-5.25m5.25 0l-6.3-6.3"/></svg>
+        <span>Full View</span>
+      `;
+    }
+  }
+  setTimeout(adjustPreviewScale, 50);
 }
 
 // ── DOM CONTENT LOADED EVENT HANDLER ──
@@ -763,10 +927,14 @@ window.addEventListener('DOMContentLoaded', () => {
   // 2. Initialize profiles state
   initProfiles();
 
+  document.title = `${currentProfileId} — Resume Builder`;
+
   // 3. Set initial textarea content
   const textarea = document.getElementById('resume-text');
   if (textarea) {
     textarea.value = activeProfile.text;
+    updateEditorWordCount();
+    updateSectionTags();
   }
   
   // 4. Update dropdown selections
@@ -851,6 +1019,8 @@ window.addEventListener('DOMContentLoaded', () => {
       scanKeywordsRealtime();
       
       detectSectionsAndCompanies();
+      updateEditorWordCount();
+      updateSectionTags();
       updatePreview();
       recordStateChange(this.value);
     };
@@ -859,23 +1029,25 @@ window.addEventListener('DOMContentLoaded', () => {
   // 10. Drag and drop features
   const dropArea = document.querySelector('.drop-area');
   if (dropArea) {
-    dropArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      dropArea.style.borderColor = 'var(--app-accent)';
-      dropArea.style.background = 'var(--app-accent-glow)';
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropArea.style.borderColor = 'var(--app-accent)';
+        dropArea.style.background = 'var(--app-accent-glow)';
+      });
     });
     
-    dropArea.addEventListener('dragleave', (e) => {
-      e.preventDefault();
-      dropArea.style.borderColor = 'var(--app-border)';
-      dropArea.style.background = 'var(--app-surface)';
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropArea.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropArea.style.borderColor = 'var(--app-border)';
+        dropArea.style.background = 'var(--app-surface)';
+      });
     });
     
     dropArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      dropArea.style.borderColor = 'var(--app-border)';
-      dropArea.style.background = 'var(--app-surface)';
-      
       const file = e.dataTransfer.files[0];
       if (file) {
         const reader = new FileReader();
@@ -883,6 +1055,8 @@ window.addEventListener('DOMContentLoaded', () => {
           if (textarea) {
             textarea.value = evt.target.result;
             activeProfile.text = evt.target.result;
+            updateEditorWordCount();
+            updateSectionTags();
             detectSectionsAndCompanies();
             updatePreviewImmediate();
             scanKeywordsRealtime();

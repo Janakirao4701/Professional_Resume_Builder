@@ -84,6 +84,7 @@ export function updateHeaderScoreBadge(score) {
   if (score === null || score === undefined || score === '--') {
     valEl.textContent = '--';
     badge.classList.add('no-score');
+    badge.title = "ATS Match Score. Enter a target Job Description below and click 'Analyze ATS Score' to calculate.";
     return;
   }
 
@@ -91,6 +92,7 @@ export function updateHeaderScoreBadge(score) {
   if (isNaN(targetVal)) {
     valEl.textContent = '--';
     badge.classList.add('no-score');
+    badge.title = "ATS Match Score. Enter a target Job Description below and click 'Analyze ATS Score' to calculate.";
     return;
   }
 
@@ -101,6 +103,8 @@ export function updateHeaderScoreBadge(score) {
   } else {
     badge.classList.add('low-score');
   }
+
+  badge.title = `Current ATS Match Score: ${targetVal}/100. Click to analyze again.`;
 
   const currentValText = valEl.textContent;
   const currentVal = (currentValText === '--' || isNaN(parseInt(currentValText))) ? 0 : parseInt(currentValText);

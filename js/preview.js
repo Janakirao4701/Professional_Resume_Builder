@@ -144,7 +144,7 @@ export function updatePreviewRaw() {
     display = display.replace(/^www\./i, '');
     display = display.replace(/-[a-zA-Z0-9]+(?=\/?$)/, '');
     display = display.replace(/\/+$/, '');
-    contactParts.push(`<a href="${escHtml(hrefUrl)}" target="_blank">${escHtml(display)}</a>`);
+    contactParts.push(`<a href="${escHtml(hrefUrl)}" target="_blank" rel="noopener noreferrer">${escHtml(display)}</a>`);
   }
   const contactHtml = contactParts.join(' &nbsp;|&nbsp; ');
 
@@ -247,7 +247,6 @@ export function updatePreviewRaw() {
     page.className = 'preview-page';
     page.id = `page-${num}`;
     page.innerHTML = `
-      <div class="mock-page-border"></div>
       <div class="page-content"></div>
     `;
     return page;
@@ -268,6 +267,17 @@ export function updatePreviewRaw() {
       pageContent = currentPage.querySelector('.page-content');
       pageContent.appendChild(el);
     }
+  });
+
+  // Dynamically inject non-printable Page X of Y indicators
+  const pages = mockup.querySelectorAll('.preview-page');
+  const totalPages = pages.length;
+  pages.forEach((page, index) => {
+    const pNum = index + 1;
+    const indicator = document.createElement('div');
+    indicator.className = 'page-indicator';
+    indicator.textContent = `Page ${pNum} of ${totalPages}`;
+    page.parentNode.insertBefore(indicator, page);
   });
 
   if (typeof window.updateCombinedPromptPreview === 'function') {
