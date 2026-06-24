@@ -14,12 +14,10 @@ export default {
             headers: { 'Content-Type': 'application/json' }
           });
         }
-        if (!jobDescription || !jobDescription.trim()) {
-          return new Response(JSON.stringify({ error: 'Job description text is required.' }), {
-            status: 400,
-            headers: { 'Content-Type': 'application/json' }
-          });
-        }
+
+        const targetJD = (jobDescription && jobDescription.trim()) 
+          ? jobDescription.trim() 
+          : "Evaluate overall general resume strength, readability, formatting, and structural quality without a specific target job description.";
 
         const apiKey = env.OPENROUTER_API_KEY || env['OPENROUTER API KEY'] || globalThis.OPENROUTER_API_KEY || globalThis['OPENROUTER API KEY'] || '';
         const model = env.OPENROUTER_MODEL || 'google/gemini-2.5-flash';
@@ -88,7 +86,7 @@ Make the strengths and weaknesses descriptive and actionable (e.g. "ATS: Spelled
         const userPrompt = `### TODAY'S DATE: ${todayDate}
 
 ### JOB DESCRIPTION:
-${jobDescription}
+${targetJD}
 
 ### RESUME CONTENT:
 ${resumeText}`;

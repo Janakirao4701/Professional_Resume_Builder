@@ -42,19 +42,28 @@
     <button class="btn-hdr-action" onclick="createNewProfile()" title="Create Blank Profile" aria-label="Create Blank Profile">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg> New
     </button>
-    <button class="btn-hdr-action" onclick="renameCurrentProfile()" title="Rename Current Profile" aria-label="Rename Current Profile">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg> Rename
-    </button>
-    <button class="btn-hdr-action btn-hdr-danger" onclick="deleteCurrentProfile()" title="Delete Current Profile" aria-label="Delete Current Profile">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg> Delete
+    <button class="btn-hdr-action btn-hdr-danger" onclick="deleteCurrentProfileConfirm(event)" title="Delete Current Profile" aria-label="Delete Current Profile" id="delete-profile-btn">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg> <span>Delete</span>
     </button>
     <div class="hdr-divider"></div>
-    <button class="btn-hdr-action" onclick="triggerImport()" title="Import JSON Profiles" aria-label="Import JSON Profiles">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg> Import
-    </button>
-    <button class="btn-hdr-action" onclick="exportProfiles()" title="Export JSON Backup" aria-label="Export JSON Backup">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5" /></svg> Export
-    </button>
+    
+    <!-- Overflow Dropdown for Secondary Actions -->
+    <div class="hdr-dropdown">
+      <button class="btn-hdr-action" onclick="toggleHdrDropdown(event)" title="More Profile Actions" aria-label="More Profile Actions" id="hdr-dropdown-btn" type="button">
+        <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; display: inline-block; margin-right: 2px;" aria-hidden="true"><path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z"/></svg> <span>More</span>
+      </button>
+      <div class="hdr-dropdown-menu" id="hdr-dropdown-menu">
+        <button class="dropdown-item" type="button" onclick="renameCurrentProfile(); closeHdrDropdown();">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px;"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg> Rename Profile
+        </button>
+        <button class="dropdown-item" type="button" onclick="triggerImport(); closeHdrDropdown();">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg> Import JSON
+        </button>
+        <button class="dropdown-item" type="button" onclick="exportProfiles(); closeHdrDropdown();">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5" /></svg> Export Backup
+        </button>
+      </div>
+    </div>
     <input type="file" id="import-file-input" style="display: none;" accept=".json" onchange="importProfiles(event)">
   </div>
   
@@ -86,7 +95,9 @@
 <div class="mobile-menu-drawer" id="mobile-menu-drawer">
   <div class="drawer-title-row">
     <h3>Settings & Actions</h3>
-    <button class="drawer-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close menu">✕</button>
+    <button class="drawer-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close menu">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+    </button>
   </div>
   
   <div class="drawer-card">
@@ -155,7 +166,7 @@
     <div class="input-zone">
       <div class="zone-label">Paste Professional Experience</div>
       <div class="zone-sub">
-        Enter your work history (companies, roles, dates, and bullet points) below. Summary, skills, and contact details can be edited in the <strong style="display:inline-flex; align-items:center; gap:3px;"><svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Info</strong> drawer.
+        Enter your work history (companies, roles, dates, and bullet points) below. Summary, skills, and contact details can be edited in the <strong>Edit Info (⚙)</strong> drawer in the header.
       </div>
 
       <!-- ✨ AI Tailoring Assistant Accordion Panel -->
@@ -227,124 +238,142 @@
 
       <div class="drop-area double-bezel-outer">
         <div class="double-bezel-inner" style="padding: 0; overflow: hidden;">
-          <div class="drop-hint-wrapper" style="flex-direction: column; gap: 4px;">
-            <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="color: var(--app-ink-muted);"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-            <div class="drop-hint">Drop your experience text file here or <strong>paste directly</strong></div>
+          <div class="drop-hint-wrapper" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--color-chalk);">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="color: var(--app-ink-muted); flex-shrink: 0;"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+              <div class="drop-hint" style="font-size: 11px;">Drop experience file here or paste directly</div>
+            </div>
+            <button class="btn-dl" id="paste-btn" onclick="pasteFromClipboard()" style="height: 24px; padding: 0 8px; font-size: 10px; display: flex; align-items: center; gap: 4px; margin: 0; border-radius: 4px;">
+              <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink: 0;" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+              </svg>
+              <span>Paste</span>
+            </button>
           </div>
           <textarea id="resume-text" spellcheck="false" placeholder="Company | Location | Role | Dates&#10;- Bullet point 1&#10;- Bullet point 2" aria-label="Resume experience and details editor"></textarea>
         </div>
       </div>
 
-      <div style="margin-top: 10px; display: flex; justify-content: center;">
-        <button class="btn-dl" id="paste-btn" onclick="pasteFromClipboard()" style="padding: 6px 12px; font-size: 11px; display: flex; align-items: center; gap: 6px;">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24" style="flex-shrink: 0;" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-          </svg>
-          <span>Paste from Clipboard</span>
-        </button>
+      <!-- Job Description Input Panel (Optional) -->
+      <div class="jd-accordion double-bezel-outer" style="margin-top: 16px;">
+        <div class="double-bezel-inner" style="padding: 0; overflow: hidden;">
+          <button class="jd-accordion-btn" id="jd-toggle-btn" onclick="toggleJDPane()" aria-expanded="false" aria-controls="jd-content" type="button">
+            <span style="display: flex; flex-direction: column; align-items: flex-start; text-align: left; gap: 2px;">
+              <span style="font-weight: 600; font-size: 13px; color: var(--color-carbon);">🎯 Paste Target Job Description</span>
+              <span style="font-size: 10px; color: var(--color-pencil); font-weight: normal;">Optional: enables target keyword matching & improves ATS accuracy</span>
+            </span>
+            <svg class="chevron-icon-mini" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="transition: transform 0.2s;"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+          </button>
+          <div class="jd-content-pane" id="jd-content">
+            <div style="padding: 12px 16px;">
+              <textarea id="jd-text" placeholder="Paste the target job description here to analyze keyword match rate..." aria-label="Job description for keyword matching" style="min-height: 120px; width: 100%; border: 1px solid var(--color-chalk); border-radius: 6px; padding: 10px; font-size: 12px; font-family: var(--font-tt-commons); background: var(--color-paper); resize: vertical; outline: none;"></textarea>
+              <div class="jd-word-count" id="jd-word-count" style="font-size: 10px; color: var(--color-fog); text-align: right; margin-top: 4px;">0 words</div>
+              <div class="analyze-divider" style="height: 1px; background: var(--color-chalk); margin: 12px 0;"></div>
+              <div>
+                <button class="btn-dl analyze-btn-full" id="analyze-btn" type="button" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; height: 36px; border-radius: 8px; background: var(--color-signal-blue); color: var(--color-paper); border: none; font-weight: 600; cursor: pointer; transition: background 0.15s;">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" /></svg>
+                  <span>Analyze ATS Score</span>
+                  <span class="btn-arrow-circle" style="background: rgba(255, 255, 255, 0.25); display: flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%;">
+                    <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- 📈 Resume Strength Scoring Panel -->
+      <!-- 📈 Resume Strength Scoring & Analysis Panel -->
       <div class="scoring-container double-bezel-outer" style="margin-top: 16px; position: relative;">
         <div class="scoring-loading-overlay" id="scoring-loading" style="display: none;">
           <div class="spinner-loader"></div>
           <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--app-ink-muted);">Analyzing Resume...</span>
         </div>
         <div class="double-bezel-inner" style="padding: 16px;">
-          <div class="score-header">
-            <span class="header-title">📈 Resume Strength Score</span>
-            <span class="overall-badge" id="overall-score-badge">0/100</span>
+          <!-- Empty State (Shown initially) -->
+          <div class="score-empty-state" id="score-empty-state" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px 12px;">
+            <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" style="color: var(--color-fog); margin-bottom: 8px;"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.3 0A2.25 2.25 0 0 1 12 15.75h-3a2.25 2.25 0 0 1-2.166-1.638" /></svg>
+            <span style="font-size: 13px; font-weight: 600; color: var(--color-carbon); display: block; margin-bottom: 4px;">No Analysis Data Yet</span>
+            <p style="font-size: 11px; color: var(--color-pencil); line-height: 1.4; max-width: 280px; margin: 0 auto 12px auto;">Paste your experience, add an optional Job Description, and click Analyze to generate your scores and checklist.</p>
           </div>
-          
-          <div class="score-summary-grid">
-            <!-- Radial progress meter -->
-            <div class="radial-score-wrapper">
-              <svg class="radial-ring" viewBox="0 0 36 36" width="64" height="64">
-                <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--color-chalk)" stroke-width="3" />
-                <path class="ring-fill" id="overall-radial-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--color-signal-blue)" stroke-width="3" stroke-dasharray="0, 100" stroke-linecap="round" />
-              </svg>
-              <div class="radial-text" id="overall-score-pct">0%</div>
+
+          <!-- Score Results details container (hidden initially, shown after analysis) -->
+          <div id="score-details-container" style="display: none;">
+            <div class="score-header">
+              <span class="header-title">📈 Resume Strength Score</span>
+              <span class="overall-badge" id="overall-score-badge">0/100</span>
             </div>
             
-            <!-- Three mini dimensions -->
-            <div class="dimension-scores-list">
-              <div class="dim-score-row">
-                <div class="dim-labels">
-                  <span class="dim-name">ATS Score</span>
-                  <span class="dim-val" id="ats-score-val">0/100</span>
-                </div>
-                <div class="dim-bar-track">
-                  <div class="dim-bar-fill" id="ats-score-bar" style="width: 0%;"></div>
-                </div>
+            <div class="score-summary-grid">
+              <!-- Radial progress meter -->
+              <div class="radial-score-wrapper">
+                <svg class="radial-ring" viewBox="0 0 36 36" width="64" height="64">
+                  <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--color-chalk)" stroke-width="3" />
+                  <path class="ring-fill" id="overall-radial-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--color-signal-blue)" stroke-width="3" stroke-dasharray="0, 100" stroke-linecap="round" />
+                </svg>
+                <div class="radial-text" id="overall-score-pct">0%</div>
               </div>
-              <div class="dim-score-row">
-                <div class="dim-labels">
-                  <span class="dim-name">Recruiter Appeal</span>
-                  <span class="dim-val" id="recruiter-score-val">0/100</span>
-                </div>
-                <div class="dim-bar-track">
-                  <div class="dim-bar-fill" id="recruiter-score-bar" style="width: 0%;"></div>
-                </div>
-              </div>
-              <div class="dim-score-row">
-                <div class="dim-labels">
-                  <span class="dim-name">Technical Credibility</span>
-                  <span class="dim-val" id="technical-score-val">0/100</span>
-                </div>
-                <div class="dim-bar-track">
-                  <div class="dim-bar-fill" id="technical-score-bar" style="width: 0%;"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="score-formula-note" id="score-formula-note" style="display:none;">Overall = ATS×40% + Recruiter×35% + Technical×25%</div>
- 
-          <!-- Job Description Accordion -->
-          <div class="jd-accordion">
-            <button class="jd-accordion-btn" id="jd-toggle-btn" onclick="toggleJDPane()" aria-expanded="true" aria-controls="jd-content" type="button">
-              <span>🎯 Paste Job Description for Keyword Match</span>
-              <svg class="chevron-icon-mini" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
-            </button>
-            <div class="jd-content-pane expanded" id="jd-content">
-              <textarea id="jd-text" placeholder="Paste the target job description here..." aria-label="Job description for keyword matching"></textarea>
-              <div class="jd-word-count" id="jd-word-count">0 words</div>
-              <div class="analyze-divider"></div>
-              <div style="margin-top: 10px; margin-bottom: 12px;">
-                <button class="btn-dl analyze-btn-full" id="analyze-btn">
-                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" /></svg>
-                  <span>Analyze ATS Score</span>
-                  <span class="btn-arrow-circle" style="background: rgba(255, 255, 255, 0.25);">
-                    <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                  </span>
-                </button>
-              </div>
-              <div class="keyword-feedback" id="keyword-feedback" style="display: none;">
-                <div class="kw-stat-row">
-                  <span>Match Rate: <strong id="keyword-match-rate">0%</strong></span>
-                  <span id="keyword-match-count">0 of 0 keywords</span>
-                </div>
-                <div class="ats-gap-note" id="ats-gap-note" style="display:none;">ATS score also factors formatting, structure, and date accuracy — not just keywords.</div>
-                <div class="kw-legend"><span class="legend-tag critical">(C)</span> Critical · <span class="legend-tag important">(I)</span> Important · <span class="legend-tag preferred">(P)</span> Preferred</div>
-                <div class="kw-lists">
-                  <div class="kw-column">
-                    <span class="kw-title match">Matched Keywords</span>
-                    <div class="kw-tags" id="matched-kw-tags"></div>
+              
+              <!-- Three mini dimensions -->
+              <div class="dimension-scores-list">
+                <div class="dim-score-row">
+                  <div class="dim-labels">
+                    <span class="dim-name">ATS Score</span>
+                    <span class="dim-val" id="ats-score-val">0/100</span>
                   </div>
-                  <div class="kw-column">
-                    <span class="kw-title missing">Missing Keywords</span>
-                    <div class="kw-tags" id="missing-kw-tags"></div>
+                  <div class="dim-bar-track">
+                    <div class="dim-bar-fill" id="ats-score-bar" style="width: 0%;"></div>
+                  </div>
+                </div>
+                <div class="dim-score-row">
+                  <div class="dim-labels">
+                    <span class="dim-name">Recruiter Appeal</span>
+                    <span class="dim-val" id="recruiter-score-val">0/100</span>
+                  </div>
+                  <div class="dim-bar-track">
+                    <div class="dim-bar-fill" id="recruiter-score-bar" style="width: 0%;"></div>
+                  </div>
+                </div>
+                <div class="dim-score-row">
+                  <div class="dim-labels">
+                    <span class="dim-name">Technical Credibility</span>
+                    <span class="dim-val" id="technical-score-val">0/100</span>
+                  </div>
+                  <div class="dim-bar-track">
+                    <div class="dim-bar-fill" id="technical-score-bar" style="width: 0%;"></div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
- 
-          <!-- Improvement Suggestions Checklist -->
-          <div class="suggestions-section">
-            <div class="suggestions-title">Optimization Suggestions</div>
-            <ul class="suggestions-list" id="suggestions-list">
-              <li class="empty-suggestions">Paste or type your resume content to see dynamic improvement suggestions.</li>
-            </ul>
+            <div class="score-formula-note" id="score-formula-note">Overall = ATS×40% + Recruiter×35% + Technical×25%</div>
+
+            <!-- Keyword feedback tags (shown inside results container) -->
+            <div class="keyword-feedback" id="keyword-feedback" style="display: none; margin-top: 16px; border-top: 1px dashed var(--color-chalk); padding-top: 14px;">
+              <div class="kw-stat-row">
+                <span>Match Rate: <strong id="keyword-match-rate">0%</strong></span>
+                <span id="keyword-match-count">0 of 0 keywords</span>
+              </div>
+              <div class="ats-gap-note" id="ats-gap-note" style="display:none;">ATS score also factors formatting, structure, and date accuracy — not just keywords.</div>
+              <div class="kw-legend"><span class="legend-tag critical">(C)</span> Critical · <span class="legend-tag important">(I)</span> Important · <span class="legend-tag preferred">(P)</span> Preferred</div>
+              <div class="kw-lists">
+                <div class="kw-column">
+                  <span class="kw-title match">Matched Keywords</span>
+                  <div class="kw-tags" id="matched-kw-tags"></div>
+                </div>
+                <div class="kw-column">
+                  <span class="kw-title missing">Missing Keywords</span>
+                  <div class="kw-tags" id="missing-kw-tags"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Improvement Suggestions Checklist -->
+            <div class="suggestions-section" style="margin-top: 16px; border-top: 1px solid var(--color-chalk); padding-top: 14px;">
+              <div class="suggestions-title">Optimization Suggestions</div>
+              <ul class="suggestions-list" id="suggestions-list">
+                <li class="empty-suggestions">Paste or type your resume content to see dynamic improvement suggestions.</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -362,6 +391,13 @@
   <div class="divider"><span>Resume Preview</span></div>
   
   <div class="preview-pane">
+    <!-- Zoom controls for checking details -->
+    <div class="zoom-toolbar" role="toolbar" aria-label="Resume Preview Zoom">
+      <button class="btn-zoom active" id="btn-zoom-auto" onclick="setZoomScale('auto')" type="button">Auto</button>
+      <button class="btn-zoom" id="btn-zoom-75" onclick="setZoomScale(0.75)" type="button">75%</button>
+      <button class="btn-zoom" id="btn-zoom-100" onclick="setZoomScale(1.0)" type="button">100%</button>
+      <button class="btn-zoom" id="btn-zoom-125" onclick="setZoomScale(1.25)" type="button">125%</button>
+    </div>
     <div class="preview-wrap">
       <div id="resume-mockup">
         <div class="empty-state" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
@@ -378,7 +414,9 @@
 <div class="profile-drawer" id="profile-drawer">
   <div class="drawer-header">
     <div class="drawer-title" style="display:flex; align-items:center; gap:6px;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Profile Details</div>
-    <button class="btn-drawer-close" onclick="toggleDetailsForm()" aria-label="Close details drawer">&times;</button>
+    <button class="btn-drawer-close" onclick="toggleDetailsForm()" aria-label="Close details drawer">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+    </button>
   </div>
   <div class="drawer-body">
     <div class="form-section-title">Personal Information</div>

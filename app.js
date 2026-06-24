@@ -144,6 +144,12 @@ function initProfiles() {
   renderFormFields();
   detectSectionsAndCompanies();
   updatePreview();
+
+  if (profiles[currentProfileId] && profiles[currentProfileId].ats_results) {
+    renderScoringUI(profiles[currentProfileId].ats_results);
+  } else {
+    clearScoringUI();
+  }
 }
 
 function updateProfileSelectDropdown() {
@@ -184,6 +190,12 @@ function switchProfile(profileId) {
   renderFormFields();
   detectSectionsAndCompanies();
   updatePreview();
+
+  if (profiles[currentProfileId] && profiles[currentProfileId].ats_results) {
+    renderScoringUI(profiles[currentProfileId].ats_results);
+  } else {
+    clearScoringUI();
+  }
 }
 
 function createNewProfile() {
@@ -216,6 +228,7 @@ function createNewProfile() {
   renderFormFields();
   detectSectionsAndCompanies();
   updatePreview();
+  clearScoringUI();
   showToast("Created blank profile: " + cleanLabel);
   
   // Auto-expand drawer for the new profile
@@ -248,6 +261,12 @@ function duplicateCurrentProfile() {
   renderFormFields();
   detectSectionsAndCompanies();
   updatePreview();
+  
+  if (profiles[currentProfileId] && profiles[currentProfileId].ats_results) {
+    renderScoringUI(profiles[currentProfileId].ats_results);
+  } else {
+    clearScoringUI();
+  }
   showToast("Duplicated profile to: " + cleanLabel);
 }
 
@@ -275,27 +294,85 @@ function renameCurrentProfile() {
   }
 }
 
-function deleteCurrentProfile() {
+let deleteConfirmTimeout = null;
+
+function deleteCurrentProfileConfirm(event) {
+  if (event) event.stopPropagation();
+  
+  const btn = document.getElementById('delete-profile-btn');
+  if (!btn) return;
+  
+  const span = btn.querySelector('span');
+  
+  if (btn.classList.contains('confirming')) {
+    clearTimeout(deleteConfirmTimeout);
+    btn.classList.remove('confirming');
+    if (span) span.textContent = 'Delete';
+    performProfileDelete();
+  } else {
+    btn.classList.add('confirming');
+    if (span) span.textContent = 'Confirm Delete?';
+    
+    deleteConfirmTimeout = setTimeout(() => {
+      btn.classList.remove('confirming');
+      if (span) span.textContent = 'Delete';
+    }, 3000);
+  }
+}
+
+function performProfileDelete() {
   const keys = Object.keys(profiles);
   if (keys.length <= 1) {
     showToast("You must keep at least one profile.");
     return;
   }
   const targetId = currentProfileId;
+  delete profiles[targetId];
+  currentProfileId = Object.keys(profiles)[0];
+  localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
+  PROFILE = profiles[currentProfileId].profile;
+  saveToStorage();
+  updateProfileSelectDropdown();
+  document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
+  renderFormFields();
+  detectSectionsAndCompanies();
+  updatePreview();
+  
+  if (profiles[currentProfileId] && profiles[currentProfileId].ats_results) {
+    renderScoringUI(profiles[currentProfileId].ats_results);
+  } else {
+    clearScoringUI();
+  }
+  showToast(`Deleted profile "${targetId}"`);
+}
+
+function deleteCurrentProfile() {
+  const targetId = currentProfileId;
   if (confirm(`Are you sure you want to delete the profile "${targetId}"?`)) {
-    delete profiles[targetId];
-    currentProfileId = Object.keys(profiles)[0];
-    localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
-    PROFILE = profiles[currentProfileId].profile;
-    saveToStorage();
-    updateProfileSelectDropdown();
-    document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
-    renderFormFields();
-    detectSectionsAndCompanies();
-    updatePreview();
-    showToast(`Deleted profile "${targetId}"`);
+    performProfileDelete();
   }
 }
+
+// ── HEADER ACTIONS DROPDOWN ──
+function toggleHdrDropdown(event) {
+  if (event) event.stopPropagation();
+  const menu = document.getElementById('hdr-dropdown-menu');
+  if (menu) {
+    menu.classList.toggle('show');
+  }
+}
+
+function closeHdrDropdown() {
+  const menu = document.getElementById('hdr-dropdown-menu');
+  if (menu) {
+    menu.classList.remove('show');
+  }
+}
+
+// Close dropdown when user clicks outside
+window.addEventListener('click', () => {
+  closeHdrDropdown();
+});
 
 function toggleDetailsForm() {
   const drawer = document.getElementById('profile-drawer');
@@ -518,11 +595,33 @@ function parseContent(raw) {
 
 // ── PREVIEW BUILDER ──
 
-// ── SCALE PREVIEW TO FIT VIEWPORT ──
+// ── SCALE PREVIEW TO FIT VIEWPORT OR USER ZOOM ──
 let lastPaneWidth = 0;
 let lastMockupWidth = 0;
 let lastMockupHeight = 0;
 let isScaling = false;
+let currentZoomScale = 'auto';
+
+function setZoomScale(scale) {
+  currentZoomScale = scale;
+  
+  // Update zoom active buttons styling
+  const buttons = document.querySelectorAll('.btn-zoom');
+  buttons.forEach(btn => {
+    btn.classList.remove('active');
+    if (scale === 'auto' && btn.id === 'btn-zoom-auto') {
+      btn.classList.add('active');
+    } else if (scale === 0.75 && btn.id === 'btn-zoom-75') {
+      btn.classList.add('active');
+    } else if (scale === 1.0 && btn.id === 'btn-zoom-100') {
+      btn.classList.add('active');
+    } else if (scale === 1.25 && btn.id === 'btn-zoom-125') {
+      btn.classList.add('active');
+    }
+  });
+  
+  adjustPreviewScale();
+}
 
 function adjustPreviewScale() {
   if (isScaling) return;
@@ -535,13 +634,6 @@ function adjustPreviewScale() {
   const mockupWidth = mockup.offsetWidth;
   const mockupHeight = mockup.offsetHeight;
   
-  // Return early if dimensions haven't changed significantly to prevent layout recursion and scrollbar oscillation loops
-  if (Math.abs(paneWidth - lastPaneWidth) < 12 && 
-      mockupWidth === lastMockupWidth && 
-      mockupHeight === lastMockupHeight) {
-    return;
-  }
-  
   isScaling = true;
   
   if (paneWidth <= 0 || mockupWidth <= 0) {
@@ -553,10 +645,17 @@ function adjustPreviewScale() {
   lastMockupWidth = mockupWidth;
   lastMockupHeight = mockupHeight;
   
-  if (paneWidth < mockupWidth) {
-    const scale = paneWidth / mockupWidth;
+  let scale = 1.0;
+  if (currentZoomScale === 'auto') {
+    if (paneWidth < mockupWidth) {
+      scale = paneWidth / mockupWidth;
+    }
+  } else {
+    scale = currentZoomScale;
+  }
+  
+  if (scale < 1.0 || (currentZoomScale !== 'auto' && scale !== 1.0)) {
     const heightReduction = mockupHeight * (1 - scale);
-    
     mockup.style.transform = `scale(${scale})`;
     mockup.style.transformOrigin = 'top center';
     mockup.style.marginBottom = `-${heightReduction}px`;
@@ -566,7 +665,6 @@ function adjustPreviewScale() {
     mockup.style.marginBottom = '0';
   }
   
-  // Release execution lock in the next animation frame
   requestAnimationFrame(() => {
     isScaling = false;
   });
@@ -1291,20 +1389,30 @@ function setMobileView(view) {
   
   if (view === 'preview') {
     body.classList.add('show-preview');
-    if (navEdit) navEdit.classList.remove('active');
-    if (navPreview) navPreview.classList.add('active');
-    // Force preview rendering and pagination when visible
+    if (navEdit) {
+      navEdit.classList.remove('active');
+      navEdit.setAttribute('aria-pressed', 'false');
+    }
+    if (navPreview) {
+      navPreview.classList.add('active');
+      navPreview.setAttribute('aria-pressed', 'true');
+    }
     if (typeof updatePreview === 'function') {
       updatePreview();
     }
-    // Adjust scale for mobile preview
     if (typeof adjustPreviewScale === 'function') {
       setTimeout(adjustPreviewScale, 50);
     }
   } else {
     body.classList.remove('show-preview');
-    if (navEdit) navEdit.classList.add('active');
-    if (navPreview) navPreview.classList.remove('active');
+    if (navEdit) {
+      navEdit.classList.add('active');
+      navEdit.setAttribute('aria-pressed', 'true');
+    }
+    if (navPreview) {
+      navPreview.classList.remove('active');
+      navPreview.setAttribute('aria-pressed', 'false');
+    }
   }
 }
 
@@ -1508,8 +1616,7 @@ async function analyzeATSScore() {
     return;
   }
   if (!jdText || !jdText.trim()) {
-    showToast("Please paste a target Job Description first.");
-    return;
+    showToast("Job description is empty. Analyzing general resume quality and formatting instead.");
   }
 
   const loadingOverlay = document.getElementById('scoring-loading');
@@ -1530,6 +1637,10 @@ async function analyzeATSScore() {
     }
 
     const data = await response.json();
+    if (profiles[currentProfileId]) {
+      profiles[currentProfileId].ats_results = data;
+      saveToStorage();
+    }
     renderScoringUI(data);
     // Persist analysis results so they survive page refresh
     localStorage.setItem('resume_builder_ats_results', JSON.stringify(data));
@@ -1548,7 +1659,22 @@ function getScoreColor(val) {
   return '#ef4444';
 }
 
+function clearScoringUI() {
+  const emptyState = document.getElementById('score-empty-state');
+  if (emptyState) emptyState.style.display = 'flex';
+
+  const detailsContainer = document.getElementById('score-details-container');
+  if (detailsContainer) detailsContainer.style.display = 'none';
+}
+
 function renderScoringUI(data) {
+  // Hide empty state and show results details container
+  const emptyState = document.getElementById('score-empty-state');
+  if (emptyState) emptyState.style.display = 'none';
+
+  const detailsContainer = document.getElementById('score-details-container');
+  if (detailsContainer) detailsContainer.style.display = 'block';
+
   // ── Score Delta (before/after) ──
   const prevScoresRaw = localStorage.getItem('resume_builder_last_scores');
   const prevScores = prevScoresRaw ? JSON.parse(prevScoresRaw) : null;
@@ -1597,9 +1723,12 @@ function renderScoringUI(data) {
   // Update Keyword Feedback Tags
   const kwFeedback = document.getElementById('keyword-feedback');
   if (kwFeedback) {
-    kwFeedback.style.display = 'block';
-    
     const total = data.criticalMatched.length + data.criticalMissing.length + data.importantMatched.length + data.importantMissing.length + data.preferredMatched.length + data.preferredMissing.length;
+    if (total === 0) {
+      kwFeedback.style.display = 'none';
+    } else {
+      kwFeedback.style.display = 'block';
+    }
     const matched = data.criticalMatched.length + data.importantMatched.length + data.preferredMatched.length;
     const rate = total > 0 ? Math.round((matched / total) * 100) : 0;
     
@@ -1709,13 +1838,21 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   // Restore previous analysis results on page load
-  const savedResults = localStorage.getItem('resume_builder_ats_results');
-  if (savedResults) {
-    try {
-      const data = JSON.parse(savedResults);
-      renderScoringUI(data);
-    } catch (e) {
-      console.warn('Could not restore saved ATS results:', e);
+  if (profiles[currentProfileId] && profiles[currentProfileId].ats_results) {
+    // Loaded by initProfiles
+  } else {
+    const savedResults = localStorage.getItem('resume_builder_ats_results');
+    if (savedResults) {
+      try {
+        const data = JSON.parse(savedResults);
+        if (profiles[currentProfileId]) {
+          profiles[currentProfileId].ats_results = data;
+          saveToStorage();
+        }
+        renderScoringUI(data);
+      } catch (e) {
+        console.warn('Could not restore saved ATS results:', e);
+      }
     }
   }
 });

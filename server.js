@@ -41,9 +41,10 @@ app.post('/api/ats-score', async (req, res) => {
   if (!resumeText || !resumeText.trim()) {
     return res.status(400).json({ error: 'Resume text is required.' });
   }
-  if (!jobDescription || !jobDescription.trim()) {
-    return res.status(400).json({ error: 'Job description text is required.' });
-  }
+
+  const targetJD = (jobDescription && jobDescription.trim()) 
+    ? jobDescription.trim() 
+    : "Evaluate overall general resume strength, readability, formatting, and structural quality without a specific target job description.";
 
   const systemPrompt = `You are a professional ATS (Applicant Tracking System) Evaluation Engine and senior technical recruiter.
 Your task is to analyze the provided Resume and Job Description (JD) to calculate compatibility scores and match metrics.
@@ -102,7 +103,7 @@ Make the strengths and weaknesses descriptive and actionable (e.g. "ATS: Spelled
   const userPrompt = `### TODAY'S DATE: ${todayDate}
 
 ### JOB DESCRIPTION:
-${jobDescription}
+${targetJD}
 
 ### RESUME CONTENT:
 ${resumeText}`;

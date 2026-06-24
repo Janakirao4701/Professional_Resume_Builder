@@ -319,6 +319,7 @@
     align-items: flex-start;
     overflow-x: auto;
     border-left: 1px solid var(--color-chalk);
+    position: relative;
   }
 
   @media (min-width: 1024px) {
@@ -3364,4 +3365,122 @@
     filter: brightness(1.12);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 82, 204, 0.35);
+  }
+
+  /* ── Header actions overflow dropdown ── */
+  .hdr-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .hdr-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 6px;
+    background: var(--color-paper);
+    border: 1px solid var(--color-chalk);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    min-width: 155px;
+    z-index: 250;
+    overflow: hidden;
+    padding: 4px 0;
+  }
+
+  .hdr-dropdown-menu.show {
+    display: block;
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 8px 14px;
+    background: none;
+    border: none;
+    color: var(--color-ink);
+    font-size: 12.5px;
+    font-weight: 500;
+    font-family: var(--font-tt-commons);
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    gap: 6px;
+  }
+
+  .dropdown-item:hover {
+    background: var(--color-lavender-wash);
+    color: var(--color-signal-blue);
+  }
+
+  .dropdown-item svg {
+    color: var(--color-pencil);
+    transition: color 0.15s ease;
+  }
+
+  .dropdown-item:hover svg {
+    color: var(--color-signal-blue);
+  }
+
+  /* ── Zoom Controls for Preview Pane ── */
+  .zoom-toolbar {
+    position: absolute;
+    top: 12px;
+    right: 24px;
+    display: flex;
+    gap: 2px;
+    background: var(--color-paper);
+    border: 1px solid var(--color-chalk);
+    border-radius: 6px;
+    padding: 3px;
+    z-index: 150;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .btn-zoom {
+    background: none;
+    border: none;
+    color: var(--color-pencil);
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: var(--font-tt-commons);
+  }
+
+  .btn-zoom:hover {
+    background: var(--color-mist);
+    color: var(--color-ink);
+  }
+
+  .btn-zoom.active {
+    background: var(--color-lavender-wash);
+    color: var(--color-signal-blue);
+    font-weight: 600;
+  }
+
+  /* ── Delete Button Confirm State Styling ── */
+  .btn-hdr-action.btn-hdr-danger.confirming {
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    border-color: #ef4444 !important;
+  }
+  .btn-hdr-action.btn-hdr-danger.confirming:hover {
+    background: #dc2626 !important;
+    color: #ffffff !important;
+    border-color: #dc2626 !important;
+  }
+
+  /* ── Scoring Empty State ── */
+  .score-empty-state svg {
+    animation: pulse-score-empty 2s infinite ease-in-out;
+  }
+
+  @keyframes pulse-score-empty {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 0.9; transform: scale(1.05); }
   }
