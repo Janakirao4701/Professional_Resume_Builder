@@ -50,10 +50,10 @@
     </button>
     <div class="hdr-divider"></div>
     <button class="btn-hdr-action" onclick="triggerImport()" title="Import JSON Profiles" aria-label="Import JSON Profiles">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75Z" /></svg> Import
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg> Import
     </button>
     <button class="btn-hdr-action" onclick="exportProfiles()" title="Export JSON Backup" aria-label="Export JSON Backup">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6.75m0 0l-3-3m3 3l3-3m2.25 5.25v.75A2.25 2.25 0 0115 18H9a2.25 2.25 0 01-2.25-2.25v-.75" /></svg> Export
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5" /></svg> Export
     </button>
     <input type="file" id="import-file-input" style="display: none;" accept=".json" onchange="importProfiles(event)">
   </div>
@@ -62,7 +62,7 @@
     <button class="btn-dl" id="pdf-btn">
       <span>Download PDF</span>
       <span class="btn-arrow-circle" style="background: rgba(255, 255, 255, 0.25);">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14m0 0l-4-4m4 4l-4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14m0 0l4-4m-4 4l-4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </span>
     </button>
     <button class="btn-dl" id="dl-btn">
@@ -113,7 +113,7 @@
   <div class="drawer-card">
     <div class="drawer-card-title">Export Options</div>
     <button class="drawer-action-btn" onclick="triggerMobilePDF();">
-      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px;"><path d="M12 5v14m0 0l-4-4m4 4l-4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px;"><path d="M12 5v14m0 0l4-4m-4 4l-4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Download PDF
     </button>
     <button class="drawer-action-btn" onclick="triggerMobileDOCX();">
@@ -125,10 +125,10 @@
   <div class="drawer-card">
     <div class="drawer-card-title">Backup & Migration</div>
     <button class="drawer-action-btn" onclick="triggerMobileImport();" style="background: var(--app-surface); border-color: var(--app-border); color: #fff;">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V9.75m0 0l3 3m-3-3l-3 3M6.75 19.5a4.5 4.5 0 01-1.41-8.775 5.25 5.25 0 0110.233-2.33 3 3 0 013.758 3.848A3.752 3.752 0 0118 19.5H6.75Z" /></svg>Import JSON Profiles
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>Import JSON Profiles
     </button>
     <button class="drawer-action-btn" onclick="triggerMobileExport();" style="background: var(--app-surface); border-color: var(--app-border); color: #fff;">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6.75m0 0l-3-3m3 3l3-3m2.25 5.25v.75A2.25 2.25 0 0115 18H9a2.25 2.25 0 01-2.25-2.25v-.75" /></svg>Export JSON Backup
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5" /></svg>Export JSON Backup
     </button>
   </div>
 </div>
@@ -346,7 +346,7 @@
       <!-- Company Experience Copy (appears after paste) -->
       <div class="company-section" id="company-section">
         <div class="company-section-title">
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-19.5 0A2.25 2.25 0 0 0 4.5 15h15a2.25 2.25 0 0 0 2.25-2.25m-19.5 0v.228c0 .265.112.518.307.702l1.562 1.476a1.125 1.125 0 0 0 .762.306h11.82c.29 0 .57-.108.79-.306l1.562-1.477a1.125 1.125 0 0 0 .307-.702V12.75m-18.75-3-1.593-3.186a2.25 2.25 0 0 1 2.012-3.256h3.692c.602 0 1.173.24 1.593.667l1.792 1.792a1.125 1.125 0 0 0 .796.33h4.568a2.25 2.25 0 0 1 2.25 2.25v1.314" /></svg>Copy Experience by Company
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0A2.25 2.25 0 0113.5 4.75h-3a2.25 2.25 0 01-2.166-1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75 2.25 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.346.102.637.318.806.622L18 7.5V19.5a2.25 2.25 0 01-2.25 2.25H8.25A2.25 2.25 0 016 19.5V7.5l1.112-2.012a1.125 1.125 0 01.806-.622" /></svg>Copy Experience by Company
         </div>
         <div class="company-btns" id="company-btns"></div>
       </div>
