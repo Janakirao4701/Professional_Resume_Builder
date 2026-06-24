@@ -1521,355 +1521,491 @@ function calculateResumeScore() {
   // ==========================================
   // DIMENSION 1: ATS SCORE (Max 100)
   // ==========================================
-  let atsScore = 0;
-
-  // 1. Keyword Match Rate (40 points)
-  let kwScore = 0;
+  let kwRelevanceScore = 0;
   let jdKeywords = [];
   let matchedKeywords = [];
   let missingKeywords = [];
 
+  let criticalList = [];
+  let importantList = [];
+  let preferredList = [];
+
+  let criticalMatchedList = [];
+  let importantMatchedList = [];
+  let preferredMatchedList = [];
+
+  let criticalMissingList = [];
+  let importantMissingList = [];
+  let preferredMissingList = [];
+
   if (jdText) {
     const STOP_WORDS = new Set([
       'the', 'and', 'for', 'with', 'you', 'our', 'are', 'this', 'that', 'will', 'work', 'team', 'from', 'your', 'have', 'their', 'they', 'them', 'who', 'what', 'its', 'about', 'been', 'were', 'was', 'has', 'had', 'does', 'did', 'but', 'not', 'can', 'should', 'would', 'could', 'than', 'then', 'into', 'onto', 'upon', 'also', 'other', 'some', 'such', 'only', 'very', 'more', 'most', 'any', 'each', 'both', 'all', 'one', 'two', 'new', 'old', 'good', 'best', 'well', 'etc', 'under', 'role', 'highly', 'required', 'skills', 'experience', 'ability', 'duties', 'responsibilities', 'project', 'support', 'management', 'technical', 'development',
-      'job', 'may', 'sets', 'section', 'title', 'general', 'overview', 'functional', 'area', 'engineering', 'eng', 'description', 'position', 'candidate', 'details', 'knowledge', 'maintenance'
+      'job', 'may', 'sets', 'section', 'title', 'general', 'overview', 'functional', 'area', 'engineering', 'eng', 'description', 'position', 'candidate', 'details', 'knowledge', 'maintenance', 'including', 'using', 'working', 'ability', 'successful', 'proven', 'track', 'record', 'strong', 'excellent', 'written', 'verbal', 'communication', 'interpersonal', 'skills', 'years', 'degree', 'preferred', 'required', 'ideal', 'plus', 'desirable', 'nice', 'have', 'must', 'should', 'will', 'would', 'could', 'join', 'company', 'client', 'customer', 'business', 'environment', 'organization', 'teamwork', 'collaborate', 'cooperate'
     ]);
-    const TECH_TERMS = new Set(['plc', 'hmi', 'scada', 'studio', '5000', 'rslogix', 'controllogix', 'siemens', 'beckhoff', 'twincat', 'ignition', 'factorytalk', 'panels', 'wiring', 'cad', 'eplan', 'autocad', 'python', 'javascript', 'typescript', 'react', 'node', 'express', 'nextjs', 'aws', 'docker', 'kubernetes', 'git', 'sql', 'mysql', 'postgres', 'mongodb', 'redis', 'c#', 'java', 'c++', 'testing', 'automation', 'commissioning', 'controls', 'systems', 'integration', 'vfd', 'servo', 'ethernet', 'modbus', 'profibus', 'devicenet', 'rs232', 'calibration', 'troubleshooting', 'safety', 'compliance']);
 
-    // Extract potential keywords from JD
-    const jdWords = jdText.toLowerCase().match(/[a-z0-9+#\-]+/g) || [];
-    const freq = {};
-    jdWords.forEach(w => {
-      if (w.length >= 3 && !STOP_WORDS.has(w)) {
-        freq[w] = (freq[w] || 0) + 1;
+    const lines = jdText.split('\n');
+    const kwMap = {};
+
+    lines.forEach(line => {
+      const lineLower = line.toLowerCase();
+      let category = 'important';
+      if (/must|require|essential|minimum|qualification|need|should have/i.test(lineLower)) {
+        category = 'critical';
+      } else if (/preferred|plus|desirable|nice|ideal|bonus|advantage|opportunity/i.test(lineLower)) {
+        category = 'preferred';
       }
+
+      const words = line.match(/[a-zA-Z0-9+#.\-]+/g) || [];
+      words.forEach(word => {
+        const clean = word.replace(/[.,;()]/g, '').trim();
+        const lower = clean.toLowerCase();
+        if (lower.length >= 2 && !STOP_WORDS.has(lower) && !/^\d+$/.test(lower)) {
+          if (kwMap[lower]) {
+            const currentCat = kwMap[lower].category;
+            if (category === 'critical' || (category === 'important' && currentCat === 'preferred')) {
+              kwMap[lower].category = category;
+            }
+          } else {
+            kwMap[lower] = { raw: clean, category: category };
+          }
+        }
+      });
     });
 
-    // Select unique keywords, prioritizing tech terms and high-frequency terms
-    const candidates = Object.keys(freq).sort((a, b) => {
-      const aIsTech = TECH_TERMS.has(a) ? 1 : 0;
-      const bIsTech = TECH_TERMS.has(b) ? 1 : 0;
-      if (aIsTech !== bIsTech) return bIsTech - aIsTech;
-      return freq[b] - freq[a];
+    const criticalCandidates = [];
+    const importantCandidates = [];
+    const preferredCandidates = [];
+
+    Object.keys(kwMap).forEach(key => {
+      const item = kwMap[key];
+      if (item.category === 'critical') criticalCandidates.push(item);
+      else if (item.category === 'important') importantCandidates.push(item);
+      else preferredCandidates.push(item);
     });
 
-    jdKeywords = candidates.slice(0, 15); // Top 15 keywords
+    criticalList = criticalCandidates.slice(0, 8);
+    importantList = importantCandidates.slice(0, 8);
+    preferredList = preferredCandidates.slice(0, 5);
+
+    jdKeywords = [...criticalList, ...importantList, ...preferredList];
 
     if (jdKeywords.length > 0) {
       const resumeLower = resumeText.toLowerCase();
-      jdKeywords.forEach(kw => {
-        const startBoundary = /^\w/.test(kw) ? '\\b' : '';
-        const endBoundary = /\w$/.test(kw) ? '\\b' : '';
-        const regex = new RegExp(startBoundary + kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + endBoundary, 'i');
+      
+      criticalList.forEach(kw => {
+        const cleanKw = kw.raw.toLowerCase();
+        const startBoundary = /^\w/.test(cleanKw) ? '\\b' : '';
+        const endBoundary = /\w$/.test(cleanKw) ? '\\b' : '';
+        const regex = new RegExp(startBoundary + cleanKw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + endBoundary, 'i');
         if (regex.test(resumeLower)) {
-          matchedKeywords.push(kw);
+          criticalMatchedList.push(kw.raw);
         } else {
-          missingKeywords.push(kw);
+          criticalMissingList.push(kw.raw);
         }
       });
-      kwScore = Math.round((matchedKeywords.length / jdKeywords.length) * 40);
+
+      importantList.forEach(kw => {
+        const cleanKw = kw.raw.toLowerCase();
+        const startBoundary = /^\w/.test(cleanKw) ? '\\b' : '';
+        const endBoundary = /\w$/.test(cleanKw) ? '\\b' : '';
+        const regex = new RegExp(startBoundary + cleanKw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + endBoundary, 'i');
+        if (regex.test(resumeLower)) {
+          importantMatchedList.push(kw.raw);
+        } else {
+          importantMissingList.push(kw.raw);
+        }
+      });
+
+      preferredList.forEach(kw => {
+        const cleanKw = kw.raw.toLowerCase();
+        const startBoundary = /^\w/.test(cleanKw) ? '\\b' : '';
+        const endBoundary = /\w$/.test(cleanKw) ? '\\b' : '';
+        const regex = new RegExp(startBoundary + cleanKw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + endBoundary, 'i');
+        if (regex.test(resumeLower)) {
+          preferredMatchedList.push(kw.raw);
+        } else {
+          preferredMissingList.push(kw.raw);
+        }
+      });
+
+      matchedKeywords = [...criticalMatchedList, ...importantMatchedList, ...preferredMatchedList];
+      missingKeywords = [...criticalMissingList, ...importantMissingList, ...preferredMissingList];
+
+      let totalActiveWeight = 0;
+      if (criticalList.length > 0) totalActiveWeight += 0.60;
+      if (importantList.length > 0) totalActiveWeight += 0.30;
+      if (preferredList.length > 0) totalActiveWeight += 0.10;
+
+      if (totalActiveWeight > 0) {
+        let scoreSum = 0;
+        if (criticalList.length > 0) {
+          scoreSum += (criticalMatchedList.length / criticalList.length) * (0.60 / totalActiveWeight);
+        }
+        if (importantList.length > 0) {
+          scoreSum += (importantMatchedList.length / importantList.length) * (0.30 / totalActiveWeight);
+        }
+        if (preferredList.length > 0) {
+          scoreSum += (preferredMatchedList.length / preferredList.length) * (0.10 / totalActiveWeight);
+        }
+        kwRelevanceScore = Math.round(scoreSum * 60);
+
+        // Missing critical keywords penalty
+        const missingCriticalPenalty = Math.min(20, criticalMissingList.length * 5);
+        kwRelevanceScore = Math.max(0, kwRelevanceScore - missingCriticalPenalty);
+      }
+    }
+    
+    if (criticalMissingList.length > 0) {
+      suggestions.push({ dim: 'ats', status: 'fail', text: `ATS: Missing ${criticalMissingList.length} critical keyword(s) required by the Job Description.` });
+    } else if (jdKeywords.length > 0) {
+      suggestions.push({ dim: 'ats', status: 'pass', text: "ATS: Excellent! All critical Job Description keywords are covered in your resume." });
     }
   } else {
-    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Paste a Job Description to calculate Keyword Match Rate." });
+    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Paste a Job Description in the accordion below to calculate Keyword Relevance." });
   }
-  atsScore += kwScore;
 
-  // 2. Date Format Compliance (10 points)
-  let dateScore = 0;
-  const dateRegex = /\b(0[1-9]|1[0-2])\/\d{4}\b/g; // MM/YYYY
-  const datesFound = resumeText.match(dateRegex) || [];
-  const textHasDates = /\b(19|20)\d{2}\b/.test(resumeText);
-  
-  if (datesFound.length > 0) {
-    dateScore = 10;
-  } else if (textHasDates) {
-    dateScore = 5;
-    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Ensure all dates in Professional Experience use the standard MM/YYYY format (e.g., 06/2021)." });
-  } else {
-    dateScore = 0;
-    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: No experience dates detected. Add dates using the MM/YYYY format." });
-  }
-  atsScore += dateScore;
-
-  // 3. Section Header Compliance (15 points)
-  let headerScore = 0;
+  // 2. Section Structure (10 points)
+  let structureScore = 0;
   const hasSummary = /\[(?:SUMMARY|PROFESSIONAL SUMMARY)\]/i.test(resumeText);
   const hasSkills = /\[(?:SKILLS|TECHNICAL SKILLS)\]/i.test(resumeText);
   const hasExperience = /\[(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]/i.test(resumeText);
+  const hasEducation = /education/i.test(resumeText) || (p.education && p.education.length > 0);
   
-  if (hasSummary) headerScore += 5;
-  if (hasSkills) headerScore += 5;
-  if (hasExperience) headerScore += 5;
+  if (hasSummary) structureScore += 2.5;
+  if (hasSkills) structureScore += 2.5;
+  if (hasExperience) structureScore += 2.5;
+  if (hasEducation) structureScore += 2.5;
 
-  if (headerScore < 15) {
+  const hasCerts = /certifications|certs/i.test(resumeText) || (p.certs && p.certs.length > 0);
+  const hasProjects = /projects/i.test(resumeText);
+  const hasPublications = /publications/i.test(resumeText);
+  
+  if (hasCerts || hasProjects || hasPublications) {
+    structureScore = Math.min(10, structureScore + 1.25);
+  }
+  structureScore = Math.round(structureScore);
+
+  if (structureScore < 10) {
     const missing = [];
     if (!hasSummary) missing.push('[PROFESSIONAL SUMMARY]');
     if (!hasSkills) missing.push('[TECHNICAL SKILLS]');
     if (!hasExperience) missing.push('[PROFESSIONAL EXPERIENCE]');
-    suggestions.push({ dim: 'ats', status: 'fail', text: `ATS: Missing required section tags: ${missing.join(', ')}.` });
+    if (!hasEducation) missing.push('Education');
+    suggestions.push({ dim: 'ats', status: 'fail', text: `ATS: Missing standard sections: ${missing.join(', ')}.` });
+  } else {
+    suggestions.push({ dim: 'ats', status: 'pass', text: "ATS: Standard resume sections are present and fully structured." });
   }
-  atsScore += headerScore;
 
-  // 4. Acronym Handling (10 points)
-  let acronymScore = 10;
-  const acronyms = ['PLC', 'HMI', 'SCADA', 'VFD', 'CAD', 'AWS', 'API', 'SQL', 'ATS'];
-  let foundAcronyms = 0;
-  let spelledOut = 0;
+  // 3. Date Consistency (5 points)
+  let dateScore = 0;
+  const patternA = /\b(0[1-9]|1[0-2])\/\d{4}\b/g;
+  const patternB = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{4}\b/gi;
+  const patternC = /\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\b/gi;
 
-  acronyms.forEach(ac => {
-    const regex = new RegExp('\\b' + ac + '\\b');
-    if (regex.test(resumeText)) {
-      foundAcronyms++;
-      const bracketRegex = new RegExp('(?:' + ac + '\\s*\\([^)]+\\)|\\([^)]+\\)\\s*' + ac + ')', 'i');
-      if (bracketRegex.test(resumeText)) {
-        spelledOut++;
-      }
-    }
-  });
+  const matchesA = resumeText.match(patternA) || [];
+  const matchesB = resumeText.match(patternB) || [];
+  const matchesC = resumeText.match(patternC) || [];
 
-  if (foundAcronyms > 0) {
-    if (spelledOut === 0) {
-      acronymScore = 0;
-      suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Acronyms detected (e.g. PLC). Spell out acronyms on first use (e.g. PLC (Programmable Logic Controller))." });
-    } else if (spelledOut < foundAcronyms) {
-      acronymScore = 5;
-      suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Some acronyms are not spelled out on first use." });
-    }
+  let formatsFound = 0;
+  if (matchesA.length > 0) formatsFound++;
+  if (matchesB.length > 0) formatsFound++;
+  if (matchesC.length > 0) formatsFound++;
+
+  const totalDates = matchesA.length + matchesB.length + matchesC.length;
+
+  if (totalDates === 0) {
+    dateScore = 0;
+    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: No work experience dates detected. Add date ranges to establish career duration." });
+  } else if (formatsFound === 1) {
+    dateScore = 5;
+    suggestions.push({ dim: 'ats', status: 'pass', text: "ATS: Date formats are consistent throughout the resume." });
+  } else {
+    dateScore = 2;
+    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Mixed date formats detected. Standardize date ranges to a single format." });
   }
-  atsScore += acronymScore;
 
-  // 5. Format Cleanliness (15 points)
-  let cleanlinessScore = 15;
-  const bulletsLines = resumeText.split('\n').map(l => l.trim()).filter(l => /^[-\u2013\u2014\u2022•*]/.test(l));
-  const badBullets = bulletsLines.filter(l => !/^-/.test(l));
+  // 4. ATS Formatting (10 points)
+  let formatScore = 10;
+  const hasPipe = /\|/.test(experience || "");
+  const hasTabs = /\t/.test(resumeText);
+  const hasHtml = /<[^>]+>/.test(resumeText);
+
+  if (hasPipe) {
+    formatScore -= 3;
+    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Detected column dividers ('|') inside bullet lists. Keep lists simple." });
+  }
+  if (hasTabs) {
+    formatScore -= 3;
+    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Avoid using tab indentation inside the textarea." });
+  }
+  if (hasHtml) {
+    formatScore -= 4;
+    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Remove HTML or script markup tags from the resume text." });
+  }
+  formatScore = Math.max(0, formatScore);
   
-  if (bulletsLines.length > 0 && badBullets.length > 0) {
-    cleanlinessScore -= 5;
-    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Mixed bullet point formats. Ensure all experience list items start with a plain hyphen '-'." });
+  if (formatScore === 10) {
+    suggestions.push({ dim: 'ats', status: 'pass', text: "ATS: Resume formatting is clean, single-column friendly, and fully compliant." });
   }
-  atsScore += cleanlinessScore;
 
-  // 6. Forbidden Headers Penalty (-10 points each)
-  let forbiddenPenalty = 0;
-  const forbiddenHeaders = ['objective', 'about me', 'references'];
-  forbiddenHeaders.forEach(fh => {
-    const regex = new RegExp('\\b' + fh + '\\b', 'i');
-    if (regex.test(resumeText)) {
-      forbiddenPenalty += 10;
-      suggestions.push({ dim: 'ats', status: 'fail', text: `ATS Penalty: Remove forbidden header/concept '${fh}' (Objective statements and references are outdated).` });
+  // 5. Experience Alignment (10 points)
+  let reqYoe = 0;
+  if (jdText) {
+    const yoeMatch = jdText.match(/\b(\d+)\+?\s*(?:years?|yoe)\b/i);
+    if (yoeMatch) {
+      reqYoe = parseInt(yoeMatch[1]);
     }
-  });
-  atsScore = Math.max(0, atsScore - forbiddenPenalty);
+  }
+
+  let actualYoe = 0;
+  const summaryYoeMatch = summary ? summary.match(/\b(\d+)\+?\s*(?:years?|yoe)\b/i) : null;
+  if (summaryYoeMatch) {
+    actualYoe = parseInt(summaryYoeMatch[1]);
+  } else {
+    const rolesCount = (experience || "").split(/(?=[^|\n]+\|[^\n]+\|[^\n]+\|[^\n]+)/).length;
+    actualYoe = Math.max(2, rolesCount * 2);
+  }
+
+  let expAlignScore = 10;
+  if (jdText && reqYoe > 0) {
+    if (actualYoe >= reqYoe) {
+      expAlignScore = 10;
+      suggestions.push({ dim: 'ats', status: 'pass', text: `ATS: Experience duration (${actualYoe} years) meets the JD target (${reqYoe} years).` });
+    } else {
+      expAlignScore = Math.round((actualYoe / reqYoe) * 10);
+      suggestions.push({ dim: 'ats', status: 'fail', text: `ATS: Experience alignment. JD targets ${reqYoe} years, but resume shows ${actualYoe} years.` });
+    }
+  } else {
+    expAlignScore = 10;
+  }
+
+  // 6. Education Alignment (5 points)
+  let eduAlignScore = 5;
+  if (jdText) {
+    const degreeKeywords = /(bachelor|master|phd|doctorate|bs|ms|mba|b\.s\.|m\.s\.)/i;
+    const jdDegreeMatch = jdText.match(degreeKeywords);
+    if (jdDegreeMatch) {
+      const reqDegree = jdDegreeMatch[1].toLowerCase();
+      const resumeTextLower = resumeText.toLowerCase();
+      if (!resumeTextLower.includes(reqDegree)) {
+        eduAlignScore = 2;
+        suggestions.push({ dim: 'ats', status: 'fail', text: `ATS: Required degree level (${jdDegreeMatch[1]}) not detected in resume text.` });
+      } else {
+        suggestions.push({ dim: 'ats', status: 'pass', text: `ATS: Target degree level (${jdDegreeMatch[1]}) is represented in the resume.` });
+      }
+    } else {
+      suggestions.push({ dim: 'ats', status: 'pass', text: "ATS: No specific educational degree constraints found in the JD." });
+    }
+  } else {
+    eduAlignScore = 5;
+  }
 
   // ==========================================
   // DIMENSION 2: RECRUITER APPEAL (Max 100)
   // ==========================================
-  let recruiterScore = 0;
-
-  // 1. Summary Quality (25 points)
-  let summaryScore = 0;
+  let recSummaryScore = 0;
   if (summary) {
-    const hasYoe = /\d+\+?\s*(years|yoe)/i.test(summary);
-    const hasJobTitle = /(engineer|developer|designer|analyst|programmer)/i.test(summary);
-    if (hasYoe && hasJobTitle) summaryScore += 5;
-    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Summary should open with target job title and YOE (e.g. 'Controls Engineer with 5+ years...')." });
+    const hasRoleTitle = /(engineer|developer|designer|analyst|manager|technician|specialist|lead|programmer|consultant|officer|coordinator|accountant|auditor|director|agent|architect)/i.test(summary);
+    const hasYoe = /\b\d+\+?\s*(?:years?|yoe)\b/i.test(summary);
+    const hasExpertise = summary.split(/\s+/).length > 15;
+    const hasValueStatement = /(improve|reduce|increase|optimize|streamline|revenue|save|growth|enhance|deliver|drive)/i.test(summary.toLowerCase());
 
-    const summaryWords = summary.toLowerCase();
-    const hasTools = /(plc|siemens|studio|allen|rockwell|python|react|aws|docker|sql|cad|ignition)/i.test(summaryWords);
-    if (hasTools) summaryScore += 5;
-    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Feature at least 2 key tools or technologies in your professional summary." });
+    if (hasRoleTitle) recSummaryScore += 5;
+    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Professional summary lacks target role designation." });
 
-    const hasIndustries = /(automotive|manufacturing|oil|gas|chemical|aerospace|utility|logistics|software|tech|medical|water)/i.test(summaryWords);
-    if (hasIndustries) summaryScore += 5;
-    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Mention your primary domain or target industry sectors in your summary." });
+    if (hasYoe) recSummaryScore += 5;
+    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: State years of experience inside your summary statement." });
 
-    const hasProblemSolve = /(solve|solving|implement|reduce|optimise|optimize|increase|improve|streamline)/i.test(summaryWords);
-    if (hasProblemSolve) summaryScore += 5;
+    if (hasExpertise) recSummaryScore += 5;
+    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Detail core expertise sectors inside the summary." });
 
-    const clichés = ['passionate', 'results-driven', 'detail-oriented', 'self-starter', 'motivated', 'hardworking'];
-    let foundCliche = false;
-    clichés.forEach(c => {
-      if (summaryWords.includes(c)) foundCliche = true;
-    });
-    if (!foundCliche) summaryScore += 5;
-    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Remove subjective buzzwords (e.g. 'passionate', 'results-driven') from summary; replace with hard facts." });
+    if (hasValueStatement) recSummaryScore += 5;
+    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Add a clear business value statement showing productivity / performance gains." });
+
+    if (recSummaryScore === 20) {
+      suggestions.push({ dim: 'recruiter', status: 'pass', text: "Recruiter: Professional Summary is high-impact and well-focused." });
+    }
   } else {
-    suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Summary block is empty. Write an impactful 3-line professional summary." });
+    suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Write a professional summary statement." });
   }
-  recruiterScore += summaryScore;
 
-  // 2. Bullet Quality (30 points)
-  let bulletScore = 0;
+  // 2. Experience Quality (35 points)
+  let recExpScore = 0;
   if (experience) {
     const bullets = experience.split('\n').map(l => l.trim()).filter(l => l.startsWith('-'));
-    let strongBulletsCount = 0;
-    let bannedVerbsCount = 0;
+    if (bullets.length > 0) {
+      let bulletScores = [];
+      const actionVerbs = /\b(designed|engineered|programmed|automated|commissioned|optimized|led|developed|reduced|increased|implemented|spearheaded|configured|authored|analyzed|managed|coordinated|established|secured|saved|drew|wrote)\b/i;
+      const outcomeWords = /\b(resulted in|leading to|improving|reducing|increasing|saving|optimized|percent|%|hours|costs|\$)\b/i;
 
-    const strongVerbs = /\b(designed|engineered|programmed|automated|commissioned|optimized|led|developed|reduced|increased|implemented|spearheaded|developed|configured|authored)\b/i;
-    const bannedVerbs = /\b(collaborated|responsible for|helped|supported|worked on)\b/i;
+      bullets.forEach(b => {
+        let bScore = 0;
+        if (actionVerbs.test(b)) bScore += 10;
+        if (b.split(/\s+/).length >= 8) bScore += 15;
+        if (outcomeWords.test(b)) bScore += 10;
+        bulletScores.push(bScore);
+      });
 
-    bullets.forEach(b => {
-      if (strongVerbs.test(b)) strongBulletsCount++;
-      if (bannedVerbs.test(b)) bannedVerbsCount++;
-    });
-
-    bulletScore = Math.min(30, strongBulletsCount * 4);
-    
-    if (bannedVerbsCount > 0) {
-      bulletScore = Math.max(0, bulletScore - (bannedVerbsCount * 2));
-      suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Detected ${bannedVerbsCount} weak/passive verbs (e.g. 'helped', 'worked on'). Replace them with action verbs.` });
-    }
-  }
-  recruiterScore += bulletScore;
-
-  // 3. Job Title Accuracy (15 points)
-  let titleScore = 15;
-  if (jdText) {
-    const jdTitleMatch = jdText.match(/(?:title|role):\s*([^\n]+)/i) || [null, jdText.substring(0, 30)];
-    const targetTitleRaw = jdTitleMatch[1] ? jdTitleMatch[1].trim() : "";
-    const targetTitle = targetTitleRaw.toLowerCase();
-    const currentTitle = (p.subtitle || "").toLowerCase();
-
-    const titleKeywords = /(engineer|developer|designer|analyst|manager|technician|specialist|lead|programmer|operator|electrician|architect|administrator|consultant|officer|agent|coordinator)/i;
-    const isMetadata = /overview|general|description|functional|area/i.test(targetTitle);
-    const hasValidNoun = titleKeywords.test(targetTitle);
-
-    if (currentTitle && targetTitle && hasValidNoun && !isMetadata) {
-      if (currentTitle === targetTitle) {
-        titleScore = 15;
-      } else if (targetTitle.split(/\s+/).some(word => word.length > 3 && currentTitle.includes(word))) {
-        titleScore = 8;
-        suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Profile subtitle '${p.subtitle}' is a partial match. Align it exactly to target role.` });
+      const avgBulletScore = bulletScores.reduce((sum, s) => sum + s, 0) / bullets.length;
+      recExpScore = Math.round(avgBulletScore);
+      
+      const lowQualityCount = bulletScores.filter(s => s < 25).length;
+      if (lowQualityCount > 0) {
+        suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Found ${lowQualityCount} weak bullet point(s) lacking context or outcome statements.` });
       } else {
-        titleScore = 0;
-        suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Profile subtitle mismatch. Current: '${p.subtitle || 'None'}'. Target: '${targetTitleRaw || 'Unknown'}'.` });
+        suggestions.push({ dim: 'recruiter', status: 'pass', text: "Recruiter: Bullet points utilize strong verbs and explain task context." });
       }
+    } else {
+      suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: List detailed professional experience items using bullets." });
     }
   }
-  recruiterScore += titleScore;
 
-  // 4. Career Progression Clarity (15 points)
-  let progressionScore = 15;
-  const gapRegex = /gap/i;
-  if (gapRegex.test(resumeText)) {
-    progressionScore = 5;
-    suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Ensure career gaps or shifts are logical and have clear context." });
+  // 3. Quantification (15 points)
+  let recQuantScore = 0;
+  const metricsCount = (resumeText.match(/\b\d+%/g) || []).length + 
+                       (resumeText.match(/\$\b\d+/g) || []).length + 
+                       (resumeText.match(/\b(reduced|increased|saved|improved)\s+by\s+\d+/gi) || []).length;
+  
+  if (metricsCount >= 5) recQuantScore = 15;
+  else if (metricsCount >= 3) recQuantScore = 10;
+  else if (metricsCount >= 1) recQuantScore = 5;
+  else recQuantScore = 0;
+
+  if (recQuantScore >= 10) {
+    suggestions.push({ dim: 'recruiter', status: 'pass', text: "Recruiter: Resume details metrics showing measurable results." });
+  } else {
+    suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Quantify achievements with metrics (e.g. costs saved, revenue increased, percentages)." });
   }
-  recruiterScore += progressionScore;
 
-  // 5. Bullet Count Per Role (15 points)
-  let countScore = 0;
+  // 4. Career Progression (15 points)
+  let recProgScore = 5;
   if (experience) {
     const roles = experience.split(/(?=[^|\n]+\|[^\n]+\|[^\n]+\|[^\n]+)/);
-    if (roles.length > 0) {
-      const firstBullets = (roles[0] || "").split('\n').filter(l => l.trim().startsWith('-'));
-      if (firstBullets.length >= 7 && firstBullets.length <= 8) countScore += 5;
-      else suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Target 7-8 bullets for your present/most recent role (currently: ${firstBullets.length}).` });
+    if (roles.length >= 3) recProgScore = 15;
+    else if (roles.length === 2) recProgScore = 10;
+    
+    const hasPromoted = /promoted|advancement|senior|lead|head/i.test(experience);
+    if (hasPromoted && recProgScore < 15) {
+      recProgScore += 2;
+    }
+  }
+  if (recProgScore >= 10) {
+    suggestions.push({ dim: 'recruiter', status: 'pass', text: "Recruiter: Work history reflects solid career progression." });
+  }
 
-      if (roles.length > 1) {
-        const secondBullets = (roles[1] || "").split('\n').filter(l => l.trim().startsWith('-'));
-        if (secondBullets.length >= 6 && secondBullets.length <= 7) countScore += 5;
-        else suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Target 6-7 bullets for your previous role (currently: ${secondBullets.length}).` });
+  // 5. Readability (15 points)
+  let recReadScore = 15;
+  if (experience) {
+    const bullets = experience.split('\n').map(l => l.trim()).filter(l => l.startsWith('-'));
+    if (bullets.length > 0) {
+      const avgWordCount = bullets.reduce((sum, b) => sum + b.split(/\s+/).length, 0) / bullets.length;
+      if (avgWordCount > 25) {
+        recReadScore -= 5;
+        suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Experience bullet points are too long. Keep sentences punchy." });
+      } else if (avgWordCount < 5) {
+        recReadScore -= 5;
+        suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Bullet points are too brief. Add context to your tasks." });
       } else {
-        countScore += 5;
-      }
-
-      if (roles.length > 2) {
-        const thirdBullets = (roles[2] || "").split('\n').filter(l => l.trim().startsWith('-'));
-        if (thirdBullets.length >= 5 && thirdBullets.length <= 6) countScore += 5;
-        else suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Target 5-6 bullets for your older roles (currently: ${thirdBullets.length}).` });
-      } else {
-        countScore += 5;
+        suggestions.push({ dim: 'recruiter', status: 'pass', text: "Recruiter: Readability is excellent. Bullet lengths are balanced." });
       }
     }
   }
-  recruiterScore += countScore;
 
   // ==========================================
   // DIMENSION 3: TECHNICAL CREDIBILITY (Max 100)
   // ==========================================
-  let technicalScore = 0;
-
-  // 1. Tool Specificity (25 points)
-  let specScore = 5;
-  const specificTools = /(studio 5000|control logix|slc 500|compactlogix|micrologix|rslogix|factorytalk|wonderware|system platform|step 7|s7-1200|s7-1500|beckhoff twincat|ignition scada|node\.js|next\.js|kubernetes|aws s3|dynamodb|docker compose|react native)/i;
+  let techSpecScore = 5;
+  const specificTools = /(studio 5000|control logix|slc 500|compactlogix|micrologix|rslogix|factorytalk|wonderware|system platform|step 7|s7-1200|s7-1500|beckhoff twincat|ignition scada|node\.js|next\.js|kubernetes|aws s3|dynamodb|docker compose|react native|salesforce|quickbooks|tableau|power bi|excel|ga4|google analytics|google ads|photoshop|illustrator|figma|jira|confluence|slack|trello)/i;
   
   if (specificTools.test(resumeText)) {
-    specScore = 25;
+    techSpecScore = 25;
+    suggestions.push({ dim: 'technical', status: 'pass', text: "Technical: Mentions industry-specific products and tools." });
   } else {
-    suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Specify exact software versions or products (e.g. 'Studio 5000', 'TwinCAT') rather than generic terms like 'PLC software'." });
-  }
-  technicalScore += specScore;
-
-  // 2. Metric Defensibility (25 points)
-  let metricScore = 0;
-  const hasNumbers = /\b\d+\b/g;
-  const hasPercentage = /\b\d+%/g;
-  const numbers = resumeText.match(hasNumbers) || [];
-  const percentages = resumeText.match(hasPercentage) || [];
-
-  if (numbers.length > 0) {
-    if (percentages.length > 0 && percentages.length === numbers.length) {
-      metricScore = 10;
-      suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Resume contains percentages only. Add count-based metrics (e.g. 'commissioned 12 panels') to establish baselines." });
-    } else {
-      metricScore = 25;
-    }
-  } else {
-    metricScore = 0;
-    suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: No defensible metrics found. Incorporate quantities (defect counts, commissioning times) to substantiate impact." });
+    suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Specify software tools or technologies (e.g. 'Tableau', 'Excel') instead of generic categories." });
   }
 
-  const roundPct = /\b(100|50|10|20|30|40|60|70|80|90)%/g;
-  const roundMatches = resumeText.match(roundPct) || [];
-  if (roundMatches.length > 0) {
-    metricScore = Math.max(0, metricScore - (roundMatches.length * 5));
-    suggestions.push({ dim: 'technical', status: 'fail', text: `Technical Penalty: Avoid clean round-number percentages (e.g. ${roundMatches[0]}) without contextual proof.` });
-  }
-  technicalScore += metricScore;
-
-  // 3. Industry Alignment (20 points)
-  let industryScore = 5;
-  const alignmentKeywords = /(commissioning|wiring|hmi|scada|control panel|wiring schematics|fat|sat|safety protocols|field testing|rest api|microservices|ci\/cd|pipeline)/i;
-  
-  if (alignmentKeywords.test(resumeText)) {
-    industryScore = 20;
-  } else {
-    suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Bullets are generic. Inject domain-specific terms (e.g., schematics, SAT, microservices) to align with target industry." });
-  }
-  technicalScore += industryScore;
-
-  // 4. Credibility Signals (20 points)
-  let signalScore = 0;
-  const ownershipVerbs = /\b(led|spearheaded|managed|owned|commissioned|designed and implemented)\b/i;
-  const matchesOwnership = resumeText.match(ownershipVerbs) || [];
-  signalScore += Math.min(15, matchesOwnership.length * 5);
-
-  const crossFunc = /(cross-functional|client|operators|electricians|stakeholders|vendors|product managers)/i;
-  if (crossFunc.test(resumeText)) {
-    signalScore += 5;
-  } else {
-    suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Include cross-functional collaborate bullets (e.g. coordinate with electricians, operators, PMs)." });
-  }
-  technicalScore += signalScore;
-
-  // 5. Skill Depth (10 points)
-  let depthScore = 10;
+  // 2. Skill Depth (20 points)
+  let techDepthScore = 5;
   if (skills) {
     const linesCount = skills.split('\n').filter(l => l.trim()).length;
-    if (linesCount < 8) {
-      depthScore = Math.round(linesCount * 1.25);
-      suggestions.push({ dim: 'technical', status: 'fail', text: `Technical: List at least 8 specific skill categorisation rows (currently: ${linesCount}).` });
+    if (linesCount >= 12) techDepthScore = 20;
+    else if (linesCount >= 8) techDepthScore = 15;
+    else if (linesCount >= 4) techDepthScore = 10;
+
+    if (techDepthScore >= 15) {
+      suggestions.push({ dim: 'technical', status: 'pass', text: `Technical: Excellent skills breakdown with ${linesCount} categorizations.` });
+    } else {
+      suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: List at least 8 specific skill categorization rows." });
     }
   } else {
-    depthScore = 0;
+    suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Technical Skills section is empty." });
   }
-  technicalScore += depthScore;
+
+  // 3. Industry Alignment (25 points)
+  let techAlignScore = 25;
+  if (jdText && jdKeywords.length > 0) {
+    const totalJd = criticalList.length + importantList.length;
+    if (totalJd > 0) {
+      const matchedJd = criticalMatchedList.length + importantMatchedList.length;
+      techAlignScore = Math.round((matchedJd / totalJd) * 25);
+      if (techAlignScore >= 18) {
+        suggestions.push({ dim: 'technical', status: 'pass', text: "Technical: Core skills are highly aligned with the Job Description requirements." });
+      } else {
+        suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Core skills are generic. Align keywords to match Job Description domain." });
+      }
+    }
+  } else {
+    techAlignScore = 25;
+  }
+
+  // 4. Achievement Credibility (20 points)
+  let techCredScore = 20;
+  const roundPct = /\b(100|50|20|30|40|60|70|80|90)%/g;
+  const roundMatches = resumeText.match(roundPct) || [];
+  if (roundMatches.length > 0) {
+    techCredScore = Math.max(5, techCredScore - (roundMatches.length * 5));
+    suggestions.push({ dim: 'technical', status: 'fail', text: `Technical: Avoid round percentage values (e.g. ${roundMatches[0]}) without contextual proof.` });
+  } else {
+    suggestions.push({ dim: 'technical', status: 'pass', text: "Technical: Achievement metrics are realistic and credible." });
+  }
+
+  // 5. Ownership Signals (10 points)
+  let techOwnerScore = 0;
+  const ownershipVerbs = /\b(led|spearheaded|managed|owned|commissioned|designed and implemented|architected)\b/g;
+  const matchesOwnership = [...new Set(resumeText.match(ownershipVerbs) || [])];
+  if (matchesOwnership.length >= 4) techOwnerScore = 10;
+  else if (matchesOwnership.length >= 2) techOwnerScore = 7;
+  else if (matchesOwnership.length === 1) techOwnerScore = 4;
+
+  if (techOwnerScore >= 7) {
+    suggestions.push({ dim: 'technical', status: 'pass', text: "Technical: Work bullet points emphasize clear project ownership and design roles." });
+  } else {
+    suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Add ownership verbs (e.g., 'led', 'designed', 'architected') to show authority." });
+  }
 
   // ==========================================
   // COMPOSITE & UI UPDATES
   // ==========================================
-  const compositeScore = Math.round((atsScore * 0.35) + (recruiterScore * 0.35) + (technicalScore * 0.30));
+  const finalAtsScore = Math.round(kwRelevanceScore + structureScore + dateScore + formatScore + expAlignScore + eduAlignScore);
+  const finalRecruiterScore = Math.round(recSummaryScore + recExpScore + recQuantScore + recProgScore + recReadScore);
+  const finalTechnicalScore = Math.round(techSpecScore + techDepthScore + techAlignScore + techCredScore + techOwnerScore);
+
+  const compositeScore = Math.round((finalAtsScore * 0.40) + (finalRecruiterScore * 0.35) + (finalTechnicalScore * 0.25));
+
+  // Determine Match Level
+  let matchLevel = "Weak";
+  let matchClass = "match-level-weak";
+  if (compositeScore >= 85) {
+    matchLevel = "Excellent";
+    matchClass = "match-level-excellent";
+  } else if (compositeScore >= 70) {
+    matchLevel = "Strong";
+    matchClass = "match-level-strong";
+  } else if (compositeScore >= 50) {
+    matchLevel = "Moderate";
+    matchClass = "match-level-moderate";
+  }
 
   document.getElementById('overall-score-badge').textContent = `${compositeScore}/100`;
   document.getElementById('overall-score-pct').textContent = `${compositeScore}%`;
@@ -1886,14 +2022,14 @@ function calculateResumeScore() {
     }
   }
 
-  document.getElementById('ats-score-val').textContent = `${atsScore}/100`;
-  document.getElementById('ats-score-bar').style.width = `${atsScore}%`;
+  document.getElementById('ats-score-val').textContent = `${finalAtsScore}/100`;
+  document.getElementById('ats-score-bar').style.width = `${finalAtsScore}%`;
   
-  document.getElementById('recruiter-score-val').textContent = `${recruiterScore}/100`;
-  document.getElementById('recruiter-score-bar').style.width = `${recruiterScore}%`;
+  document.getElementById('recruiter-score-val').textContent = `${finalRecruiterScore}/100`;
+  document.getElementById('recruiter-score-bar').style.width = `${finalRecruiterScore}%`;
   
-  document.getElementById('technical-score-val').textContent = `${technicalScore}/100`;
-  document.getElementById('technical-score-bar').style.width = `${technicalScore}%`;
+  document.getElementById('technical-score-val').textContent = `${finalTechnicalScore}/100`;
+  document.getElementById('technical-score-bar').style.width = `${finalTechnicalScore}%`;
 
   const kwFeedback = document.getElementById('keyword-feedback');
   if (jdText && kwFeedback) {
@@ -1904,10 +2040,18 @@ function calculateResumeScore() {
     document.getElementById('keyword-match-count').textContent = `${matchedKeywords.length} of ${jdKeywords.length} keywords`;
 
     const matchedContainer = document.getElementById('matched-kw-tags');
-    matchedContainer.innerHTML = matchedKeywords.map(k => `<span class="kw-tag match">${escHtml(k)}</span>`).join('');
+    matchedContainer.innerHTML = [
+      ...criticalMatchedList.map(k => `<span class="kw-tag match critical" title="Critical Requirement">${escHtml(k)} (C)</span>`),
+      ...importantMatchedList.map(k => `<span class="kw-tag match important" title="Important Requirement">${escHtml(k)} (I)</span>`),
+      ...preferredMatchedList.map(k => `<span class="kw-tag match preferred" title="Preferred Requirement">${escHtml(k)} (P)</span>`)
+    ].join('');
 
     const missingContainer = document.getElementById('missing-kw-tags');
-    missingContainer.innerHTML = missingKeywords.map(k => `<span class="kw-tag missing">${escHtml(k)}</span>`).join('');
+    missingContainer.innerHTML = [
+      ...criticalMissingList.map(k => `<span class="kw-tag missing critical" title="Critical Requirement">${escHtml(k)} (C)</span>`),
+      ...importantMissingList.map(k => `<span class="kw-tag missing important" title="Important Requirement">${escHtml(k)} (I)</span>`),
+      ...preferredMissingList.map(k => `<span class="kw-tag missing preferred" title="Preferred Requirement">${escHtml(k)} (P)</span>`)
+    ].join('');
   } else if (kwFeedback) {
     kwFeedback.style.display = 'none';
   }
@@ -1915,19 +2059,43 @@ function calculateResumeScore() {
   const listContainer = document.getElementById('suggestions-list');
   if (listContainer) {
     listContainer.innerHTML = '';
-    const failedOnly = suggestions.filter(s => s.status === 'fail');
     
-    if (failedOnly.length === 0) {
-      listContainer.innerHTML = `<li class="suggestion-pass" style="justify-content:center; width:100%; font-weight:600;">✓ Excellent! Your resume conforms to all ATS, Recruiter, and Technical guidelines.</li>`;
-    } else {
-      listContainer.innerHTML = failedOnly.map(s => {
-        return `<li class="suggestion-fail">
-          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-          <span>${escHtml(s.text)}</span>
-        </li>`;
-      }).join('');
-    }
+    let html = '';
+    html += `<div class="match-level-badge ${matchClass}">Match Level: ${matchLevel}</div>`;
+
+    const passed = suggestions.filter(s => s.status === 'pass');
+    html += `
+      <div class="suggestion-group">
+        <div class="group-title strengths">Strengths (${passed.length})</div>
+        <ul class="suggestions-list">
+          ${passed.length > 0 ? passed.map(s => `
+            <li class="suggestion-pass">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+              <span>${escHtml(s.text)}</span>
+            </li>
+          `).join('') : '<li class="empty-suggestions">No key strengths identified yet. Optimize your resume structure.</li>'}
+        </ul>
+      </div>
+    `;
+
+    const failed = suggestions.filter(s => s.status === 'fail');
+    html += `
+      <div class="suggestion-group" style="margin-top: 14px;">
+        <div class="group-title weaknesses">Weaknesses & Actionable Improvements (${failed.length})</div>
+        <ul class="suggestions-list">
+          ${failed.length > 0 ? failed.map(s => `
+            <li class="suggestion-fail">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+              <span>${escHtml(s.text)}</span>
+            </li>
+          `).join('') : '<li class="suggestion-pass" style="justify-content:center; width:100%; font-weight:600;">✓ Excellent! Your resume conforms to all ATS, Recruiter, and Technical guidelines.</li>'}
+        </ul>
+      </div>
+    `;
+
+    listContainer.innerHTML = html;
   }
+}
 }
 
 // Populate company copy buttons and preview on load

@@ -3131,3 +3131,69 @@
     text-align: center;
     font-style: italic;
   }
+
+  /* Match Level Badge */
+  .match-level-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+  .match-level-excellent {
+    background: #eff6ff;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+  }
+  .match-level-strong {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+  }
+  .match-level-moderate {
+    background: #fffbeb;
+    color: #92400e;
+    border: 1px solid #fde68a;
+  }
+  .match-level-weak {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+
+  /* Suggestion Groups */
+  .suggestion-group {
+    margin-top: 12px;
+  }
+  .group-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    margin-top: 10px;
+    font-family: 'Outfit', sans-serif;
+  }
+  .group-title.strengths { color: #166534; }
+  .group-title.weaknesses { color: #991b1b; }
+  .group-title.improvements { color: var(--color-carbon); }
+
+  /* Keyword Tag Categories */
+  .kw-tag.critical {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+  .kw-tag.important {
+    background: #fffbeb;
+    color: #92400e;
+    border: 1px solid #fde68a;
+  }
+  .kw-tag.preferred {
+    background: #eff6ff;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+  }
