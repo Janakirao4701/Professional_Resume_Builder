@@ -16,7 +16,7 @@ export async function onRequestPost(context) {
       });
     }
 
-    const apiKey = env.OPENROUTER_API_KEY || '';
+    const apiKey = env.OPENROUTER_API_KEY || env['OPENROUTER API KEY'] || '';
     const model = env.OPENROUTER_MODEL || 'google/gemini-2.5-flash';
 
     if (!apiKey) {
