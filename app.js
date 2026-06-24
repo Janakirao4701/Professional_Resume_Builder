@@ -508,9 +508,9 @@ function exportProfiles() {
 
 // ── SECTION PARSER ──
 function parseContent(raw) {
-  const summaryRx   = /\[(?:SUMMARY|PROFESSIONAL SUMMARY)\]([\s\S]*?)(?=\[|$)/i;
-  const skillsRx    = /\[(?:SKILLS|TECHNICAL SKILLS)\]([\s\S]*?)(?=\[|$)/i;
-  const experienceRx= /\[(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]([\s\S]*?)(?=\[|$)/i;
+  const summaryRx   = /\[?(?:SUMMARY|PROFESSIONAL SUMMARY)\]?([\s\S]*?)(?=\[|$)/i;
+  const skillsRx    = /\[?(?:SKILLS|TECHNICAL SKILLS)\]?([\s\S]*?)(?=\[|$)/i;
+  const experienceRx= /\[?(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]?([\s\S]*?)(?=\[|$)/i;
   const get = (rx) => { const m = raw.match(rx); return m ? m[1].trim() : ''; };
   return { summary: get(summaryRx), skills: get(skillsRx), experience: get(experienceRx) };
 }
@@ -1543,10 +1543,33 @@ function calculateResumeScore() {
   if (jdText) {
     const STOP_WORDS = new Set([
       'the', 'and', 'for', 'with', 'you', 'our', 'are', 'this', 'that', 'will', 'work', 'team', 'from', 'your', 'have', 'their', 'they', 'them', 'who', 'what', 'its', 'about', 'been', 'were', 'was', 'has', 'had', 'does', 'did', 'but', 'not', 'can', 'should', 'would', 'could', 'than', 'then', 'into', 'onto', 'upon', 'also', 'other', 'some', 'such', 'only', 'very', 'more', 'most', 'any', 'each', 'both', 'all', 'one', 'two', 'new', 'old', 'good', 'best', 'well', 'etc', 'under', 'role', 'highly', 'required', 'skills', 'experience', 'ability', 'duties', 'responsibilities', 'project', 'support', 'management', 'technical', 'development',
-      'job', 'may', 'sets', 'section', 'title', 'general', 'overview', 'functional', 'area', 'engineering', 'eng', 'description', 'position', 'candidate', 'details', 'knowledge', 'maintenance', 'including', 'using', 'working', 'ability', 'successful', 'proven', 'track', 'record', 'strong', 'excellent', 'written', 'verbal', 'communication', 'interpersonal', 'skills', 'years', 'degree', 'preferred', 'required', 'ideal', 'plus', 'desirable', 'nice', 'have', 'must', 'should', 'will', 'would', 'could', 'join', 'company', 'client', 'customer', 'business', 'environment', 'organization', 'teamwork', 'collaborate', 'cooperate'
+      'job', 'may', 'sets', 'section', 'title', 'general', 'overview', 'functional', 'area', 'description', 'position', 'candidate', 'details', 'knowledge', 'maintenance', 'including', 'using', 'working', 'ability', 'successful', 'proven', 'track', 'record', 'strong', 'excellent', 'written', 'verbal', 'communication', 'interpersonal', 'skills', 'years', 'degree', 'preferred', 'required', 'ideal', 'plus', 'desirable', 'nice', 'have', 'must', 'should', 'will', 'would', 'could', 'join', 'company', 'client', 'customer', 'business', 'environment', 'organization', 'teamwork', 'collaborate', 'cooperate',
+      'remote', 'apply', 'locations', 'posted', 'ago', 'requisition', 'type', 'time', 'full', 'part', 'days', 'months', 'weeks', 'to', 'on', 'in', 'of', 'is', 'at', 'as', 'or', 'be', 'by', 'an', 'it', 'if', 'so', 'no', 'do', 'up', 'us', 'we', 'go', 'am', 'other', 'others', 'another', 'like', 'than', 'then', 'there', 'their', 'them', 'they', 'he', 'she', 'his', 'her', 'him', 'its', 'about', 'above', 'below', 'under', 'over', 'between', 'through', 'during', 'before', 'after', 'against', 'with', 'without', 'within', 'around',
+      'engineer', 'engineering', 'engineers', 'systems', 'system', 'projects', 'project', 'peachtree', 'corners', 'georgia', 'usa', 'united', 'states', 'america', 'fortna', 'corporate', 'office', 'travel', 'traveling', 'workplace', 'movement', 'collective', 'redefine', 'success', 'challenges', 'opportunities', 'opportunity', 'culture', 'diversity', 'individual', 'contribute', 'passion', 'approach', 'fostering', 'commitment', 'collaboration', 'collaborating', 'equal', 'opportunity', 'employer', 'race', 'color', 'religion', 'creed', 'sex', 'gender', 'national', 'origin', 'age', 'disability', 'veteran', 'marital', 'status', 'citizenship', 'pregnancy', 'accommodation', 'accommodations', 'physical', 'demands', 'lift', 'pounds', 'stand', 'walk', 'sit', 'climb', 'bend', 'stoop', 'kneel', 'crouch', 'crawl', 'noise',
+      'partners', 'partnership', 'partner', 'world', 'worlds', 'leading', 'lead', 'leader', 'brands', 'brand', 'transform', 'transformation', 'operations', 'operation', 'digital', 'disruption', 'growth', 'objectives', 'objective', 'solutions', 'solution', 'powered', 'intelligent', 'fast', 'accurate', 'fulfillment', 'delivery', 'deliveries', 'people', 'person', 'innovative', 'innovation', 'algorithms', 'algorithm', 'optimal', 'optimize', 'optimizing', 'value', 'every', 'customer', 'customers', 'client', 'clients', 'comprehensive', 'services', 'service', 'products', 'product', 'strategy', 'strategies', 'center', 'centers', 'operational', 'automated', 'equipment', 'suite', 'lifecycle', 'transforming', 'hourly', 'pay', 'usd', 'benefits', 'affirmative', 'action', 'qualified', 'applicants', 'receive', 'consideration', 'protected', 'characteristic', 'federal', 'state', 'local', 'law', 'reasonable', 'qualified', 'individuals', 'disabilities', 'policy', 'affiliated', 'companies', 'persons', 'regardless', 'sexual', 'orientation', 'identity', 'expression', 'genetic', 'regard', 'public', 'assistance', 'authorized', 'representative', 'successfully', 'perform', 'essential', 'functions', 'navigate', 'safely', 'over', 'around', 'automation', 'stamina', 'prolonged', 'standing', 'cramped', 'quarters', 'exposure', 'dangerous', 'tools', 'materials', 'probable', 'moving', 'mechanical', 'parts', 'level', 'vary', 'quiet', 'moderate', 'excessive', 'salary', 'representing', 'low', 'high', 'end', 'actual', 'offered', 'based', 'various', 'factors', 'performance', 'employees', 'duties', 'requested', 'supervisor', 'posting', 'information', 'requirements', 'indicate', 'minimum', 'deemed', 'necessary', 'proficiently', 'provide', 'individuals', 'distribution',
+      'and/or', 'additionally', 'individually', 'demonstrates', 'demonstrate', 'expected', 'unexpected', 'comparable', 'equivalent', 'expect', 'expects', 'expectedly', 'expecting', 'requirements', 'requirement', 'required'
     ]);
+    const SHORT_TECH = new Set(['c#', 'c', 'go', 'r', 'ip', 'io', 'it', 'hr', 's3', 'ft']);
 
-    const lines = jdText.split('\n');
+    const lines = jdText.split('\n').filter(line => {
+      const l = line.toLowerCase();
+      // Skip section headers ending in a colon or consisting of header names
+      if (/^\s*[a-z0-9_/\-\s]+:\s*$/i.test(line.trim())) return false;
+      if (/^\s*(essential functions|qualifications|skills\/abilities|work environment|travel|physical demands|salary|base salary)\s*$/i.test(line.trim())) return false;
+      // Skip metadata lines
+      if (/^\s*(locations|time type|posted|requisition id|apply)\b/i.test(l)) return false;
+      if (/^\s*[a-z0-9\-]+\s*$/i.test(line.trim()) && !SHORT_TECH.has(l)) {
+        // Skip single-word lines like "Apply", "R9119"
+        return false;
+      }
+      // Skip EEO boilerplate
+      if (/equal employment opportunity|race,\s*color|national\s*origin|veteran\s*status|gender\s*identity|protected\s*characteristic/i.test(l)) return false;
+      // Skip physical demands boilerplate
+      if (/physical demands|lift\s*\d+\s*(pounds|lbs)|climb\s*ladders/i.test(l)) return false;
+      // Skip salary boilerplate
+      if (/base salary range|salary range/i.test(l)) return false;
+      return true;
+    });
     const kwMap = {};
 
     lines.forEach(line => {
@@ -1558,11 +1581,15 @@ function calculateResumeScore() {
         category = 'preferred';
       }
 
-      const words = line.match(/[a-zA-Z0-9+#.\-]+/g) || [];
+      const words = line.match(/[a-zA-Z0-9+#.\-/]+/g) || [];
       words.forEach(word => {
         const clean = word.replace(/[.,;()]/g, '').trim();
         const lower = clean.toLowerCase();
-        if (lower.length >= 2 && !STOP_WORDS.has(lower) && !/^\d+$/.test(lower)) {
+        
+        const isValidLen = lower.length >= 3 || SHORT_TECH.has(lower);
+        const hasLetters = /[a-zA-Z]/.test(clean);
+        
+        if (isValidLen && hasLetters && !STOP_WORDS.has(lower)) {
           if (kwMap[lower]) {
             const currentCat = kwMap[lower].category;
             if (category === 'critical' || (category === 'important' && currentCat === 'preferred')) {
@@ -1586,9 +1613,28 @@ function calculateResumeScore() {
       else preferredCandidates.push(item);
     });
 
-    criticalList = criticalCandidates.slice(0, 8);
-    importantList = importantCandidates.slice(0, 8);
-    preferredList = preferredCandidates.slice(0, 5);
+    function rankCandidates(candidates) {
+      return candidates.sort((a, b) => {
+        const isAcronymOrSymbol = (word) => {
+          return /^[A-Z0-9+#.\-/]+$/.test(word) || /[+#\/]/.test(word);
+        };
+        const isProperNoun = (word) => {
+          return /^[A-Z][a-z]/.test(word);
+        };
+
+        const scoreA = isAcronymOrSymbol(a.raw) ? 3 : (isProperNoun(a.raw) ? 2 : 1);
+        const scoreB = isAcronymOrSymbol(b.raw) ? 3 : (isProperNoun(b.raw) ? 2 : 1);
+
+        if (scoreA !== scoreB) {
+          return scoreB - scoreA;
+        }
+        return b.raw.length - a.raw.length;
+      });
+    }
+
+    criticalList = rankCandidates(criticalCandidates).slice(0, 8);
+    importantList = rankCandidates(importantCandidates).slice(0, 8);
+    preferredList = rankCandidates(preferredCandidates).slice(0, 5);
 
     jdKeywords = [...criticalList, ...importantList, ...preferredList];
 
@@ -1669,9 +1715,9 @@ function calculateResumeScore() {
 
   // 2. Section Structure (10 points)
   let structureScore = 0;
-  const hasSummary = /\[(?:SUMMARY|PROFESSIONAL SUMMARY)\]/i.test(resumeText);
-  const hasSkills = /\[(?:SKILLS|TECHNICAL SKILLS)\]/i.test(resumeText);
-  const hasExperience = /\[(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]/i.test(resumeText);
+  const hasSummary = /\[?(?:SUMMARY|PROFESSIONAL SUMMARY)\]?/i.test(resumeText);
+  const hasSkills = /\[?(?:SKILLS|TECHNICAL SKILLS)\]?/i.test(resumeText);
+  const hasExperience = /\[?(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]?/i.test(resumeText);
   const hasEducation = /education/i.test(resumeText) || (p.education && p.education.length > 0);
   
   if (hasSummary) structureScore += 2.5;
