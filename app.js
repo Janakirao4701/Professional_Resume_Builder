@@ -1530,8 +1530,11 @@ function calculateResumeScore() {
   let missingKeywords = [];
 
   if (jdText) {
-    const STOP_WORDS = new Set(['the', 'and', 'for', 'with', 'you', 'our', 'are', 'this', 'that', 'will', 'work', 'team', 'from', 'your', 'have', 'their', 'they', 'them', 'who', 'what', 'its', 'about', 'been', 'were', 'was', 'has', 'had', 'does', 'did', 'but', 'not', 'can', 'should', 'would', 'could', 'than', 'then', 'into', 'onto', 'upon', 'also', 'other', 'some', 'such', 'only', 'very', 'more', 'most', 'any', 'each', 'both', 'all', 'one', 'two', 'new', 'old', 'good', 'best', 'well', 'etc', 'under', 'role', 'highly', 'required', 'skills', 'experience', 'ability', 'duties', 'responsibilities', 'project', 'support', 'management', 'technical', 'development']);
-    const TECH_TERMS = new Set(['plc', 'hmi', 'scada', 'studio', '5000', 'rslogix', 'controllogix', 'siemens', 'beckhoff', 'twincat', 'ignition', 'factorytalk', 'panels', 'wiring', 'cad', 'eplan', 'autocad', 'python', 'javascript', 'typescript', 'react', 'node', 'express', 'nextjs', 'aws', 'docker', 'kubernetes', 'git', 'sql', 'mysql', 'postgres', 'mongodb', 'redis', 'c#', 'java', 'c++', 'testing', 'automation', 'commissioning', 'engineering', 'controls', 'systems', 'integration', 'vfd', 'servo', 'ethernet', 'modbus', 'profibus', 'devicenet', 'rs232', 'calibration', 'troubleshooting', 'maintenance', 'safety', 'compliance']);
+    const STOP_WORDS = new Set([
+      'the', 'and', 'for', 'with', 'you', 'our', 'are', 'this', 'that', 'will', 'work', 'team', 'from', 'your', 'have', 'their', 'they', 'them', 'who', 'what', 'its', 'about', 'been', 'were', 'was', 'has', 'had', 'does', 'did', 'but', 'not', 'can', 'should', 'would', 'could', 'than', 'then', 'into', 'onto', 'upon', 'also', 'other', 'some', 'such', 'only', 'very', 'more', 'most', 'any', 'each', 'both', 'all', 'one', 'two', 'new', 'old', 'good', 'best', 'well', 'etc', 'under', 'role', 'highly', 'required', 'skills', 'experience', 'ability', 'duties', 'responsibilities', 'project', 'support', 'management', 'technical', 'development',
+      'job', 'may', 'sets', 'section', 'title', 'general', 'overview', 'functional', 'area', 'engineering', 'eng', 'description', 'position', 'candidate', 'details', 'knowledge', 'maintenance'
+    ]);
+    const TECH_TERMS = new Set(['plc', 'hmi', 'scada', 'studio', '5000', 'rslogix', 'controllogix', 'siemens', 'beckhoff', 'twincat', 'ignition', 'factorytalk', 'panels', 'wiring', 'cad', 'eplan', 'autocad', 'python', 'javascript', 'typescript', 'react', 'node', 'express', 'nextjs', 'aws', 'docker', 'kubernetes', 'git', 'sql', 'mysql', 'postgres', 'mongodb', 'redis', 'c#', 'java', 'c++', 'testing', 'automation', 'commissioning', 'controls', 'systems', 'integration', 'vfd', 'servo', 'ethernet', 'modbus', 'profibus', 'devicenet', 'rs232', 'calibration', 'troubleshooting', 'safety', 'compliance']);
 
     // Extract potential keywords from JD
     const jdWords = jdText.toLowerCase().match(/[a-z0-9+#\-]+/g) || [];
@@ -1555,7 +1558,9 @@ function calculateResumeScore() {
     if (jdKeywords.length > 0) {
       const resumeLower = resumeText.toLowerCase();
       jdKeywords.forEach(kw => {
-        const regex = new RegExp('\\b' + kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '\\b', 'i');
+        const startBoundary = /^\w/.test(kw) ? '\\b' : '';
+        const endBoundary = /\w$/.test(kw) ? '\\b' : '';
+        const regex = new RegExp(startBoundary + kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + endBoundary, 'i');
         if (regex.test(resumeLower)) {
           matchedKeywords.push(kw);
         } else {
@@ -1721,10 +1726,15 @@ function calculateResumeScore() {
   let titleScore = 15;
   if (jdText) {
     const jdTitleMatch = jdText.match(/(?:title|role):\s*([^\n]+)/i) || [null, jdText.substring(0, 30)];
-    const targetTitle = jdTitleMatch[1] ? jdTitleMatch[1].trim().toLowerCase() : "";
+    const targetTitleRaw = jdTitleMatch[1] ? jdTitleMatch[1].trim() : "";
+    const targetTitle = targetTitleRaw.toLowerCase();
     const currentTitle = (p.subtitle || "").toLowerCase();
 
-    if (currentTitle && targetTitle) {
+    const titleKeywords = /(engineer|developer|designer|analyst|manager|technician|specialist|lead|programmer|operator|electrician|architect|administrator|consultant|officer|agent|coordinator)/i;
+    const isMetadata = /overview|general|description|functional|area/i.test(targetTitle);
+    const hasValidNoun = titleKeywords.test(targetTitle);
+
+    if (currentTitle && targetTitle && hasValidNoun && !isMetadata) {
       if (currentTitle === targetTitle) {
         titleScore = 15;
       } else if (targetTitle.split(/\s+/).some(word => word.length > 3 && currentTitle.includes(word))) {
@@ -1732,7 +1742,7 @@ function calculateResumeScore() {
         suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Profile subtitle '${p.subtitle}' is a partial match. Align it exactly to target role.` });
       } else {
         titleScore = 0;
-        suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Profile subtitle mismatch. Current: '${p.subtitle || 'None'}'. Target: '${jdTitleMatch[1] || 'Unknown'}'.` });
+        suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Profile subtitle mismatch. Current: '${p.subtitle || 'None'}'. Target: '${targetTitleRaw || 'Unknown'}'.` });
       }
     }
   }
