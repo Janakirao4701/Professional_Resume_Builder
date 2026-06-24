@@ -300,11 +300,11 @@
  
           <!-- Job Description Accordion -->
           <div class="jd-accordion">
-            <button class="jd-accordion-btn" id="jd-toggle-btn" onclick="toggleJDPane()" aria-expanded="false" aria-controls="jd-content" type="button">
+            <button class="jd-accordion-btn" id="jd-toggle-btn" onclick="toggleJDPane()" aria-expanded="true" aria-controls="jd-content" type="button">
               <span>🎯 Paste Job Description for Keyword Match</span>
               <svg class="chevron-icon-mini" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
             </button>
-            <div class="jd-content-pane" id="jd-content">
+            <div class="jd-content-pane expanded" id="jd-content">
               <textarea id="jd-text" placeholder="Paste the target job description here..." aria-label="Job description for keyword matching"></textarea>
               <div style="margin-top: 10px; display: flex; justify-content: center; margin-bottom: 12px;">
                 <button class="btn-dl" id="analyze-btn" style="padding: 6px 14px; font-size: 11px; background: var(--color-signal-blue); color: white; border-color: var(--color-signal-blue);">

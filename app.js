@@ -1644,6 +1644,19 @@ function renderScoringUI(data) {
 window.addEventListener('DOMContentLoaded', () => {
   initProfiles();
 
+  // Load saved Job Description if it exists in localStorage
+  const jdTextarea = document.getElementById('jd-text');
+  if (jdTextarea) {
+    const savedJD = localStorage.getItem('resume_builder_saved_jd');
+    if (savedJD) {
+      jdTextarea.value = savedJD;
+    }
+    // Save Job Description to localStorage on input
+    jdTextarea.addEventListener('input', () => {
+      localStorage.setItem('resume_builder_saved_jd', jdTextarea.value);
+    });
+  }
+
   // Bind the analyze button
   const analyzeBtn = document.getElementById('analyze-btn');
   if (analyzeBtn) {
