@@ -508,9 +508,9 @@ function exportProfiles() {
 
 // ── SECTION PARSER ──
 function parseContent(raw) {
-  const summaryRx   = /\[?(?:SUMMARY|PROFESSIONAL SUMMARY)\]?([\s\S]*?)(?=\[|$)/i;
-  const skillsRx    = /\[?(?:SKILLS|TECHNICAL SKILLS)\]?([\s\S]*?)(?=\[|$)/i;
-  const experienceRx= /\[?(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]?([\s\S]*?)(?=\[|$)/i;
+  const summaryRx   = /(?:^|\n)\s*\[?(?:SUMMARY|PROFESSIONAL SUMMARY)\]?:?\s*([\s\S]*?)(?=(?:\n\s*\[?(?:SKILLS|TECHNICAL SKILLS|EXPERIENCE|PROFESSIONAL EXPERIENCE|EDUCATION|CERTIFICATIONS)\]?:?)|$)/i;
+  const skillsRx    = /(?:^|\n)\s*\[?(?:SKILLS|TECHNICAL SKILLS)\]?:?\s*([\s\S]*?)(?=(?:\n\s*\[?(?:SUMMARY|PROFESSIONAL SUMMARY|EXPERIENCE|PROFESSIONAL EXPERIENCE|EDUCATION|CERTIFICATIONS)\]?:?)|$)/i;
+  const experienceRx= /(?:^|\n)\s*\[?(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]?:?\s*([\s\S]*?)(?=(?:\n\s*\[?(?:SUMMARY|PROFESSIONAL SUMMARY|SKILLS|TECHNICAL SKILLS|EDUCATION|CERTIFICATIONS)\]?:?)|$)/i;
   const get = (rx) => { const m = raw.match(rx); return m ? m[1].trim() : ''; };
   return { summary: get(summaryRx), skills: get(skillsRx), experience: get(experienceRx) };
 }
@@ -1715,9 +1715,9 @@ function calculateResumeScore() {
 
   // 2. Section Structure (10 points)
   let structureScore = 0;
-  const hasSummary = /\[?(?:SUMMARY|PROFESSIONAL SUMMARY)\]?/i.test(resumeText);
-  const hasSkills = /\[?(?:SKILLS|TECHNICAL SKILLS)\]?/i.test(resumeText);
-  const hasExperience = /\[?(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]?/i.test(resumeText);
+  const hasSummary = /(?:^|\n)\s*\[?(?:SUMMARY|PROFESSIONAL SUMMARY)\]?:?/i.test(resumeText);
+  const hasSkills = /(?:^|\n)\s*\[?(?:SKILLS|TECHNICAL SKILLS)\]?:?/i.test(resumeText);
+  const hasExperience = /(?:^|\n)\s*\[?(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]?:?/i.test(resumeText);
   const hasEducation = /education/i.test(resumeText) || (p.education && p.education.length > 0);
   
   if (hasSummary) structureScore += 2.5;
