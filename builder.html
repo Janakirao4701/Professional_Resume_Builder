@@ -297,6 +297,7 @@
               </div>
             </div>
           </div>
+          <div class="score-formula-note" id="score-formula-note" style="display:none;">Overall = ATS×40% + Recruiter×35% + Technical×25%</div>
  
           <!-- Job Description Accordion -->
           <div class="jd-accordion">
@@ -306,8 +307,11 @@
             </button>
             <div class="jd-content-pane expanded" id="jd-content">
               <textarea id="jd-text" placeholder="Paste the target job description here..." aria-label="Job description for keyword matching"></textarea>
-              <div style="margin-top: 10px; display: flex; justify-content: center; margin-bottom: 12px;">
-                <button class="btn-dl" id="analyze-btn" style="padding: 6px 14px; font-size: 11px; background: var(--color-signal-blue); color: white; border-color: var(--color-signal-blue);">
+              <div class="jd-word-count" id="jd-word-count">0 words</div>
+              <div class="analyze-divider"></div>
+              <div style="margin-top: 10px; margin-bottom: 12px;">
+                <button class="btn-dl analyze-btn-full" id="analyze-btn">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" /></svg>
                   <span>Analyze ATS Score</span>
                   <span class="btn-arrow-circle" style="background: rgba(255, 255, 255, 0.25);">
                     <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -319,6 +323,8 @@
                   <span>Match Rate: <strong id="keyword-match-rate">0%</strong></span>
                   <span id="keyword-match-count">0 of 0 keywords</span>
                 </div>
+                <div class="ats-gap-note" id="ats-gap-note" style="display:none;">ATS score also factors formatting, structure, and date accuracy — not just keywords.</div>
+                <div class="kw-legend"><span class="legend-tag critical">(C)</span> Critical · <span class="legend-tag important">(I)</span> Important · <span class="legend-tag preferred">(P)</span> Preferred</div>
                 <div class="kw-lists">
                   <div class="kw-column">
                     <span class="kw-title match">Matched Keywords</span>

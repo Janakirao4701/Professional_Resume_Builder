@@ -35,7 +35,7 @@ SCORING CRITERIA:
 1. ATS Score (Weight: 40%)
    - Keyword Relevance (60 pts): Extract Critical keywords (mandatory skills in JD), Important keywords (frequent skill terms in JD), and Preferred keywords (nice-to-haves). Match them against the resume using flexible matches (e.g., C++ should match C++). Deduct 5 pts per missing Critical keyword (max -20 penalty).
    - Section Structure (10 pts): Check completeness (Professional Summary, Skills, Experience, Education).
-   - Date Consistency (5 pts): Check if dates use a consistent format.
+   - Date Consistency (5 pts): Check if dates use a consistent format. IMPORTANT: "Present" in date ranges (e.g. "04/2025 - Present") is standard resume convention and must NEVER be flagged as an error. Only flag a date as "future" if it is strictly after TODAY'S DATE provided below.
    - ATS Formatting (10 pts): Warn if tables (column dividers like '|'), tab columns, or HTML formatting tags exist.
    - Experience Alignment (10 pts): Compare candidate YOE to JD target YOE.
    - Education Alignment (5 pts): Compare degree level requirements.
@@ -70,12 +70,20 @@ Return ONLY a raw, valid JSON object with the following schema. Do not enclose i
   "preferredMatched": string[],
   "preferredMissing": string[],
   "strengths": string[],
-  "weaknesses": string[]
+  "weaknesses": { "text": string, "severity": "critical" | "medium" | "low" }[]
 }
+
+Classify each weakness by severity:
+- "critical": ATS-breaking issues (wrong/future dates, missing required sections, major formatting errors)
+- "medium": Missing important keywords, weak quantification, poor summary quality
+- "low": Minor formatting issues, nice-to-have skills missing, stylistic suggestions
 
 Make the strengths and weaknesses descriptive and actionable (e.g. "ATS: Spelled out acronyms...", "Recruiter: Quantify older roles...").`;
 
-    const userPrompt = `### JOB DESCRIPTION:
+    const todayDate = new Date().toISOString().split('T')[0];
+    const userPrompt = `### TODAY'S DATE: ${todayDate}
+
+### JOB DESCRIPTION:
 ${jobDescription}
 
 ### RESUME CONTENT:

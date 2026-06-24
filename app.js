@@ -1540,33 +1540,57 @@ async function analyzeATSScore() {
   }
 }
 
+function getScoreColor(val) {
+  if (val >= 80) return '#22c55e';
+  if (val >= 60) return '#eab308';
+  return '#ef4444';
+}
+
 function renderScoringUI(data) {
+  // ── Score Delta (before/after) ──
+  const prevScoresRaw = localStorage.getItem('resume_builder_last_scores');
+  const prevScores = prevScoresRaw ? JSON.parse(prevScoresRaw) : null;
+  localStorage.setItem('resume_builder_last_scores', JSON.stringify({
+    overall: data.overall, ats: data.ats, recruiter: data.recruiter, technical: data.technical
+  }));
+
+  function deltaStr(cur, prev) {
+    if (prev === null || prev === undefined) return '';
+    const diff = cur - prev;
+    if (diff === 0) return '';
+    return diff > 0 ? ` <span class="score-delta up">↑${diff}</span>` : ` <span class="score-delta down">↓${Math.abs(diff)}</span>`;
+  }
+
   // Update Overall Badge & Pct Text
-  document.getElementById('overall-score-badge').textContent = `${data.overall}/100`;
+  document.getElementById('overall-score-badge').innerHTML = `${data.overall}/100${prevScores ? deltaStr(data.overall, prevScores.overall) : ''}`;
   document.getElementById('overall-score-pct').textContent = `${data.overall}%`;
   
   // Radial Ring Fill
   const ringFill = document.getElementById('overall-radial-fill');
   if (ringFill) {
     ringFill.setAttribute('stroke-dasharray', `${data.overall}, 100`);
-    if (data.overall < 50) {
-      ringFill.style.stroke = '#dc2626';
-    } else if (data.overall < 75) {
-      ringFill.style.stroke = '#ca8a04';
-    } else {
-      ringFill.style.stroke = '#0052cc';
-    }
+    ringFill.style.stroke = getScoreColor(data.overall);
   }
 
-  // Update Dimensions
-  document.getElementById('ats-score-val').textContent = `${data.ats}/100`;
-  document.getElementById('ats-score-bar').style.width = `${data.ats}%`;
+  // Show score formula note
+  const formulaNote = document.getElementById('score-formula-note');
+  if (formulaNote) formulaNote.style.display = 'block';
+
+  // Update Dimensions with color-coded bars and deltas
+  document.getElementById('ats-score-val').innerHTML = `${data.ats}/100${prevScores ? deltaStr(data.ats, prevScores.ats) : ''}`;
+  const atsBar = document.getElementById('ats-score-bar');
+  atsBar.style.width = `${data.ats}%`;
+  atsBar.style.background = getScoreColor(data.ats);
   
-  document.getElementById('recruiter-score-val').textContent = `${data.recruiter}/100`;
-  document.getElementById('recruiter-score-bar').style.width = `${data.recruiter}%`;
+  document.getElementById('recruiter-score-val').innerHTML = `${data.recruiter}/100${prevScores ? deltaStr(data.recruiter, prevScores.recruiter) : ''}`;
+  const recBar = document.getElementById('recruiter-score-bar');
+  recBar.style.width = `${data.recruiter}%`;
+  recBar.style.background = getScoreColor(data.recruiter);
   
-  document.getElementById('technical-score-val').textContent = `${data.technical}/100`;
-  document.getElementById('technical-score-bar').style.width = `${data.technical}%`;
+  document.getElementById('technical-score-val').innerHTML = `${data.technical}/100${prevScores ? deltaStr(data.technical, prevScores.technical) : ''}`;
+  const techBar = document.getElementById('technical-score-bar');
+  techBar.style.width = `${data.technical}%`;
+  techBar.style.background = getScoreColor(data.technical);
 
   // Update Keyword Feedback Tags
   const kwFeedback = document.getElementById('keyword-feedback');
@@ -1579,6 +1603,12 @@ function renderScoringUI(data) {
     
     document.getElementById('keyword-match-rate').textContent = `${rate}%`;
     document.getElementById('keyword-match-count').textContent = `${matched} of ${total} keywords`;
+
+    // Show ATS gap note when match rate and ATS score differ significantly
+    const atsGapNote = document.getElementById('ats-gap-note');
+    if (atsGapNote && Math.abs(rate - data.ats) > 5) {
+      atsGapNote.style.display = 'block';
+    }
 
     const matchedContainer = document.getElementById('matched-kw-tags');
     matchedContainer.innerHTML = [
@@ -1628,12 +1658,17 @@ function renderScoringUI(data) {
       <div class="suggestion-group" style="margin-top: 14px;">
         <div class="group-title weaknesses">Weaknesses & Actionable Improvements (${data.weaknesses.length})</div>
         <ul class="suggestions-list">
-          ${data.weaknesses.length > 0 ? data.weaknesses.map(w => `
-            <li class="suggestion-fail">
+          ${data.weaknesses.length > 0 ? data.weaknesses.map(w => {
+            const text = typeof w === 'object' ? w.text : w;
+            const severity = typeof w === 'object' ? (w.severity || 'medium') : 'medium';
+            const sevLabel = severity === 'critical' ? 'CRITICAL' : severity === 'low' ? 'LOW' : 'MEDIUM';
+            return `
+            <li class="suggestion-fail severity-${severity}">
               <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-              <span>${escHtml(w)}</span>
+              <span class="severity-badge sev-${severity}">${sevLabel}</span>
+              <span>${escHtml(text)}</span>
             </li>
-          `).join('') : '<li class="suggestion-pass" style="justify-content:center; width:100%; font-weight:600;">✓ Excellent! Your resume conforms to all guidelines.</li>'}
+          `}).join('') : '<li class="suggestion-pass" style="justify-content:center; width:100%; font-weight:600;">✓ Excellent! Your resume conforms to all guidelines.</li>'}
         </ul>
       </div>
     `;
@@ -1652,9 +1687,16 @@ window.addEventListener('DOMContentLoaded', () => {
     if (savedJD) {
       jdTextarea.value = savedJD;
     }
-    // Save Job Description to localStorage on input
+    // Save Job Description to localStorage on input + word count
+    function updateJDWordCount() {
+      const words = jdTextarea.value.trim() ? jdTextarea.value.trim().split(/\s+/).length : 0;
+      const wcEl = document.getElementById('jd-word-count');
+      if (wcEl) wcEl.textContent = `${words} word${words !== 1 ? 's' : ''}`;
+    }
+    updateJDWordCount();
     jdTextarea.addEventListener('input', () => {
       localStorage.setItem('resume_builder_saved_jd', jdTextarea.value);
+      updateJDWordCount();
     });
   }
 

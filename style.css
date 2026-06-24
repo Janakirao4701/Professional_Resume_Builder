@@ -3230,3 +3230,128 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
+
+  /* ── Score Formula Note ── */
+  .score-formula-note {
+    font-size: 10px;
+    color: var(--color-pencil);
+    text-align: center;
+    padding: 6px 0 0;
+    letter-spacing: 0.02em;
+    font-family: 'Outfit', sans-serif;
+    border-top: 1px dashed var(--color-chalk);
+    margin-top: 10px;
+  }
+
+  /* ── ATS Gap Explanation Note ── */
+  .ats-gap-note {
+    font-size: 10px;
+    color: var(--color-pencil);
+    font-style: italic;
+    padding: 4px 0 6px;
+    line-height: 1.4;
+  }
+
+  /* ── Keyword Legend ── */
+  .kw-legend {
+    font-size: 9px;
+    color: var(--color-pencil);
+    padding: 4px 0 8px;
+    letter-spacing: 0.02em;
+  }
+  .legend-tag {
+    font-weight: 700;
+    font-family: monospace;
+    font-size: 9px;
+  }
+  .legend-tag.critical { color: #991b1b; }
+  .legend-tag.important { color: #92400e; }
+  .legend-tag.preferred { color: #1e40af; }
+
+  /* ── Score Delta Arrows ── */
+  .score-delta {
+    font-size: 10px;
+    font-weight: 700;
+    margin-left: 4px;
+  }
+  .score-delta.up {
+    color: #16a34a;
+  }
+  .score-delta.down {
+    color: #dc2626;
+  }
+
+  /* ── Severity Badges on Weakness Cards ── */
+  .severity-badge {
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 1px 5px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .sev-critical {
+    background: #dc2626;
+    color: #fff;
+  }
+  .sev-medium {
+    background: #eab308;
+    color: #422006;
+  }
+  .sev-low {
+    background: #e2e8f0;
+    color: #475569;
+  }
+
+  /* Severity-colored left border on weakness items */
+  .suggestion-fail.severity-critical {
+    border-left: 3px solid #dc2626;
+  }
+  .suggestion-fail.severity-medium {
+    border-left: 3px solid #eab308;
+  }
+  .suggestion-fail.severity-low {
+    border-left: 3px solid #94a3b8;
+  }
+
+  /* ── JD Word Count ── */
+  .jd-word-count {
+    font-size: 10px;
+    color: var(--color-pencil);
+    text-align: right;
+    padding: 2px 4px 0;
+    letter-spacing: 0.02em;
+  }
+
+  /* ── Analyze Divider ── */
+  .analyze-divider {
+    height: 1px;
+    background: var(--color-chalk);
+    margin: 8px 0 0;
+  }
+
+  /* ── Full-Width Analyze Button ── */
+  .analyze-btn-full {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 16px !important;
+    font-size: 12px !important;
+    font-weight: 700;
+    background: var(--color-signal-blue) !important;
+    color: white !important;
+    border-color: var(--color-signal-blue) !important;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: all 0.2s ease;
+  }
+  .analyze-btn-full:hover {
+    filter: brightness(1.12);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 82, 204, 0.35);
+  }
