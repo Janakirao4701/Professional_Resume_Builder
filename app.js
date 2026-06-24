@@ -762,10 +762,12 @@ async function pasteFromClipboard() {
     updatePreview();
     parseCompanies(text);
 
-    btn.innerHTML = '✓ Pasted!';
+    const span = btn.querySelector('span');
+    const originalText = span.textContent;
+    span.textContent = '✓ Pasted!';
     btn.classList.add('pasted');
     setTimeout(() => {
-      btn.innerHTML = '📋 Paste from Clipboard';
+      span.textContent = originalText;
       btn.classList.remove('pasted');
     }, 2000);
   } catch (err) {
