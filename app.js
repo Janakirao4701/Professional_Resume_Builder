@@ -2092,10 +2092,8 @@ function calculateResumeScore() {
         </ul>
       </div>
     `;
-
     listContainer.innerHTML = html;
   }
-}
 }
 
 // Populate company copy buttons and preview on load
