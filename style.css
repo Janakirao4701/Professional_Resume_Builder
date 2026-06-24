@@ -1,22 +1,28 @@
 :root {
   /* Colors */
-  --color-ink: #1e2532;
-  --color-carbon: #0f141e;
-  --color-pencil: #656e83;
-  --color-fog: #828ba2;
-  --color-haze: #9fa6bb;
+  --color-ink: #111111;
+  --color-carbon: #0f141f;
+  --color-pencil: #4b5563;
+  --color-fog: #6b7280;
+  --color-haze: #9ca3af;
   --color-paper: #ffffff;
-  --color-mist: #f7f9fc;
-  --color-lavender-wash: #f1f2ff;
-  --color-chalk: #d9deeb;
-  --color-ash: #e7eaf4;
-  --color-signal-blue: #1a91f0;
-  --color-deep-signal: #016fd0;
-  --color-iris: #5660e8;
-  --color-midnight: #1a1c6a;
-  --color-mint-whisper: #e7f4ed;
-  --color-blush-whisper: #ffebe4;
-  --color-rose-whisper: #edd7df;
+  --color-mist: #fafaf9;
+  --color-lavender-wash: #f0f2ff;
+  --color-chalk: #eaeaea;
+  --color-ash: #e5e7eb;
+  --color-signal-blue: #0052cc;
+  --color-deep-signal: #0747a6;
+  --color-iris: #4f46e5;
+  --color-midnight: #1e1b4b;
+  --color-mint-whisper: #edf3ec;
+  --color-blush-whisper: #fdebec;
+  --color-rose-whisper: #f5e6eb;
+
+  /* Muted spot pastels */
+  --color-pale-blue: #e1f3fe;
+  --color-pale-red: #fdebec;
+  --color-pale-green: #edf3ec;
+  --color-pale-yellow: #fbf3db;
 
   /* App Theme Variables mapping */
   --app-bg: var(--color-mist);
@@ -27,7 +33,7 @@
   --app-ink-muted: var(--color-pencil);
   --app-accent: var(--color-signal-blue);
   --app-accent-hover: var(--color-deep-signal);
-  --app-accent-glow: rgba(26, 145, 240, 0.1);
+  --app-accent-glow: rgba(0, 82, 204, 0.08);
   
   --paper-well-bg: var(--color-mist);
   --border: var(--color-chalk);
@@ -36,30 +42,30 @@
   --ink: var(--color-ink);
 
   /* Typography — Fonts */
-  --font-tt-commons: 'Plus Jakarta Sans', 'Outfit', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-tt-commons: 'Outfit', 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   /* Typography — Scale */
   --text-caption: 14px;
   --leading-caption: 1.43;
-  --tracking-caption: 0.29px;
+  --tracking-caption: 0.2px;
   --text-body: 16px;
   --leading-body: 1.25;
-  --tracking-body: 0.336px;
+  --tracking-body: 0px;
   --text-subheading: 19px;
   --leading-subheading: 1.22;
-  --tracking-subheading: 0.399px;
+  --tracking-subheading: -0.1px;
   --text-heading-sm: 24px;
   --leading-heading-sm: 1.17;
-  --tracking-heading-sm: 0.504px;
-  --text-heading: 31px;
-  --leading-heading: 1.14;
-  --tracking-heading: 0.651px;
-  --text-heading-lg: 40px;
-  --leading-heading-lg: 1.07;
-  --tracking-heading-lg: 0.84px;
-  --text-display: 67px;
-  --leading-display: 0.96;
-  --tracking-display: 1.407px;
+  --tracking-heading-sm: -0.2px;
+  --text-heading: 32px;
+  --leading-heading: 1.15;
+  --tracking-heading: -0.5px;
+  --text-heading-lg: 44px;
+  --leading-heading-lg: 1.1;
+  --tracking-heading-lg: -0.8px;
+  --text-display: 68px;
+  --leading-display: 1.05;
+  --tracking-display: -1.5px;
 
   /* Typography — Weights */
   --font-weight-regular: 400;
@@ -87,13 +93,13 @@
   --spacing-144: 144px;
 
   /* Layout */
-  --page-max-width: 1200px;
-  --section-gap: 80px;
+  --page-max-width: 1280px;
+  --section-gap: 140px;
   --card-padding: 24px;
   --element-gap: 12px;
 
   /* Border Radius */
-  --radius-md: 4px;
+  --radius-md: 6px;
   --radius-xl: 12px;
   --radius-2xl: 16px;
   --radius-2xl-2: 20px;
@@ -105,8 +111,8 @@
   /* Named Radii */
   --radius-tags: 100px;
   --radius-cards: 16px;
-  --radius-icons: 4px;
-  --radius-inputs: 4px;
+  --radius-icons: 6px;
+  --radius-inputs: 6px;
   --radius-buttons: 36px;
 }
 
@@ -2187,19 +2193,33 @@
   }
 
   .bento-card {
-    background: var(--color-paper);
     border: 1px solid var(--color-chalk);
-    border-radius: var(--radius-2xl);
-    padding: var(--spacing-32);
+    padding: 6px;
+    background: var(--color-mist);
+    border-radius: 20px;
+    box-sizing: border-box;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    min-height: 280px;
-    transition: transform 0.2s ease;
   }
 
   .bento-card:hover {
+    border-color: var(--color-haze);
     transform: translateY(-2px);
+  }
+
+  .bento-card-inner {
+    background: var(--color-paper);
+    border-radius: calc(20px - 6px);
+    padding: var(--spacing-32);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8);
+    flex-grow: 1;
   }
 
   .col-span-2 {
@@ -2212,12 +2232,12 @@
   }
 
   @media (min-width: 1024px) {
-    .bento-card.col-span-2 {
+    .bento-card.col-span-2 .bento-card-inner {
       display: grid;
       grid-template-columns: 1.2fr 0.8fr;
       gap: var(--spacing-32);
       align-items: center;
-      min-height: 280px;
+      min-height: calc(280px - 12px);
     }
     
     .bento-card.col-span-2 .bento-card-info {
@@ -2735,4 +2755,65 @@
     .logos-grid {
       grid-template-columns: repeat(2, 1fr);
     }
+  }
+
+  /* ── Tactile Button Icons and Scroll entry animations ── */
+  .btn-arrow-circle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.18);
+    margin-left: 10px;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.15s;
+    flex-shrink: 0;
+  }
+  
+  .btn-primary-cta:hover .btn-arrow-circle {
+    background: rgba(255, 255, 255, 0.28);
+    transform: translateX(2px);
+  }
+  
+  .btn-ghost-cta .btn-arrow-circle {
+    background: rgba(0, 82, 204, 0.08);
+    color: var(--color-signal-blue);
+  }
+  
+  .btn-ghost-cta:hover .btn-arrow-circle {
+    background: rgba(0, 82, 204, 0.15);
+    transform: translateX(2px);
+  }
+
+  .reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  
+  .reveal-on-scroll.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  
+  /* Double-Bezel Card utility classes */
+  .double-bezel-outer {
+    border: 1px solid var(--color-chalk);
+    padding: 6px;
+    background: var(--color-mist);
+    border-radius: 16px;
+    box-sizing: border-box;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+  }
+  .double-bezel-outer:hover {
+    border-color: var(--color-haze);
+  }
+  .double-bezel-inner {
+    background: var(--color-paper);
+    border-radius: calc(16px - 6px);
+    padding: var(--spacing-20);
+    box-sizing: border-box;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.8);
   }

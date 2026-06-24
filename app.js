@@ -519,41 +519,58 @@ function parseContent(raw) {
 // ── PREVIEW BUILDER ──
 
 // ── SCALE PREVIEW TO FIT VIEWPORT ──
+let lastPaneWidth = 0;
+let lastMockupWidth = 0;
+let lastMockupHeight = 0;
+let isScaling = false;
+
 function adjustPreviewScale() {
+  if (isScaling) return;
+  
   const pane = document.querySelector('.preview-pane');
   const mockup = document.getElementById('resume-mockup');
   if (!pane || !mockup) return;
   
-  if (pane.clientWidth === 0) return;
-  
-  mockup.style.transform = 'none';
-  mockup.style.marginBottom = '0';
-  
   const paneWidth = pane.clientWidth - 32;
-  if (paneWidth <= 0) return;
-  
   const mockupWidth = mockup.offsetWidth;
   const mockupHeight = mockup.offsetHeight;
   
+  // Return early if dimensions haven't changed significantly to prevent layout recursion and scrollbar oscillation loops
+  if (Math.abs(paneWidth - lastPaneWidth) < 12 && 
+      mockupWidth === lastMockupWidth && 
+      mockupHeight === lastMockupHeight) {
+    return;
+  }
+  
+  isScaling = true;
+  
+  if (paneWidth <= 0 || mockupWidth <= 0) {
+    isScaling = false;
+    return;
+  }
+  
+  lastPaneWidth = paneWidth;
+  lastMockupWidth = mockupWidth;
+  lastMockupHeight = mockupHeight;
+  
   if (paneWidth < mockupWidth) {
     const scale = paneWidth / mockupWidth;
+    const heightReduction = mockupHeight * (1 - scale);
+    
     mockup.style.transform = `scale(${scale})`;
     mockup.style.transformOrigin = 'top center';
-    const heightReduction = mockupHeight * (1 - scale);
     mockup.style.marginBottom = `-${heightReduction}px`;
+  } else {
+    mockup.style.transform = 'none';
+    mockup.style.transformOrigin = 'initial';
+    mockup.style.marginBottom = '0';
   }
+  
+  // Release execution lock in the next animation frame
+  requestAnimationFrame(() => {
+    isScaling = false;
+  });
 }
-window.addEventListener('resize', adjustPreviewScale);
-
-
-// ── SCALE PREVIEW TO FIT VIEWPORT ──
-
-window.addEventListener('resize', adjustPreviewScale);
-
-// ── PREVIEW BUILDER ──
-
-// ── SCALE PREVIEW TO FIT VIEWPORT ──
-
 window.addEventListener('resize', adjustPreviewScale);
 
 // ── PREVIEW BUILDER ──
