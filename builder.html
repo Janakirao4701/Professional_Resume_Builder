@@ -240,6 +240,93 @@
         <span>Press <strong>Ctrl+V</strong> (or <strong>Cmd+V</strong>) to paste your resume content directly.</span>
       </div>
 
+      <!-- 📈 Resume Strength Scoring Panel -->
+      <div class="scoring-container double-bezel-outer" style="margin-top: 16px;">
+        <div class="double-bezel-inner" style="padding: 16px;">
+          <div class="score-header">
+            <span class="header-title">📈 Resume Strength Score</span>
+            <span class="overall-badge" id="overall-score-badge">0/100</span>
+          </div>
+          
+          <div class="score-summary-grid">
+            <!-- Radial progress meter -->
+            <div class="radial-score-wrapper">
+              <svg class="radial-ring" viewBox="0 0 36 36" width="64" height="64">
+                <path class="ring-bg" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--color-chalk)" stroke-width="3" />
+                <path class="ring-fill" id="overall-radial-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="var(--color-signal-blue)" stroke-width="3" stroke-dasharray="0, 100" stroke-linecap="round" />
+              </svg>
+              <div class="radial-text" id="overall-score-pct">0%</div>
+            </div>
+            
+            <!-- Three mini dimensions -->
+            <div class="dimension-scores-list">
+              <div class="dim-score-row">
+                <div class="dim-labels">
+                  <span class="dim-name">ATS Score</span>
+                  <span class="dim-val" id="ats-score-val">0/100</span>
+                </div>
+                <div class="dim-bar-track">
+                  <div class="dim-bar-fill" id="ats-score-bar" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="dim-score-row">
+                <div class="dim-labels">
+                  <span class="dim-name">Recruiter Appeal</span>
+                  <span class="dim-val" id="recruiter-score-val">0/100</span>
+                </div>
+                <div class="dim-bar-track">
+                  <div class="dim-bar-fill" id="recruiter-score-bar" style="width: 0%;"></div>
+                </div>
+              </div>
+              <div class="dim-score-row">
+                <div class="dim-labels">
+                  <span class="dim-name">Technical Credibility</span>
+                  <span class="dim-val" id="technical-score-val">0/100</span>
+                </div>
+                <div class="dim-bar-track">
+                  <div class="dim-bar-fill" id="technical-score-bar" style="width: 0%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Job Description Accordion -->
+          <div class="jd-accordion">
+            <button class="jd-accordion-btn" id="jd-toggle-btn" onclick="toggleJDPane()" aria-expanded="false" aria-controls="jd-content" type="button">
+              <span>🎯 Paste Job Description for Keyword Match</span>
+              <svg class="chevron-icon-mini" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
+            </button>
+            <div class="jd-content-pane" id="jd-content">
+              <textarea id="jd-text" placeholder="Paste the target job description here..." aria-label="Job description for keyword matching" oninput="triggerScoreCalculation()"></textarea>
+              <div class="keyword-feedback" id="keyword-feedback" style="display: none;">
+                <div class="kw-stat-row">
+                  <span>Match Rate: <strong id="keyword-match-rate">0%</strong></span>
+                  <span id="keyword-match-count">0 of 0 keywords</span>
+                </div>
+                <div class="kw-lists">
+                  <div class="kw-column">
+                    <span class="kw-title match">Matched Keywords</span>
+                    <div class="kw-tags" id="matched-kw-tags"></div>
+                  </div>
+                  <div class="kw-column">
+                    <span class="kw-title missing">Missing Keywords</span>
+                    <div class="kw-tags" id="missing-kw-tags"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Improvement Suggestions Checklist -->
+          <div class="suggestions-section">
+            <div class="suggestions-title">Optimization Suggestions</div>
+            <ul class="suggestions-list" id="suggestions-list">
+              <li class="empty-suggestions">Paste or type your resume content to see dynamic improvement suggestions.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
       <!-- Company Experience Copy (appears after paste) -->
       <div class="company-section" id="company-section">
         <div class="company-section-title">

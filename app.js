@@ -738,6 +738,7 @@ function updatePreview() {
 
   updateCombinedPromptPreview();
   setTimeout(adjustPreviewScale, 10);
+  triggerScoreCalculation();
 }
 
 
@@ -1484,6 +1485,431 @@ async function copyAIPrompt() {
   } catch (err) {
     console.error(err);
     showToast("Failed to copy prompt. Please copy manually from the preview.");
+  }
+}
+
+function toggleJDPane() {
+  const pane = document.getElementById('jd-content');
+  const btn = document.getElementById('jd-toggle-btn');
+  if (pane && btn) {
+    const isExpanded = pane.classList.toggle('expanded');
+    btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+  }
+}
+
+function triggerScoreCalculation() {
+  const container = document.querySelector('.scoring-container');
+  if (!container) return;
+  calculateResumeScore();
+}
+
+function calculateResumeScore() {
+  const resumeText = document.getElementById('resume-text').value;
+  const jdText = document.getElementById('jd-text') ? document.getElementById('jd-text').value.trim() : "";
+  const p = PROFILE || {};
+
+  const { summary, skills, experience } = parseContent(resumeText);
+  const suggestions = [];
+
+  // ==========================================
+  // DIMENSION 1: ATS SCORE (Max 100)
+  // ==========================================
+  let atsScore = 0;
+
+  // 1. Keyword Match Rate (40 points)
+  let kwScore = 0;
+  let jdKeywords = [];
+  let matchedKeywords = [];
+  let missingKeywords = [];
+
+  if (jdText) {
+    const STOP_WORDS = new Set(['the', 'and', 'for', 'with', 'you', 'our', 'are', 'this', 'that', 'will', 'work', 'team', 'from', 'your', 'have', 'their', 'they', 'them', 'who', 'what', 'its', 'about', 'been', 'were', 'was', 'has', 'had', 'does', 'did', 'but', 'not', 'can', 'should', 'would', 'could', 'than', 'then', 'into', 'onto', 'upon', 'also', 'other', 'some', 'such', 'only', 'very', 'more', 'most', 'any', 'each', 'both', 'all', 'one', 'two', 'new', 'old', 'good', 'best', 'well', 'etc', 'under', 'role', 'highly', 'required', 'skills', 'experience', 'ability', 'duties', 'responsibilities', 'project', 'support', 'management', 'technical', 'development']);
+    const TECH_TERMS = new Set(['plc', 'hmi', 'scada', 'studio', '5000', 'rslogix', 'controllogix', 'siemens', 'beckhoff', 'twincat', 'ignition', 'factorytalk', 'panels', 'wiring', 'cad', 'eplan', 'autocad', 'python', 'javascript', 'typescript', 'react', 'node', 'express', 'nextjs', 'aws', 'docker', 'kubernetes', 'git', 'sql', 'mysql', 'postgres', 'mongodb', 'redis', 'c#', 'java', 'c++', 'testing', 'automation', 'commissioning', 'engineering', 'controls', 'systems', 'integration', 'vfd', 'servo', 'ethernet', 'modbus', 'profibus', 'devicenet', 'rs232', 'calibration', 'troubleshooting', 'maintenance', 'safety', 'compliance']);
+
+    // Extract potential keywords from JD
+    const jdWords = jdText.toLowerCase().match(/[a-z0-9+#\-]+/g) || [];
+    const freq = {};
+    jdWords.forEach(w => {
+      if (w.length >= 3 && !STOP_WORDS.has(w)) {
+        freq[w] = (freq[w] || 0) + 1;
+      }
+    });
+
+    // Select unique keywords, prioritizing tech terms and high-frequency terms
+    const candidates = Object.keys(freq).sort((a, b) => {
+      const aIsTech = TECH_TERMS.has(a) ? 1 : 0;
+      const bIsTech = TECH_TERMS.has(b) ? 1 : 0;
+      if (aIsTech !== bIsTech) return bIsTech - aIsTech;
+      return freq[b] - freq[a];
+    });
+
+    jdKeywords = candidates.slice(0, 15); // Top 15 keywords
+
+    if (jdKeywords.length > 0) {
+      const resumeLower = resumeText.toLowerCase();
+      jdKeywords.forEach(kw => {
+        const regex = new RegExp('\\b' + kw.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&') + '\\b', 'i');
+        if (regex.test(resumeLower)) {
+          matchedKeywords.push(kw);
+        } else {
+          missingKeywords.push(kw);
+        }
+      });
+      kwScore = Math.round((matchedKeywords.length / jdKeywords.length) * 40);
+    }
+  } else {
+    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Paste a Job Description to calculate Keyword Match Rate." });
+  }
+  atsScore += kwScore;
+
+  // 2. Date Format Compliance (10 points)
+  let dateScore = 0;
+  const dateRegex = /\b(0[1-9]|1[0-2])\/\d{4}\b/g; // MM/YYYY
+  const datesFound = resumeText.match(dateRegex) || [];
+  const textHasDates = /\b(19|20)\d{2}\b/.test(resumeText);
+  
+  if (datesFound.length > 0) {
+    dateScore = 10;
+  } else if (textHasDates) {
+    dateScore = 5;
+    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Ensure all dates in Professional Experience use the standard MM/YYYY format (e.g., 06/2021)." });
+  } else {
+    dateScore = 0;
+    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: No experience dates detected. Add dates using the MM/YYYY format." });
+  }
+  atsScore += dateScore;
+
+  // 3. Section Header Compliance (15 points)
+  let headerScore = 0;
+  const hasSummary = /\[(?:SUMMARY|PROFESSIONAL SUMMARY)\]/i.test(resumeText);
+  const hasSkills = /\[(?:SKILLS|TECHNICAL SKILLS)\]/i.test(resumeText);
+  const hasExperience = /\[(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]/i.test(resumeText);
+  
+  if (hasSummary) headerScore += 5;
+  if (hasSkills) headerScore += 5;
+  if (hasExperience) headerScore += 5;
+
+  if (headerScore < 15) {
+    const missing = [];
+    if (!hasSummary) missing.push('[PROFESSIONAL SUMMARY]');
+    if (!hasSkills) missing.push('[TECHNICAL SKILLS]');
+    if (!hasExperience) missing.push('[PROFESSIONAL EXPERIENCE]');
+    suggestions.push({ dim: 'ats', status: 'fail', text: `ATS: Missing required section tags: ${missing.join(', ')}.` });
+  }
+  atsScore += headerScore;
+
+  // 4. Acronym Handling (10 points)
+  let acronymScore = 10;
+  const acronyms = ['PLC', 'HMI', 'SCADA', 'VFD', 'CAD', 'AWS', 'API', 'SQL', 'ATS'];
+  let foundAcronyms = 0;
+  let spelledOut = 0;
+
+  acronyms.forEach(ac => {
+    const regex = new RegExp('\\b' + ac + '\\b');
+    if (regex.test(resumeText)) {
+      foundAcronyms++;
+      const bracketRegex = new RegExp('(?:' + ac + '\\s*\\([^)]+\\)|\\([^)]+\\)\\s*' + ac + ')', 'i');
+      if (bracketRegex.test(resumeText)) {
+        spelledOut++;
+      }
+    }
+  });
+
+  if (foundAcronyms > 0) {
+    if (spelledOut === 0) {
+      acronymScore = 0;
+      suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Acronyms detected (e.g. PLC). Spell out acronyms on first use (e.g. PLC (Programmable Logic Controller))." });
+    } else if (spelledOut < foundAcronyms) {
+      acronymScore = 5;
+      suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Some acronyms are not spelled out on first use." });
+    }
+  }
+  atsScore += acronymScore;
+
+  // 5. Format Cleanliness (15 points)
+  let cleanlinessScore = 15;
+  const bulletsLines = resumeText.split('\n').map(l => l.trim()).filter(l => /^[-\u2013\u2014\u2022•*]/.test(l));
+  const badBullets = bulletsLines.filter(l => !/^-/.test(l));
+  
+  if (bulletsLines.length > 0 && badBullets.length > 0) {
+    cleanlinessScore -= 5;
+    suggestions.push({ dim: 'ats', status: 'fail', text: "ATS: Mixed bullet point formats. Ensure all experience list items start with a plain hyphen '-'." });
+  }
+  atsScore += cleanlinessScore;
+
+  // 6. Forbidden Headers Penalty (-10 points each)
+  let forbiddenPenalty = 0;
+  const forbiddenHeaders = ['objective', 'about me', 'references'];
+  forbiddenHeaders.forEach(fh => {
+    const regex = new RegExp('\\b' + fh + '\\b', 'i');
+    if (regex.test(resumeText)) {
+      forbiddenPenalty += 10;
+      suggestions.push({ dim: 'ats', status: 'fail', text: `ATS Penalty: Remove forbidden header/concept '${fh}' (Objective statements and references are outdated).` });
+    }
+  });
+  atsScore = Math.max(0, atsScore - forbiddenPenalty);
+
+  // ==========================================
+  // DIMENSION 2: RECRUITER APPEAL (Max 100)
+  // ==========================================
+  let recruiterScore = 0;
+
+  // 1. Summary Quality (25 points)
+  let summaryScore = 0;
+  if (summary) {
+    const hasYoe = /\d+\+?\s*(years|yoe)/i.test(summary);
+    const hasJobTitle = /(engineer|developer|designer|analyst|programmer)/i.test(summary);
+    if (hasYoe && hasJobTitle) summaryScore += 5;
+    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Summary should open with target job title and YOE (e.g. 'Controls Engineer with 5+ years...')." });
+
+    const summaryWords = summary.toLowerCase();
+    const hasTools = /(plc|siemens|studio|allen|rockwell|python|react|aws|docker|sql|cad|ignition)/i.test(summaryWords);
+    if (hasTools) summaryScore += 5;
+    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Feature at least 2 key tools or technologies in your professional summary." });
+
+    const hasIndustries = /(automotive|manufacturing|oil|gas|chemical|aerospace|utility|logistics|software|tech|medical|water)/i.test(summaryWords);
+    if (hasIndustries) summaryScore += 5;
+    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Mention your primary domain or target industry sectors in your summary." });
+
+    const hasProblemSolve = /(solve|solving|implement|reduce|optimise|optimize|increase|improve|streamline)/i.test(summaryWords);
+    if (hasProblemSolve) summaryScore += 5;
+
+    const clichés = ['passionate', 'results-driven', 'detail-oriented', 'self-starter', 'motivated', 'hardworking'];
+    let foundCliche = false;
+    clichés.forEach(c => {
+      if (summaryWords.includes(c)) foundCliche = true;
+    });
+    if (!foundCliche) summaryScore += 5;
+    else suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Remove subjective buzzwords (e.g. 'passionate', 'results-driven') from summary; replace with hard facts." });
+  } else {
+    suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Summary block is empty. Write an impactful 3-line professional summary." });
+  }
+  recruiterScore += summaryScore;
+
+  // 2. Bullet Quality (30 points)
+  let bulletScore = 0;
+  if (experience) {
+    const bullets = experience.split('\n').map(l => l.trim()).filter(l => l.startsWith('-'));
+    let strongBulletsCount = 0;
+    let bannedVerbsCount = 0;
+
+    const strongVerbs = /\b(designed|engineered|programmed|automated|commissioned|optimized|led|developed|reduced|increased|implemented|spearheaded|developed|configured|authored)\b/i;
+    const bannedVerbs = /\b(collaborated|responsible for|helped|supported|worked on)\b/i;
+
+    bullets.forEach(b => {
+      if (strongVerbs.test(b)) strongBulletsCount++;
+      if (bannedVerbs.test(b)) bannedVerbsCount++;
+    });
+
+    bulletScore = Math.min(30, strongBulletsCount * 4);
+    
+    if (bannedVerbsCount > 0) {
+      bulletScore = Math.max(0, bulletScore - (bannedVerbsCount * 2));
+      suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Detected ${bannedVerbsCount} weak/passive verbs (e.g. 'helped', 'worked on'). Replace them with action verbs.` });
+    }
+  }
+  recruiterScore += bulletScore;
+
+  // 3. Job Title Accuracy (15 points)
+  let titleScore = 15;
+  if (jdText) {
+    const jdTitleMatch = jdText.match(/(?:title|role):\s*([^\n]+)/i) || [null, jdText.substring(0, 30)];
+    const targetTitle = jdTitleMatch[1] ? jdTitleMatch[1].trim().toLowerCase() : "";
+    const currentTitle = (p.subtitle || "").toLowerCase();
+
+    if (currentTitle && targetTitle) {
+      if (currentTitle === targetTitle) {
+        titleScore = 15;
+      } else if (targetTitle.split(/\s+/).some(word => word.length > 3 && currentTitle.includes(word))) {
+        titleScore = 8;
+        suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Profile subtitle '${p.subtitle}' is a partial match. Align it exactly to target role.` });
+      } else {
+        titleScore = 0;
+        suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Profile subtitle mismatch. Current: '${p.subtitle || 'None'}'. Target: '${jdTitleMatch[1] || 'Unknown'}'.` });
+      }
+    }
+  }
+  recruiterScore += titleScore;
+
+  // 4. Career Progression Clarity (15 points)
+  let progressionScore = 15;
+  const gapRegex = /gap/i;
+  if (gapRegex.test(resumeText)) {
+    progressionScore = 5;
+    suggestions.push({ dim: 'recruiter', status: 'fail', text: "Recruiter: Ensure career gaps or shifts are logical and have clear context." });
+  }
+  recruiterScore += progressionScore;
+
+  // 5. Bullet Count Per Role (15 points)
+  let countScore = 0;
+  if (experience) {
+    const roles = experience.split(/(?=[^|\n]+\|[^\n]+\|[^\n]+\|[^\n]+)/);
+    if (roles.length > 0) {
+      const firstBullets = (roles[0] || "").split('\n').filter(l => l.trim().startsWith('-'));
+      if (firstBullets.length >= 7 && firstBullets.length <= 8) countScore += 5;
+      else suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Target 7-8 bullets for your present/most recent role (currently: ${firstBullets.length}).` });
+
+      if (roles.length > 1) {
+        const secondBullets = (roles[1] || "").split('\n').filter(l => l.trim().startsWith('-'));
+        if (secondBullets.length >= 6 && secondBullets.length <= 7) countScore += 5;
+        else suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Target 6-7 bullets for your previous role (currently: ${secondBullets.length}).` });
+      } else {
+        countScore += 5;
+      }
+
+      if (roles.length > 2) {
+        const thirdBullets = (roles[2] || "").split('\n').filter(l => l.trim().startsWith('-'));
+        if (thirdBullets.length >= 5 && thirdBullets.length <= 6) countScore += 5;
+        else suggestions.push({ dim: 'recruiter', status: 'fail', text: `Recruiter: Target 5-6 bullets for your older roles (currently: ${thirdBullets.length}).` });
+      } else {
+        countScore += 5;
+      }
+    }
+  }
+  recruiterScore += countScore;
+
+  // ==========================================
+  // DIMENSION 3: TECHNICAL CREDIBILITY (Max 100)
+  // ==========================================
+  let technicalScore = 0;
+
+  // 1. Tool Specificity (25 points)
+  let specScore = 5;
+  const specificTools = /(studio 5000|control logix|slc 500|compactlogix|micrologix|rslogix|factorytalk|wonderware|system platform|step 7|s7-1200|s7-1500|beckhoff twincat|ignition scada|node\.js|next\.js|kubernetes|aws s3|dynamodb|docker compose|react native)/i;
+  
+  if (specificTools.test(resumeText)) {
+    specScore = 25;
+  } else {
+    suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Specify exact software versions or products (e.g. 'Studio 5000', 'TwinCAT') rather than generic terms like 'PLC software'." });
+  }
+  technicalScore += specScore;
+
+  // 2. Metric Defensibility (25 points)
+  let metricScore = 0;
+  const hasNumbers = /\b\d+\b/g;
+  const hasPercentage = /\b\d+%/g;
+  const numbers = resumeText.match(hasNumbers) || [];
+  const percentages = resumeText.match(hasPercentage) || [];
+
+  if (numbers.length > 0) {
+    if (percentages.length > 0 && percentages.length === numbers.length) {
+      metricScore = 10;
+      suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Resume contains percentages only. Add count-based metrics (e.g. 'commissioned 12 panels') to establish baselines." });
+    } else {
+      metricScore = 25;
+    }
+  } else {
+    metricScore = 0;
+    suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: No defensible metrics found. Incorporate quantities (defect counts, commissioning times) to substantiate impact." });
+  }
+
+  const roundPct = /\b(100|50|10|20|30|40|60|70|80|90)%/g;
+  const roundMatches = resumeText.match(roundPct) || [];
+  if (roundMatches.length > 0) {
+    metricScore = Math.max(0, metricScore - (roundMatches.length * 5));
+    suggestions.push({ dim: 'technical', status: 'fail', text: `Technical Penalty: Avoid clean round-number percentages (e.g. ${roundMatches[0]}) without contextual proof.` });
+  }
+  technicalScore += metricScore;
+
+  // 3. Industry Alignment (20 points)
+  let industryScore = 5;
+  const alignmentKeywords = /(commissioning|wiring|hmi|scada|control panel|wiring schematics|fat|sat|safety protocols|field testing|rest api|microservices|ci\/cd|pipeline)/i;
+  
+  if (alignmentKeywords.test(resumeText)) {
+    industryScore = 20;
+  } else {
+    suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Bullets are generic. Inject domain-specific terms (e.g., schematics, SAT, microservices) to align with target industry." });
+  }
+  technicalScore += industryScore;
+
+  // 4. Credibility Signals (20 points)
+  let signalScore = 0;
+  const ownershipVerbs = /\b(led|spearheaded|managed|owned|commissioned|designed and implemented)\b/i;
+  const matchesOwnership = resumeText.match(ownershipVerbs) || [];
+  signalScore += Math.min(15, matchesOwnership.length * 5);
+
+  const crossFunc = /(cross-functional|client|operators|electricians|stakeholders|vendors|product managers)/i;
+  if (crossFunc.test(resumeText)) {
+    signalScore += 5;
+  } else {
+    suggestions.push({ dim: 'technical', status: 'fail', text: "Technical: Include cross-functional collaborate bullets (e.g. coordinate with electricians, operators, PMs)." });
+  }
+  technicalScore += signalScore;
+
+  // 5. Skill Depth (10 points)
+  let depthScore = 10;
+  if (skills) {
+    const linesCount = skills.split('\n').filter(l => l.trim()).length;
+    if (linesCount < 8) {
+      depthScore = Math.round(linesCount * 1.25);
+      suggestions.push({ dim: 'technical', status: 'fail', text: `Technical: List at least 8 specific skill categorisation rows (currently: ${linesCount}).` });
+    }
+  } else {
+    depthScore = 0;
+  }
+  technicalScore += depthScore;
+
+  // ==========================================
+  // COMPOSITE & UI UPDATES
+  // ==========================================
+  const compositeScore = Math.round((atsScore * 0.35) + (recruiterScore * 0.35) + (technicalScore * 0.30));
+
+  document.getElementById('overall-score-badge').textContent = `${compositeScore}/100`;
+  document.getElementById('overall-score-pct').textContent = `${compositeScore}%`;
+  
+  const ringFill = document.getElementById('overall-radial-fill');
+  if (ringFill) {
+    ringFill.setAttribute('stroke-dasharray', `${compositeScore}, 100`);
+    if (compositeScore < 50) {
+      ringFill.style.stroke = '#dc2626';
+    } else if (compositeScore < 75) {
+      ringFill.style.stroke = '#ca8a04';
+    } else {
+      ringFill.style.stroke = '#0052cc';
+    }
+  }
+
+  document.getElementById('ats-score-val').textContent = `${atsScore}/100`;
+  document.getElementById('ats-score-bar').style.width = `${atsScore}%`;
+  
+  document.getElementById('recruiter-score-val').textContent = `${recruiterScore}/100`;
+  document.getElementById('recruiter-score-bar').style.width = `${recruiterScore}%`;
+  
+  document.getElementById('technical-score-val').textContent = `${technicalScore}/100`;
+  document.getElementById('technical-score-bar').style.width = `${technicalScore}%`;
+
+  const kwFeedback = document.getElementById('keyword-feedback');
+  if (jdText && kwFeedback) {
+    kwFeedback.style.display = 'block';
+    
+    const rate = jdKeywords.length > 0 ? Math.round((matchedKeywords.length / jdKeywords.length) * 100) : 0;
+    document.getElementById('keyword-match-rate').textContent = `${rate}%`;
+    document.getElementById('keyword-match-count').textContent = `${matchedKeywords.length} of ${jdKeywords.length} keywords`;
+
+    const matchedContainer = document.getElementById('matched-kw-tags');
+    matchedContainer.innerHTML = matchedKeywords.map(k => `<span class="kw-tag match">${escHtml(k)}</span>`).join('');
+
+    const missingContainer = document.getElementById('missing-kw-tags');
+    missingContainer.innerHTML = missingKeywords.map(k => `<span class="kw-tag missing">${escHtml(k)}</span>`).join('');
+  } else if (kwFeedback) {
+    kwFeedback.style.display = 'none';
+  }
+
+  const listContainer = document.getElementById('suggestions-list');
+  if (listContainer) {
+    listContainer.innerHTML = '';
+    const failedOnly = suggestions.filter(s => s.status === 'fail');
+    
+    if (failedOnly.length === 0) {
+      listContainer.innerHTML = `<li class="suggestion-pass" style="justify-content:center; width:100%; font-weight:600;">✓ Excellent! Your resume conforms to all ATS, Recruiter, and Technical guidelines.</li>`;
+    } else {
+      listContainer.innerHTML = failedOnly.map(s => {
+        return `<li class="suggestion-fail">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+          <span>${escHtml(s.text)}</span>
+        </li>`;
+      }).join('');
+    }
   }
 }
 
