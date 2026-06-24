@@ -1496,11 +1496,18 @@ function toggleJDPane() {
     btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
   }
 }
-
+let scoreDebounceTimeout = null;
 function triggerScoreCalculation() {
   const container = document.querySelector('.scoring-container');
   if (!container) return;
-  calculateResumeScore();
+  
+  if (scoreDebounceTimeout) {
+    clearTimeout(scoreDebounceTimeout);
+  }
+  
+  scoreDebounceTimeout = setTimeout(() => {
+    calculateResumeScore();
+  }, 150);
 }
 
 function calculateResumeScore() {
