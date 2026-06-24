@@ -3,6 +3,13 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
+    // Debug route to see available keys in env
+    if (url.pathname === '/api/test-env') {
+      return new Response(JSON.stringify({ keys: Object.keys(env) }), {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    }
+
     // Route API requests to our handler
     if (url.pathname === '/api/ats-score' && request.method === 'POST') {
       try {
