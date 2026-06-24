@@ -5,7 +5,14 @@ export default {
 
     // Debug route to see available keys in env
     if (url.pathname === '/api/test-env') {
-      return new Response(JSON.stringify({ keys: Object.keys(env) }), {
+      const keyVal = env.OPENROUTER_API_KEY || env['OPENROUTER API KEY'];
+      return new Response(JSON.stringify({ 
+        keys: Object.keys(env),
+        keyExists: !!keyVal,
+        keyType: typeof keyVal,
+        keyLength: keyVal ? keyVal.length : 0,
+        keyStart: keyVal ? keyVal.substring(0, 10) : 'none'
+      }), {
         headers: { 'Content-Type': 'application/json' }
       });
     }
