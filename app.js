@@ -1531,6 +1531,8 @@ async function analyzeATSScore() {
 
     const data = await response.json();
     renderScoringUI(data);
+    // Persist analysis results so they survive page refresh
+    localStorage.setItem('resume_builder_ats_results', JSON.stringify(data));
     showToast("Resume analysis completed successfully!");
   } catch (err) {
     console.error(err);
@@ -1704,5 +1706,16 @@ window.addEventListener('DOMContentLoaded', () => {
   const analyzeBtn = document.getElementById('analyze-btn');
   if (analyzeBtn) {
     analyzeBtn.addEventListener('click', analyzeATSScore);
+  }
+
+  // Restore previous analysis results on page load
+  const savedResults = localStorage.getItem('resume_builder_ats_results');
+  if (savedResults) {
+    try {
+      const data = JSON.parse(savedResults);
+      renderScoringUI(data);
+    } catch (e) {
+      console.warn('Could not restore saved ATS results:', e);
+    }
   }
 });
