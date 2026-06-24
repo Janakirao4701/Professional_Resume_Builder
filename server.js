@@ -7,7 +7,7 @@ const { OpenAI } = require('openai');
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-const allowedOrigins = ['http://localhost:8000', 'https://professional.cvcraft.workers.dev'];
+const allowedOrigins = ['http://localhost:8000', 'https://professional.cvcraft.workers.dev', 'https://janakirao4701.github.io'];
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);

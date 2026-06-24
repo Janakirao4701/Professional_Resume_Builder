@@ -5,10 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Professional Resume Builder</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cdefs%3E%3ClinearGradient id='logoGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%230052cc'/%3E%3Cstop offset='100%25' stop-color='%230747a6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='24' height='24' rx='6' fill='url(%23logoGrad)'/%3E%3Cpath d='M7 5h6.5l4.5 4.5V19a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 7 19V5z' fill='%23ffffff'/%3E%3Cpath d='M13.5 5v4.5H18L13.5 5z' fill='%2393c5fd' opacity='0.85'/%3E%3Crect x='9' y='12' width='6' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3Crect x='9' y='14.5' width='6' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3Crect x='9' y='17' width='4' height='1.2' rx='0.6' fill='%231e3a8a'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Cambria&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
-<script src="https://cdn.jsdelivr.net/npm/docx@7.3.0/build/index.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+<link rel="manifest" href="manifest.json">
 </head>
 <body>
 
@@ -36,6 +35,10 @@
     <select id="profile-select" onchange="switchProfile(this.value)" aria-label="Active Profile">
       <!-- Populated dynamically -->
     </select>
+    <div id="header-ats-badge" class="header-ats-badge no-score" title="Last Known ATS Score">
+      <span class="badge-label">ATS</span>
+      <span class="badge-score-val" id="header-ats-score-val">--</span>
+    </div>
     <button class="btn-hdr-action btn-hdr-primary" onclick="toggleDetailsForm()" id="toggle-details-btn" title="Edit Profile Details" aria-label="Edit Profile Details">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Info
     </button>
@@ -51,6 +54,10 @@
     <div class="hdr-dropdown">
       <button class="btn-hdr-action" onclick="toggleHdrDropdown(event)" title="More Profile Actions" aria-label="More Profile Actions" id="hdr-dropdown-btn" type="button">
         <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24" style="vertical-align: middle; display: inline-block; margin-right: 2px;" aria-hidden="true"><path d="M12 8a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4zm0 6a2 2 0 110-4 2 2 0 010 4z"/></svg> <span>More</span>
+      </button>
+      <button class="btn-hdr-action" onclick="toggleTheme()" id="theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Theme" type="button" style="margin-left: 8px;">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+        <span>Toggle Theme</span>
       </button>
       <div class="hdr-dropdown-menu" id="hdr-dropdown-menu">
         <button class="dropdown-item" type="button" onclick="renameCurrentProfile(); closeHdrDropdown();">
@@ -111,6 +118,10 @@
     
     <button class="drawer-action-btn" onclick="toggleDetailsForm(); toggleMobileMenu(false);">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>Edit Profile Info
+    </button>
+    <button class="drawer-action-btn" onclick="toggleTheme(); toggleMobileMenu(false);" id="mobile-theme-toggle-btn">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>
+      <span>Toggle Theme</span>
     </button>
     <button class="drawer-action-btn" onclick="createNewProfile(); toggleMobileMenu(false);">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>New Profile
@@ -250,6 +261,14 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
               <span>Paste</span>
+            </button>
+            <button class="btn-dl" id="undo-btn" onclick="undoEdit()" style="height: 24px; padding: 0 8px; font-size: 10px; display: flex; align-items: center; gap: 4px; margin: 0; border-radius: 4px;" disabled title="Undo (Ctrl+Z)">
+              <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
+              <span>Undo</span>
+            </button>
+            <button class="btn-dl" id="redo-btn" onclick="redoEdit()" style="height: 24px; padding: 0 8px; font-size: 10px; display: flex; align-items: center; gap: 4px; margin: 0; border-radius: 4px;" disabled title="Redo (Ctrl+Y)">
+              <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3"/></svg>
+              <span>Redo</span>
             </button>
           </div>
           <textarea id="resume-text" spellcheck="false" placeholder="Company | Location | Role | Dates&#10;- Bullet point 1&#10;- Bullet point 2" aria-label="Resume experience and details editor"></textarea>
@@ -499,7 +518,7 @@
 
 <div class="toast-container" id="toast-container"></div>
 
-<script src="app.js" defer></script>
+<script src="app.js" type="module"></script>
 </body>
 </html>
 

@@ -111,16 +111,12 @@
             </a>
           </div>
 
-          <!-- Trustpilot Rating Row -->
+          <!-- Privacy Rating Row -->
           <div class="trustpilot-rating">
-            <div class="stars" aria-label="5 stars rating">
-              <span class="star-filled">★</span>
-              <span class="star-filled">★</span>
-              <span class="star-filled">★</span>
-              <span class="star-filled">★</span>
-              <span class="star-filled">★</span>
+            <div class="stars" aria-label="100% secure badge">
+              <span class="star-filled">✓</span>
             </div>
-            <span class="rating-text"><strong>Trustpilot</strong> score <strong>4.4 out of 5</strong> | 37,389 reviews</span>
+            <span class="rating-text"><strong>100% Privacy Focused</strong> | No Signup Required | Free & Open Source</span>
           </div>
         </div>
 
@@ -223,7 +219,8 @@
         
         <div class="grid-2-col steps-grid-content">
           <!-- Left Column step list -->
-          <div class="steps-list-wrapper">
+          <div class="steps-list-wrapper" style="position: relative;">
+            <div class="step-active-bg" id="step-active-bg"></div>
             
             <div class="step-list-card active" onclick="activateStep(1)" onkeydown="if(event.key === 'Enter') activateStep(1)" tabindex="0" id="step-card-1">
               <div class="step-indicator-wrapper">
@@ -300,6 +297,59 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- Old Way vs New Way Comparison Section -->
+    <section class="comparison-section reveal-on-scroll" id="process-comparison">
+      <div class="landing-container">
+        <h2 class="section-title">The Resume Process: Old vs. New</h2>
+        <div class="comparison-grid">
+          <!-- Old Way Card -->
+          <div class="comparison-card old-way bg-blush-whisper">
+            <h3>Old Resume Process</h3>
+            <ul class="comparison-list">
+              <li style="--index: 1;">
+                <span class="compare-icon red">✕</span>
+                <span><strong>45-min manual rewrites</strong> for every single job application</span>
+              </li>
+              <li style="--index: 2;">
+                <span class="compare-icon red">✕</span>
+                <span><strong>Blind ATS guesswork</strong> without knowing if you match keywords</span>
+              </li>
+              <li style="--index: 3;">
+                <span class="compare-icon red">✕</span>
+                <span><strong>Ghosted applications</strong> due to minor parser formatting errors</span>
+              </li>
+              <li style="--index: 4;">
+                <span class="compare-icon red">✕</span>
+                <span><strong>Paywall traps</strong> requiring credit cards to download files</span>
+              </li>
+            </ul>
+          </div>
+          <!-- New Way Card -->
+          <div class="comparison-card new-way bg-mint-whisper">
+            <h3>With Resume Builder</h3>
+            <ul class="comparison-list">
+              <li style="--index: 1;">
+                <span class="compare-icon green">✓</span>
+                <span><strong>Instant AI tailoring</strong> using optimized prompt templates</span>
+              </li>
+              <li style="--index: 2;">
+                <span class="compare-icon green">✓</span>
+                <span><strong>Real-time keyword tracker</strong> scans match tags as you type</span>
+              </li>
+              <li style="--index: 3;">
+                <span class="compare-icon green">✓</span>
+                <span><strong>100% verified parser compliance</strong> with zero hidden layout elements</span>
+              </li>
+              <li style="--index: 4;">
+                <span class="compare-icon green">✓</span>
+                <span><strong>Free offline downloads</strong> direct to PDF & DOCX in one click</span>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -411,19 +461,19 @@
     <section class="statistics-section reveal-on-scroll">
       <div class="landing-container grid-3-col">
         <div class="stat-counter-item">
-          <span class="stat-icon">📈</span>
-          <span class="stat-number">3M+</span>
-          <span class="stat-label">Resumes Created</span>
+          <span class="stat-icon">🔒</span>
+          <span class="stat-number" data-target="100" data-suffix="%">0%</span>
+          <span class="stat-label">Client-Side & Secure</span>
         </div>
         <div class="stat-counter-item">
-          <span class="stat-icon">🎯</span>
-          <span class="stat-number">45%</span>
-          <span class="stat-label">Callback Increase</span>
+          <span class="stat-icon">💳</span>
+          <span class="stat-number" data-target="0" data-start="99" data-prefix="$">$99</span>
+          <span class="stat-label">Free Forever (No Paywalls)</span>
         </div>
         <div class="stat-counter-item">
-          <span class="stat-icon">📄</span>
-          <span class="stat-number">100%</span>
-          <span class="stat-label">ATS Compliance Rate</span>
+          <span class="stat-icon">⚡</span>
+          <span class="stat-number" data-target="1" data-suffix="-Click">0-Click</span>
+          <span class="stat-label">PDF & DOCX Downloads</span>
         </div>
       </div>
     </section>
@@ -508,9 +558,17 @@
       document.querySelectorAll('.mock-graphic').forEach(graphic => graphic.classList.remove('active'));
       
       // Activate target step card
-      document.getElementById('step-card-' + stepNum).classList.add('active');
+      const activeCard = document.getElementById('step-card-' + stepNum);
+      activeCard.classList.add('active');
       // Activate target step graphic
       document.getElementById('step-graphic-' + stepNum).classList.add('active');
+
+      // Update position of sliding indicator background
+      const bg = document.getElementById('step-active-bg');
+      if (bg && activeCard) {
+        bg.style.transform = `translateY(${activeCard.offsetTop}px)`;
+        bg.style.height = `${activeCard.offsetHeight}px`;
+      }
     }
 
     // Toggle FAQ Accordions
@@ -543,6 +601,32 @@
       }
     }
 
+    // Stat count-up helpers
+    function animateCounter(el, target, startVal, duration, prefix = '', suffix = '') {
+      const startTime = performance.now();
+      const update = (now) => {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3); // ease out cubic
+        const current = Math.floor(eased * (target - startVal) + startVal);
+        el.textContent = prefix + current.toLocaleString() + suffix;
+        if (progress < 1) requestAnimationFrame(update);
+        else el.textContent = prefix + target.toLocaleString() + suffix;
+      };
+      requestAnimationFrame(update);
+    }
+
+    function animateStatsSection(section) {
+      section.querySelectorAll('.stat-number').forEach(el => {
+        const target = parseInt(el.getAttribute('data-target'));
+        const startVal = parseInt(el.getAttribute('data-start')) || 0;
+        const prefix = el.getAttribute('data-prefix') || '';
+        const suffix = el.getAttribute('data-suffix') || '';
+        if (!isNaN(target)) {
+          animateCounter(el, target, startVal, 1500, prefix, suffix);
+        }
+      });
+    }
+
     // Scroll reveal observer
     document.addEventListener('DOMContentLoaded', () => {
       const observer = new IntersectionObserver((entries) => {
@@ -558,6 +642,37 @@
       document.querySelectorAll('.reveal-on-scroll').forEach(el => {
         observer.observe(el);
       });
+      
+      // Initialize the sliding step background on load
+      const firstActiveCard = document.querySelector('.step-list-card.active');
+      const bg = document.getElementById('step-active-bg');
+      if (bg && firstActiveCard) {
+        bg.style.transform = `translateY(${firstActiveCard.offsetTop}px)`;
+        bg.style.height = `${firstActiveCard.offsetHeight}px`;
+      }
+
+      // Re-align step indicator on window resize
+      window.addEventListener('resize', () => {
+        const activeCard = document.querySelector('.step-list-card.active');
+        const bg = document.getElementById('step-active-bg');
+        if (bg && activeCard) {
+          bg.style.transform = `translateY(${activeCard.offsetTop}px)`;
+          bg.style.height = `${activeCard.offsetHeight}px`;
+        }
+      });
+
+      // Stat counters count-up animation observer
+      const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            animateStatsSection(entry.target);
+            statsObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.2 });
+
+      const statsSec = document.querySelector('.statistics-section');
+      if (statsSec) statsObserver.observe(statsSec);
       
       // Instantly trigger hero section animations on load
       setTimeout(() => {

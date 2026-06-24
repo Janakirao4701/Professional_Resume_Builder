@@ -1891,6 +1891,7 @@
     color: #047857;
     font-weight: var(--font-weight-medium);
     box-shadow: 0 12px 35px -8px rgba(15, 20, 30, 0.08);
+    animation: floatBadgeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
   }
 
   .floating-skills-card {
@@ -1905,6 +1906,18 @@
     width: 220px;
     z-index: 10;
     box-shadow: 0 12px 35px -8px rgba(15, 20, 30, 0.08);
+    animation: floatBadgeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+  }
+
+  @keyframes floatBadgeIn {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.92);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
 
   .skills-card-title {
@@ -2029,9 +2042,26 @@
     display: flex;
     flex-direction: column;
     gap: var(--spacing-16);
+    position: relative;
+  }
+
+  .step-active-bg {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 0;
+    background: var(--color-mist);
+    border: 1px solid var(--color-chalk);
+    border-left: 3px solid var(--color-signal-blue);
+    border-radius: var(--radius-cards);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), height 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    z-index: 0;
   }
 
   .step-list-card {
+    position: relative;
+    z-index: 1;
     background: var(--color-paper);
     border: 1px solid var(--color-ash);
     border-radius: var(--radius-cards);
@@ -2040,7 +2070,7 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    transition: border-color 0.15s, transform 0.1s;
+    transition: border-color 0.15s, transform 0.1s, background-color 0.2s;
   }
 
   .step-list-card:hover {
@@ -2048,9 +2078,8 @@
   }
 
   .step-list-card.active {
-    border-left: 3px solid var(--color-signal-blue);
-    border-color: var(--color-chalk);
-    background: var(--color-mist);
+    background: transparent;
+    border-color: transparent;
   }
 
   .step-indicator-wrapper {
@@ -3582,4 +3611,275 @@
     color: #b91c1c;
     margin-top: 4px;
     font-weight: 500;
+  }
+
+  /* ── DARK THEME SYSTEM VARIABLES ── */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-ink: #f3f4f6;
+      --color-carbon: #f9fafb;
+      --color-pencil: #9ca3af;
+      --color-fog: #6b7280;
+      --color-haze: #4b5563;
+      --color-paper: #0b0f17;
+      --color-mist: #05080c;
+      --color-lavender-wash: #101622;
+      --color-chalk: #1f293d;
+      --color-ash: #2d3b54;
+      
+      --color-signal-blue: #3b82f6;
+      --color-deep-signal: #60a5fa;
+      --color-iris: #818cf8;
+      --color-midnight: #c7d2fe;
+      --color-mint-whisper: #064e3b;
+      --color-blush-whisper: #7f1d1d;
+      --color-rose-whisper: #881337;
+
+      --color-pale-blue: #1e3a8a;
+      --color-pale-red: #7f1d1d;
+      --color-pale-green: #064e3b;
+      --color-pale-yellow: #78350f;
+
+      /* Theme mapping */
+      --app-bg: var(--color-mist);
+      --app-surface: var(--color-paper);
+      --app-border: var(--color-chalk);
+      --app-border-hover: var(--color-ash);
+      --app-ink: var(--color-ink);
+      --app-ink-muted: var(--color-pencil);
+      --app-accent: var(--color-signal-blue);
+      --app-accent-hover: var(--color-deep-signal);
+      --app-accent-glow: rgba(59, 130, 246, 0.15);
+
+      --paper-well-bg: var(--color-mist);
+      --border: var(--color-chalk);
+      --bg: var(--color-mist);
+      --surface: var(--color-paper);
+      --ink: var(--color-ink);
+    }
+  }
+
+  html[data-theme="dark"] {
+    --color-ink: #f3f4f6;
+    --color-carbon: #f9fafb;
+    --color-pencil: #9ca3af;
+    --color-fog: #6b7280;
+    --color-haze: #4b5563;
+    --color-paper: #0b0f17;
+    --color-mist: #05080c;
+    --color-lavender-wash: #101622;
+    --color-chalk: #1f293d;
+    --color-ash: #2d3b54;
+    
+    --color-signal-blue: #3b82f6;
+    --color-deep-signal: #60a5fa;
+    --color-iris: #818cf8;
+    --color-midnight: #c7d2fe;
+    --color-mint-whisper: #064e3b;
+    --color-blush-whisper: #7f1d1d;
+    --color-rose-whisper: #881337;
+
+    --color-pale-blue: #1e3a8a;
+    --color-pale-red: #7f1d1d;
+    --color-pale-green: #064e3b;
+    --color-pale-yellow: #78350f;
+
+    /* Theme mapping */
+    --app-bg: var(--color-mist);
+    --app-surface: var(--color-paper);
+    --app-border: var(--color-chalk);
+    --app-border-hover: var(--color-ash);
+    --app-ink: var(--color-ink);
+    --app-ink-muted: var(--color-pencil);
+    --app-accent: var(--color-signal-blue);
+    --app-accent-hover: var(--color-deep-signal);
+    --app-accent-glow: rgba(59, 130, 246, 0.15);
+
+    --paper-well-bg: var(--color-mist);
+    --border: var(--color-chalk);
+    --bg: var(--color-mist);
+    --surface: var(--color-paper);
+    --ink: var(--color-ink);
+  }
+
+  /* Force resume preview mock paper to remain light background for layout and print fidelity */
+  .preview-page, 
+  .preview-page *, 
+  #resume-mockup .preview-page, 
+  #resume-mockup .preview-page * {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  .preview-page .mock-page-border {
+    border-color: #000000 !important;
+  }
+  .preview-page a {
+    color: #0000ff !important;
+  }
+  .preview-page .mock-section-head {
+    border-bottom-color: #000000 !important;
+  }
+
+  /* Adjust textareas and inputs for better visibility in Dark Mode */
+  html[data-theme="dark"] textarea,
+  html[data-theme="dark"] input,
+  html[data-theme="dark"] select {
+    background-color: var(--color-mist) !important;
+    color: var(--color-ink) !important;
+    border-color: var(--app-border) !important;
+  }
+  html[data-theme="dark"] select option {
+    background-color: var(--color-paper) !important;
+    color: var(--color-ink) !important;
+  }
+
+  /* Specific styling for the shortcuts modal */
+  #shortcuts-modal-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  /* ── OLD VS NEW COMPARISON SECTION ── */
+  .comparison-section {
+    padding: var(--spacing-60) 0;
+    background: var(--app-bg);
+  }
+
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-32);
+    margin-top: var(--spacing-40);
+  }
+
+  @media (max-width: 1023px) {
+    .comparison-grid {
+      grid-template-columns: 1fr;
+      gap: var(--spacing-20);
+    }
+  }
+
+  .comparison-card {
+    border-radius: var(--radius-2xl-2);
+    padding: var(--spacing-36);
+    border: 1px solid var(--app-border);
+    box-shadow: 0 8px 30px -10px rgba(15, 20, 30, 0.04);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .comparison-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 35px -8px rgba(15, 20, 30, 0.08);
+  }
+
+  .comparison-card h3 {
+    font-size: var(--text-heading-sm);
+    font-weight: var(--font-weight-semibold);
+    margin-top: 0;
+    margin-bottom: var(--spacing-24);
+    color: var(--app-ink);
+  }
+
+  .comparison-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-16);
+  }
+
+  .comparison-list li {
+    display: flex;
+    gap: var(--spacing-12);
+    align-items: flex-start;
+    font-size: var(--text-body);
+    color: var(--app-ink-muted);
+  }
+
+  /* Reveal staggered items when section is revealed */
+  .comparison-section.revealed .comparison-list li {
+    animation: slideInRow 0.5s cubic-bezier(0.16, 1, 0.3, 1) calc(var(--index) * 80ms) both;
+  }
+
+  @keyframes slideInRow {
+    from {
+      opacity: 0;
+      transform: translateX(-12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  .compare-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+
+  .compare-icon.red {
+    background: #fee2e2;
+    color: #ef4444;
+  }
+
+  .compare-icon.green {
+    background: #d1fae5;
+    color: #10b981;
+  }
+
+  /* ── ATS SCORE BADGE IN EDITOR HEADER ── */
+  .header-ats-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: var(--radius-full);
+    padding: 6px 12px;
+    font-size: var(--text-caption);
+    font-weight: var(--font-weight-semibold);
+    margin-right: 12px;
+    border: 1px solid transparent;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .header-ats-badge.no-score {
+    background: var(--color-mist);
+    border-color: var(--app-border);
+    color: var(--color-fog);
+  }
+
+  .header-ats-badge.low-score {
+    background: var(--color-blush-whisper);
+    border-color: #fca5a5;
+    color: #b91c1c;
+  }
+
+  .header-ats-badge.mid-score {
+    background: var(--color-pale-yellow);
+    border-color: #fde047;
+    color: #b45309;
+  }
+
+  .header-ats-badge.high-score {
+    background: var(--color-mint-whisper);
+    border-color: #6ee7b7;
+    color: #047857;
+  }
+
+  .header-ats-badge .badge-label {
+    opacity: 0.85;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .header-ats-badge .badge-score-val {
+    font-size: 13px;
+    font-weight: 700;
   }
