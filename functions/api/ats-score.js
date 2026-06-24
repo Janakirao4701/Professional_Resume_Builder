@@ -1,3 +1,4 @@
+// Cloudflare Pages Function - Trigger redeploy
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
