@@ -3197,3 +3197,36 @@
     color: #1e40af;
     border: 1px solid #bfdbfe;
   }
+
+  /* Scoring Loading Overlay & Spinner */
+  .scoring-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 10, 10, 0.85);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+  }
+
+  .spinner-loader {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-top: 2px solid var(--color-signal-blue);
+    border-radius: 50%;
+    animation: spin-loader 0.8s linear infinite;
+  }
+
+  @keyframes spin-loader {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }

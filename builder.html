@@ -245,7 +245,11 @@
       </div>
 
       <!-- 📈 Resume Strength Scoring Panel -->
-      <div class="scoring-container double-bezel-outer" style="margin-top: 16px;">
+      <div class="scoring-container double-bezel-outer" style="margin-top: 16px; position: relative;">
+        <div class="scoring-loading-overlay" id="scoring-loading" style="display: none;">
+          <div class="spinner-loader"></div>
+          <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--app-ink-muted);">Analyzing Resume...</span>
+        </div>
         <div class="double-bezel-inner" style="padding: 16px;">
           <div class="score-header">
             <span class="header-title">📈 Resume Strength Score</span>
@@ -293,7 +297,7 @@
               </div>
             </div>
           </div>
-
+ 
           <!-- Job Description Accordion -->
           <div class="jd-accordion">
             <button class="jd-accordion-btn" id="jd-toggle-btn" onclick="toggleJDPane()" aria-expanded="false" aria-controls="jd-content" type="button">
@@ -301,7 +305,15 @@
               <svg class="chevron-icon-mini" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg>
             </button>
             <div class="jd-content-pane" id="jd-content">
-              <textarea id="jd-text" placeholder="Paste the target job description here..." aria-label="Job description for keyword matching" oninput="triggerScoreCalculation()"></textarea>
+              <textarea id="jd-text" placeholder="Paste the target job description here..." aria-label="Job description for keyword matching"></textarea>
+              <div style="margin-top: 10px; display: flex; justify-content: center; margin-bottom: 12px;">
+                <button class="btn-dl" id="analyze-btn" style="padding: 6px 14px; font-size: 11px; background: var(--color-signal-blue); color: white; border-color: var(--color-signal-blue);">
+                  <span>Analyze ATS Score</span>
+                  <span class="btn-arrow-circle" style="background: rgba(255, 255, 255, 0.25);">
+                    <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </span>
+                </button>
+              </div>
               <div class="keyword-feedback" id="keyword-feedback" style="display: none;">
                 <div class="kw-stat-row">
                   <span>Match Rate: <strong id="keyword-match-rate">0%</strong></span>
@@ -320,7 +332,7 @@
               </div>
             </div>
           </div>
-
+ 
           <!-- Improvement Suggestions Checklist -->
           <div class="suggestions-section">
             <div class="suggestions-title">Optimization Suggestions</div>
