@@ -1,3 +1,8 @@
+# Cloudflare Workers configuration for Professional Resume Builder
+# IMPORTANT: You must configure the OPENROUTER_API_KEY secret on Cloudflare using:
+#   npx wrangler secret put OPENROUTER_API_KEY
+# or configure it under Settings -> Variables in the Cloudflare Dashboard.
+
 name = "professional"
 main = "worker.js"
 compatibility_date = "2024-04-03"

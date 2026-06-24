@@ -3484,3 +3484,56 @@
     0%, 100% { opacity: 0.6; transform: scale(1); }
     50% { opacity: 0.9; transform: scale(1.05); }
   }
+
+  /* ── Custom Accessible Dialog Modal Styles ── */
+  dialog#custom-modal-dialog {
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: auto;
+    outline: none;
+    z-index: 9999;
+  }
+
+  dialog#custom-modal-dialog::backdrop {
+    background: rgba(15, 20, 31, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .modal-content-container {
+    width: 400px;
+    max-width: 90vw;
+    background: var(--color-paper);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-chalk);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    animation: modalZoomIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes modalZoomIn {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Custom outline focus ring styling for accessibility */
+  *:focus-visible {
+    outline: 2px solid var(--color-signal-blue);
+    outline-offset: 2px;
+  }
+
+  /* Inline errors for forms */
+  .inline-error {
+    display: block;
+    font-size: 11px;
+    color: #b91c1c;
+    margin-top: 4px;
+    font-weight: 500;
+  }

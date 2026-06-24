@@ -1,7 +1,6 @@
 // ── MULTI-PROFILE STORAGE AND MANAGEMENT ──
 let profiles = {};
 let currentProfileId = 'default';
-let PROFILE = {};
 
 const PROMPT_TEMPLATES = {
   software_engineer: 'resume_prompts/software_engineer_prompt.md',
@@ -45,9 +44,178 @@ Company Name | Location | Job Title | Dates
 - Collaborated with cross-functional teams to deliver high-quality projects`
 };
 
+let saveToStorageTimeout = null;
 function saveToStorage() {
+  clearTimeout(saveToStorageTimeout);
+  saveToStorageTimeout = setTimeout(() => {
+    localStorage.setItem('resume_builder_profiles', JSON.stringify(profiles));
+  }, 250);
+}
+
+function saveToStorageImmediate() {
+  clearTimeout(saveToStorageTimeout);
   localStorage.setItem('resume_builder_profiles', JSON.stringify(profiles));
 }
+
+// ── CUSTOM ACCESSIBLE DIALOG MODAL HELPER ──
+function customConfirm(title, message) {
+  return new Promise((resolve) => {
+    const dialog = document.getElementById('custom-modal-dialog');
+    if (!dialog) {
+      resolve(confirm(message));
+      return;
+    }
+    
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-message').textContent = message;
+    document.getElementById('modal-input-wrapper').style.display = 'none';
+    
+    const confirmBtn = document.getElementById('modal-confirm-btn');
+    const cancelBtn = document.getElementById('modal-cancel-btn');
+    const triggerEl = document.activeElement;
+    
+    function cleanup() {
+      confirmBtn.removeEventListener('click', onConfirm);
+      cancelBtn.removeEventListener('click', onCancel);
+      dialog.removeEventListener('close', onClose);
+      if (triggerEl) triggerEl.focus();
+    }
+    
+    function onConfirm() {
+      cleanup();
+      dialog.close();
+      resolve(true);
+    }
+    
+    function onCancel() {
+      cleanup();
+      dialog.close();
+      resolve(false);
+    }
+    
+    function onClose() {
+      cleanup();
+      resolve(false);
+    }
+    
+    confirmBtn.addEventListener('click', onConfirm);
+    cancelBtn.addEventListener('click', onCancel);
+    dialog.addEventListener('close', onClose);
+    
+    dialog.showModal();
+    confirmBtn.focus();
+  });
+}
+
+function customPrompt(title, defaultValue = '') {
+  return new Promise((resolve) => {
+    const dialog = document.getElementById('custom-modal-dialog');
+    if (!dialog) {
+      resolve(prompt(title, defaultValue));
+      return;
+    }
+    
+    document.getElementById('modal-title').textContent = title;
+    document.getElementById('modal-message').textContent = '';
+    document.getElementById('modal-input-wrapper').style.display = 'block';
+    
+    const inputField = document.getElementById('modal-input-field');
+    inputField.value = defaultValue;
+    
+    const confirmBtn = document.getElementById('modal-confirm-btn');
+    const cancelBtn = document.getElementById('modal-cancel-btn');
+    const errorSpan = document.getElementById('modal-input-error');
+    if (errorSpan) {
+      errorSpan.textContent = '';
+      errorSpan.style.display = 'none';
+    }
+    
+    const triggerEl = document.activeElement;
+    
+    function cleanup() {
+      confirmBtn.removeEventListener('click', onConfirm);
+      cancelBtn.removeEventListener('click', onCancel);
+      dialog.removeEventListener('close', onClose);
+      inputField.removeEventListener('keydown', onKeyDown);
+      if (triggerEl) triggerEl.focus();
+    }
+    
+    function onConfirm() {
+      const val = inputField.value;
+      cleanup();
+      dialog.close();
+      resolve(val);
+    }
+    
+    function onCancel() {
+      cleanup();
+      dialog.close();
+      resolve(null);
+    }
+    
+    function onClose() {
+      cleanup();
+      resolve(null);
+    }
+    
+    function onKeyDown(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        onConfirm();
+      }
+    }
+    
+    confirmBtn.addEventListener('click', onConfirm);
+    cancelBtn.addEventListener('click', onCancel);
+    dialog.addEventListener('close', onClose);
+    inputField.addEventListener('keydown', onKeyDown);
+    
+    dialog.showModal();
+    inputField.focus();
+    if (defaultValue) {
+      inputField.select();
+    }
+  });
+}
+
+// Focus trapping helper for drawer
+function trapFocusInDrawer(e) {
+  const drawer = document.getElementById('profile-drawer');
+  if (!drawer || !drawer.classList.contains('active')) return;
+  
+  const focusableSelectors = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  const focusableElements = drawer.querySelectorAll(focusableSelectors);
+  if (focusableElements.length === 0) return;
+  
+  const firstFocusable = focusableElements[0];
+  const lastFocusable = focusableElements[focusableElements.length - 1];
+  
+  if (e.key === 'Tab') {
+    if (e.shiftKey) { // Shift + Tab
+      if (document.activeElement === firstFocusable) {
+        lastFocusable.focus();
+        e.preventDefault();
+      }
+    } else { // Tab
+      if (document.activeElement === lastFocusable) {
+        firstFocusable.focus();
+        e.preventDefault();
+      }
+    }
+  }
+}
+
+// Add event listener to trap focus and handle Esc key for drawer
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab') {
+    trapFocusInDrawer(e);
+  } else if (e.key === 'Escape') {
+    const drawer = document.getElementById('profile-drawer');
+    if (drawer && drawer.classList.contains('active')) {
+      toggleDetailsForm();
+    }
+  }
+});
 
 function upgradeAllProfiles() {
   if (!profiles || typeof profiles !== 'object') {
@@ -64,9 +232,18 @@ function upgradeAllProfiles() {
     }
     if (!p.profile.education || !Array.isArray(p.profile.education)) {
       p.profile.education = [];
+    } else {
+      p.profile.education = p.profile.education.filter(e => e && typeof e === 'object').map(e => ({
+        degree: typeof e.degree === 'string' ? e.degree : '',
+        school: typeof e.school === 'string' ? e.school : '',
+        dates: typeof e.dates === 'string' ? e.dates : '',
+        location: typeof e.location === 'string' ? e.location : ''
+      }));
     }
     if (!p.profile.certs || !Array.isArray(p.profile.certs)) {
       p.profile.certs = [];
+    } else {
+      p.profile.certs = p.profile.certs.filter(c => c !== null && c !== undefined).map(c => String(c));
     }
     
     // Reconstruct tags text from drawer summary/skills if the text box doesn't have the tags yet
@@ -132,8 +309,6 @@ function initProfiles() {
     profiles[currentProfileId] = JSON.parse(JSON.stringify(DEFAULT_PROFILE_DATA));
   }
   
-  PROFILE = profiles[currentProfileId].profile;
-  
   // Set textarea content
   const textarea = document.getElementById('resume-text');
   if (textarea) {
@@ -171,13 +346,14 @@ function updateProfileSelectDropdown() {
 function switchProfile(profileId) {
   // Save current textarea content to active profile
   const textareaVal = document.getElementById('resume-text').value;
-  profiles[currentProfileId].text = textareaVal;
+  if (profiles[currentProfileId]) {
+    profiles[currentProfileId].text = textareaVal;
+  }
   
   // Switch
   currentProfileId = profileId;
-  PROFILE = profiles[currentProfileId].profile;
   localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
-  saveToStorage();
+  saveToStorageImmediate();
   
   // Sync select dropdowns
   const select = document.getElementById('profile-select');
@@ -189,7 +365,7 @@ function switchProfile(profileId) {
   document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
   renderFormFields();
   detectSectionsAndCompanies();
-  updatePreview();
+  updatePreviewImmediate();
 
   if (profiles[currentProfileId] && profiles[currentProfileId].ats_results) {
     renderScoringUI(profiles[currentProfileId].ats_results);
@@ -198,8 +374,8 @@ function switchProfile(profileId) {
   }
 }
 
-function createNewProfile() {
-  const name = prompt("Enter a label/identifier for the new profile (e.g. 'Software_Engineer'):");
+async function createNewProfile() {
+  const name = await customPrompt("Enter a label/identifier for the new profile (e.g. 'Software_Engineer'):");
   if (!name) return;
   const cleanLabel = name.trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '_');
   if (!cleanLabel) { showToast("Invalid profile label. Use letters, numbers, underscores, or hyphens."); return; }
@@ -221,13 +397,12 @@ function createNewProfile() {
   
   currentProfileId = cleanLabel;
   localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
-  PROFILE = profiles[currentProfileId].profile;
-  saveToStorage();
+  saveToStorageImmediate();
   updateProfileSelectDropdown();
   document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
   renderFormFields();
   detectSectionsAndCompanies();
-  updatePreview();
+  updatePreviewImmediate();
   clearScoringUI();
   showToast("Created blank profile: " + cleanLabel);
   
@@ -238,8 +413,8 @@ function createNewProfile() {
   }
 }
 
-function duplicateCurrentProfile() {
-  const name = prompt("Enter a label/identifier for the duplicated profile (e.g. 'Software_Engineer_Copy'):");
+async function duplicateCurrentProfile() {
+  const name = await customPrompt("Enter a label/identifier for the duplicated profile (e.g. 'Software_Engineer_Copy'):");
   if (!name) return;
   const cleanLabel = name.trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '_');
   if (!cleanLabel) { showToast("Invalid profile label. Use letters, numbers, underscores, or hyphens."); return; }
@@ -254,13 +429,12 @@ function duplicateCurrentProfile() {
   
   currentProfileId = cleanLabel;
   localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
-  PROFILE = profiles[currentProfileId].profile;
-  saveToStorage();
+  saveToStorageImmediate();
   updateProfileSelectDropdown();
   document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
   renderFormFields();
   detectSectionsAndCompanies();
-  updatePreview();
+  updatePreviewImmediate();
   
   if (profiles[currentProfileId] && profiles[currentProfileId].ats_results) {
     renderScoringUI(profiles[currentProfileId].ats_results);
@@ -270,8 +444,8 @@ function duplicateCurrentProfile() {
   showToast("Duplicated profile to: " + cleanLabel);
 }
 
-function renameCurrentProfile() {
-  const newLabel = prompt("Enter a new label for the active profile:", currentProfileId);
+async function renameCurrentProfile() {
+  const newLabel = await customPrompt("Enter a new label for the active profile:", currentProfileId);
   if (!newLabel) return;
   const cleanLabel = newLabel.trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '_');
   if (!cleanLabel) { showToast("Invalid profile label."); return; }
@@ -286,9 +460,8 @@ function renameCurrentProfile() {
     delete profiles[currentProfileId];
     
     currentProfileId = cleanLabel;
-    PROFILE = profiles[currentProfileId].profile;
     localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
-    saveToStorage();
+    saveToStorageImmediate();
     updateProfileSelectDropdown();
     showToast(`Renamed profile from "${oldLabel}" to "${cleanLabel}"`);
   }
@@ -296,10 +469,10 @@ function renameCurrentProfile() {
 
 let deleteConfirmTimeout = null;
 
-function deleteCurrentProfileConfirm(event) {
+function deleteCurrentProfileConfirm(event, btnId = 'delete-profile-btn') {
   if (event) event.stopPropagation();
   
-  const btn = document.getElementById('delete-profile-btn');
+  const btn = document.getElementById(btnId);
   if (!btn) return;
   
   const span = btn.querySelector('span');
@@ -307,15 +480,22 @@ function deleteCurrentProfileConfirm(event) {
   if (btn.classList.contains('confirming')) {
     clearTimeout(deleteConfirmTimeout);
     btn.classList.remove('confirming');
-    if (span) span.textContent = 'Delete';
+    if (span) span.textContent = btn.dataset.originalText || 'Delete';
     performProfileDelete();
+    if (btnId === 'mobile-delete-profile-btn') {
+      toggleMobileMenu(false);
+    }
   } else {
+    // Save original text
+    if (span && !btn.dataset.originalText) {
+      btn.dataset.originalText = span.textContent;
+    }
     btn.classList.add('confirming');
     if (span) span.textContent = 'Confirm Delete?';
     
     deleteConfirmTimeout = setTimeout(() => {
       btn.classList.remove('confirming');
-      if (span) span.textContent = 'Delete';
+      if (span) span.textContent = btn.dataset.originalText || 'Delete';
     }, 3000);
   }
 }
@@ -330,13 +510,12 @@ function performProfileDelete() {
   delete profiles[targetId];
   currentProfileId = Object.keys(profiles)[0];
   localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
-  PROFILE = profiles[currentProfileId].profile;
-  saveToStorage();
+  saveToStorageImmediate();
   updateProfileSelectDropdown();
   document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
   renderFormFields();
   detectSectionsAndCompanies();
-  updatePreview();
+  updatePreviewImmediate();
   
   if (profiles[currentProfileId] && profiles[currentProfileId].ats_results) {
     renderScoringUI(profiles[currentProfileId].ats_results);
@@ -346,9 +525,10 @@ function performProfileDelete() {
   showToast(`Deleted profile "${targetId}"`);
 }
 
-function deleteCurrentProfile() {
+async function deleteCurrentProfile() {
   const targetId = currentProfileId;
-  if (confirm(`Are you sure you want to delete the profile "${targetId}"?`)) {
+  const confirmResult = await customConfirm("Delete Profile", `Are you sure you want to delete the profile "${targetId}"?`);
+  if (confirmResult) {
     performProfileDelete();
   }
 }
@@ -391,6 +571,19 @@ function toggleDetailsForm() {
 }
 
 function updateProfileField(field, value) {
+  const errSpan = document.getElementById(`error-prof-${field}`);
+  if (errSpan) {
+    if (field === 'email' && value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
+      errSpan.textContent = 'Please enter a valid email address.';
+      errSpan.style.display = 'block';
+    } else if (field === 'linkedin' && value.trim() && !/^(https?:\/\/)?(www\.)?linkedin\.com\/.*$/i.test(value.trim()) && !/^linkedin\.com\/.*$/i.test(value.trim())) {
+      errSpan.textContent = 'Please enter a valid LinkedIn URL.';
+      errSpan.style.display = 'block';
+    } else {
+      errSpan.textContent = '';
+      errSpan.style.display = 'none';
+    }
+  }
   profiles[currentProfileId].profile[field] = value;
   saveToStorage();
   updatePreview();
@@ -423,14 +616,14 @@ function addEducationRow() {
   profiles[currentProfileId].profile.education.push({ degree: '', school: '', dates: '', location: '' });
   saveToStorage();
   renderFormFields();
-  updatePreview();
+  updatePreviewImmediate();
 }
 
 function removeEducationRow(index) {
   profiles[currentProfileId].profile.education.splice(index, 1);
   saveToStorage();
   renderFormFields();
-  updatePreview();
+  updatePreviewImmediate();
 }
 
 function addCertRow() {
@@ -438,62 +631,90 @@ function addCertRow() {
   profiles[currentProfileId].profile.certs.push('');
   saveToStorage();
   renderFormFields();
-  updatePreview();
+  updatePreviewImmediate();
 }
 
 function removeCertRow(index) {
   profiles[currentProfileId].profile.certs.splice(index, 1);
   saveToStorage();
   renderFormFields();
-  updatePreview();
+  updatePreviewImmediate();
 }
 
 function renderFormFields() {
-  const p = profiles[currentProfileId].profile;
-  document.getElementById('prof-name').value = p.name || '';
-  document.getElementById('prof-subtitle').value = p.subtitle || '';
-  document.getElementById('prof-email').value = p.email || '';
-  document.getElementById('prof-phone').value = p.phone || '';
-  document.getElementById('prof-location').value = p.location || '';
-  document.getElementById('prof-linkedin').value = p.linkedin || '';
+  if (!profiles[currentProfileId]) {
+    profiles[currentProfileId] = { profile: {}, text: '' };
+  }
+  const p = profiles[currentProfileId].profile || {};
   
+  const nameInput = document.getElementById('prof-name');
+  if (nameInput) nameInput.value = p.name || '';
+  const subtitleInput = document.getElementById('prof-subtitle');
+  if (subtitleInput) subtitleInput.value = p.subtitle || '';
+  const emailInput = document.getElementById('prof-email');
+  if (emailInput) emailInput.value = p.email || '';
+  const phoneInput = document.getElementById('prof-phone');
+  if (phoneInput) phoneInput.value = p.phone || '';
+  const locationInput = document.getElementById('prof-location');
+  if (locationInput) locationInput.value = p.location || '';
+  const linkedinInput = document.getElementById('prof-linkedin');
+  if (linkedinInput) linkedinInput.value = p.linkedin || '';
+  
+  // Clear any existing inline errors
+  ['name', 'subtitle', 'email', 'phone', 'location', 'linkedin'].forEach(field => {
+    const errSpan = document.getElementById(`error-prof-${field}`);
+    if (errSpan) {
+      errSpan.textContent = '';
+      errSpan.style.display = 'none';
+    }
+  });
+
   // Render education
   const eduContainer = document.getElementById('education-fields-container');
-  eduContainer.innerHTML = (p.education || []).map((e, index) => `
-    <div class="edu-item-card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
-        <span style="font-size:10px; color:var(--app-ink-muted); font-weight:700;">EDUCATION #${index+1}</span>
-        <button class="btn-remove" onclick="removeEducationRow(${index})">✕ Remove</button>
+  if (eduContainer) {
+    eduContainer.innerHTML = (p.education || []).filter(e => e && typeof e === 'object').map((e, index) => `
+      <div class="edu-item-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+          <span style="font-size:10px; color:var(--app-ink-muted); font-weight:700;">EDUCATION #${index+1}</span>
+          <button class="btn-remove" onclick="removeEducationRow(${index})">✕ Remove</button>
+        </div>
+        <div class="form-grid-mini">
+          <input type="text" placeholder="Degree / Program" value="${escHtml(e.degree || '')}" oninput="updateEduField(${index}, 'degree', this.value)" aria-label="Education Degree ${index+1}">
+          <input type="text" placeholder="School / University" value="${escHtml(e.school || '')}" oninput="updateEduField(${index}, 'school', this.value)" aria-label="Education School ${index+1}">
+          <input type="text" placeholder="Dates (e.g. 06/2021 – 05/2023)" value="${escHtml(e.dates || '')}" oninput="updateEduField(${index}, 'dates', this.value)" aria-label="Education Dates ${index+1}">
+          <input type="text" placeholder="Location (e.g. Houston, TX)" value="${escHtml(e.location || '')}" oninput="updateEduField(${index}, 'location', this.value)" aria-label="Education Location ${index+1}">
+        </div>
       </div>
-      <div class="form-grid-mini">
-        <input type="text" placeholder="Degree / Program" value="${escHtml(e.degree || '')}" oninput="updateEduField(${index}, 'degree', this.value)">
-        <input type="text" placeholder="School / University" value="${escHtml(e.school || '')}" oninput="updateEduField(${index}, 'school', this.value)">
-        <input type="text" placeholder="Dates (e.g. 06/2021 – 05/2023)" value="${escHtml(e.dates || '')}" oninput="updateEduField(${index}, 'dates', this.value)">
-        <input type="text" placeholder="Location (e.g. Houston, TX)" value="${escHtml(e.location || '')}" oninput="updateEduField(${index}, 'location', this.value)">
-      </div>
-    </div>
-  `).join('');
+    `).join('');
+  }
 
   // Render certs
   const certsContainer = document.getElementById('certs-fields-container');
-  certsContainer.innerHTML = (p.certs || []).map((c, index) => `
-    <div class="cert-item-row" style="display:flex; gap:8px; margin-bottom:6px;">
-      <input type="text" placeholder="Certification Name" value="${escHtml(c || '')}" oninput="updateCertField(${index}, this.value)" class="cert-input" style="flex:1;">
-      <button class="btn-remove-icon" onclick="removeCertRow(${index})">✕</button>
-    </div>
-  `).join('');
+  if (certsContainer) {
+    certsContainer.innerHTML = (p.certs || []).filter(c => c !== null && c !== undefined).map((c, index) => `
+      <div class="cert-item-row" style="display:flex; gap:8px; margin-bottom:6px;">
+        <input type="text" placeholder="Certification Name" value="${escHtml(c || '')}" oninput="updateCertField(${index}, this.value)" class="cert-input" style="flex:1;" aria-label="Certification Name ${index+1}">
+        <button class="btn-remove-icon" onclick="removeCertRow(${index})">✕</button>
+      </div>
+    `).join('');
+  }
 }
 
 function triggerImport() {
   document.getElementById('import-file-input').click();
 }
 
-function importProfiles(event) {
+function sanitizeString(val) {
+  if (typeof val !== 'string') return '';
+  return val.replace(/<[^>]*>/g, '');
+}
+
+async function importProfiles(event) {
   const file = event.target.files[0];
   if (!file) return;
   
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = async function(e) {
     try {
       const importedData = JSON.parse(e.target.result);
       if (typeof importedData !== 'object' || importedData === null) {
@@ -517,45 +738,49 @@ function importProfiles(event) {
         throw new Error("No valid profiles found. Each profile must have a 'profile' object.");
       }
       
-      if (confirm(`Found ${validCount} profiles in backup: ${keys.join(', ')}.\nDo you want to merge them into your current profiles? (Profiles with the same label will be overwritten)`)) {
+      const confirmResult = await customConfirm(
+        "Import Profiles",
+        `Found ${validCount} profiles in backup: ${keys.join(', ')}.\nDo you want to merge them into your current profiles? (Profiles with the same label will be overwritten)`
+      );
+      
+      if (confirmResult) {
         keys.forEach(k => {
           const item = importedData[k];
           if (item && typeof item === 'object' && item.profile && typeof item.profile === 'object') {
-            profiles[k] = {
+            const cleanLabel = k.trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '_');
+            if (!cleanLabel) return;
+            
+            profiles[cleanLabel] = {
               profile: {
-                name: item.profile.name || '',
-                subtitle: item.profile.subtitle || '',
-                email: item.profile.email || '',
-                phone: item.profile.phone || '',
-                location: item.profile.location || '',
-                linkedin: item.profile.linkedin || '',
-                summary: item.profile.summary || '',
-                skills: item.profile.skills || '',
-                education: Array.isArray(item.profile.education) ? item.profile.education.map(e => ({
-                  degree: e.degree || '',
-                  school: e.school || '',
-                  dates: e.dates || '',
-                  location: e.location || ''
+                name: sanitizeString(item.profile.name),
+                subtitle: sanitizeString(item.profile.subtitle),
+                email: sanitizeString(item.profile.email),
+                phone: sanitizeString(item.profile.phone),
+                location: sanitizeString(item.profile.location),
+                linkedin: sanitizeString(item.profile.linkedin),
+                education: Array.isArray(item.profile.education) ? item.profile.education.filter(e => e && typeof e === 'object').map(e => ({
+                  degree: sanitizeString(e.degree),
+                  school: sanitizeString(e.school),
+                  dates: sanitizeString(e.dates),
+                  location: sanitizeString(e.location)
                 })) : [],
-                certs: Array.isArray(item.profile.certs) ? item.profile.certs.map(c => String(c)) : []
+                certs: Array.isArray(item.profile.certs) ? item.profile.certs.filter(c => c !== null && c !== undefined).map(c => sanitizeString(c)) : []
               },
-              text: item.text || ''
+              text: typeof item.text === 'string' ? item.text : ''
             };
           }
         });
         
         upgradeAllProfiles();
         
-        currentProfileId = keys[0];
+        currentProfileId = keys[0].trim().toLowerCase().replace(/[^a-z0-9_\-]/g, '_');
         localStorage.setItem('resume_builder_current_profile_id', currentProfileId);
-        PROFILE = profiles[currentProfileId].profile;
-        
-        saveToStorage();
+        saveToStorageImmediate();
         updateProfileSelectDropdown();
         document.getElementById('resume-text').value = profiles[currentProfileId].text || '';
         renderFormFields();
         detectSectionsAndCompanies();
-        updatePreview();
+        updatePreviewImmediate();
         
         showToast("Profiles successfully imported!");
       }
@@ -672,11 +897,12 @@ function adjustPreviewScale() {
 window.addEventListener('resize', adjustPreviewScale);
 
 // ── PREVIEW BUILDER ──
-function updatePreview() {
+function updatePreviewRaw() {
   const raw = document.getElementById('resume-text').value.trim();
   const mockup = document.getElementById('resume-mockup');
+  const p = profiles[currentProfileId]?.profile || {};
 
-  if (!raw && !PROFILE.name) {
+  if (!raw && !p.name) {
     mockup.innerHTML = `<div class="empty-state" style="display:flex; flex-direction:column; align-items:center; justify-content:center;"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--app-ink-muted); margin-bottom: 8px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0A2.25 2.25 0 0 1 13.5 4.75h-3a2.25 2.25 0 0 1-2.166-1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.346.102.637.318.806.622L18 7.5V19.5a2.25 2.25 0 0 1-2.25 2.25H8.25A2.25 2.25 0 0 1 6 19.5V7.5l1.112-2.012a1.125 1.125 0 0 1 .806-.622" /></svg><p>Paste your resume content above to see a live preview here</p></div>`;
     return;
   }
@@ -695,11 +921,11 @@ function updatePreview() {
 
   // 1. Header (Name, Subtitle, Contact)
   const contactParts = [];
-  if (PROFILE.location) contactParts.push(escHtml(PROFILE.location));
-  if (PROFILE.phone) contactParts.push(escHtml(PROFILE.phone));
-  if (PROFILE.email) contactParts.push(`<a href="mailto:${escHtml(PROFILE.email)}">${escHtml(PROFILE.email)}</a>`);
-  if (PROFILE.linkedin) {
-    let rawUrl = PROFILE.linkedin.trim();
+  if (p.location) contactParts.push(escHtml(p.location));
+  if (p.phone) contactParts.push(escHtml(p.phone));
+  if (p.email) contactParts.push(`<a href="mailto:${escHtml(p.email)}">${escHtml(p.email)}</a>`);
+  if (p.linkedin) {
+    let rawUrl = p.linkedin.trim();
     let hrefUrl = rawUrl;
     if (!/^https?:\/\//i.test(hrefUrl)) {
       hrefUrl = 'https://' + hrefUrl;
@@ -714,8 +940,8 @@ function updatePreview() {
 
   elements.push(createEl(`
     <div style="text-align: center;">
-      <div class="mock-name">${escHtml(PROFILE.name || '')}</div>
-      <div class="mock-subtitle">${escHtml(PROFILE.subtitle || '')}</div>
+      <div class="mock-name">${escHtml(p.name || '')}</div>
+      <div class="mock-subtitle">${escHtml(p.subtitle || '')}</div>
       <div class="mock-contact">
         ${contactHtml}
       </div>
@@ -783,20 +1009,20 @@ function updatePreview() {
 
   // 5. Education
   elements.push(createEl(`<div class="mock-section-head">EDUCATION:</div>`));
-  PROFILE.education.forEach(e => {
+  (p.education || []).forEach(e => {
     elements.push(createEl(`
       <div class="mock-edu-row">
-        <span>${escHtml(e.degree)}</span>
-        <span>${escHtml(e.dates)}</span>
+        <span>${escHtml(e.degree || '')}</span>
+        <span>${escHtml(e.dates || '')}</span>
       </div>
     `));
-    elements.push(createEl(`<div class="mock-edu-school">${escHtml(e.school)}${e.location ? ', ' + escHtml(e.location) : ''}</div>`));
+    elements.push(createEl(`<div class="mock-edu-school">${escHtml(e.school || '')}${e.location ? ', ' + escHtml(e.location) : ''}</div>`));
   });
 
   // 6. Certifications
-  if (PROFILE.certs && PROFILE.certs.length) {
+  if (p.certs && p.certs.length) {
     elements.push(createEl(`<div class="mock-section-head">CERTIFICATIONS:</div>`));
-    PROFILE.certs.forEach(c => {
+    p.certs.forEach(c => {
       elements.push(createEl(`<div class="mock-bullet">${escHtml(c)}</div>`));
     });
   }
@@ -822,8 +1048,6 @@ function updatePreview() {
 
   elements.forEach(el => {
     pageContent.appendChild(el);
-    // Page height is 11in = 1056px. available inner content height is ~970px.
-    // Use children.length > 1 safeguard to prevent infinite page creation loops.
     if (pageContent.offsetHeight > 970 && pageContent.children.length > 1) {
       pageContent.removeChild(el);
       pageNum++;
@@ -838,10 +1062,30 @@ function updatePreview() {
   setTimeout(adjustPreviewScale, 10);
 }
 
+let updatePreviewTimeout = null;
+
+function updatePreview() {
+  clearTimeout(updatePreviewTimeout);
+  updatePreviewTimeout = setTimeout(() => {
+    updatePreviewRaw();
+  }, 150);
+}
+
+function updatePreviewImmediate() {
+  clearTimeout(updatePreviewTimeout);
+  updatePreviewRaw();
+}
+
 
 
 function escHtml(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  if (typeof str !== 'string') return '';
+  return str.replace(/&/g,'&amp;')
+            .replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;')
+            .replace(/"/g,'&quot;')
+            .replace(/'/g,'&#x27;')
+            .replace(/\//g,'&#x2F;');
 }
 
 // ── PASTE FROM CLIPBOARD ──
@@ -1132,7 +1376,7 @@ document.getElementById('dl-btn').onclick = async () => {
   }
 
   const { summary, skills, experience } = parseContent(raw);
-  const P = PROFILE;
+  const P = profiles[currentProfileId]?.profile || {};
 
   const btn = document.getElementById('dl-btn');
   btn.disabled = true;
@@ -1523,7 +1767,7 @@ function updateCombinedPromptPreview() {
 }
 
 function generateCombinedPrompt() {
-  const p = PROFILE || {};
+  const p = profiles[currentProfileId]?.profile || {};
   const currentResumeText = document.getElementById('resume-text').value.trim();
 
   let metadata = `
@@ -1676,11 +1920,14 @@ function renderScoringUI(data) {
   if (detailsContainer) detailsContainer.style.display = 'block';
 
   // ── Score Delta (before/after) ──
-  const prevScoresRaw = localStorage.getItem('resume_builder_last_scores');
-  const prevScores = prevScoresRaw ? JSON.parse(prevScoresRaw) : null;
-  localStorage.setItem('resume_builder_last_scores', JSON.stringify({
+  if (!profiles[currentProfileId]) {
+    profiles[currentProfileId] = {};
+  }
+  const prevScores = profiles[currentProfileId].last_scores || null;
+  profiles[currentProfileId].last_scores = {
     overall: data.overall, ats: data.ats, recruiter: data.recruiter, technical: data.technical
-  }));
+  };
+  saveToStorageImmediate();
 
   function deltaStr(cur, prev) {
     if (prev === null || prev === undefined) return '';

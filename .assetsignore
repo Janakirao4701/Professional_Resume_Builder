@@ -1,0 +1,16 @@
+node_modules
+.git
+.github
+.agents
+.code-review-graph
+.gemini
+.planning
+.validation
+.vscode
+*.log
+package-lock.json
+package.json
+wrangler.toml
+server.js
+worker.js
+functions/api/ats-score.js

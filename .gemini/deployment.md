@@ -1,19 +1,30 @@
 # Deployment - Resume Builder
 
 ## Environments
-* **Development**: Workspace directory at `C:\Users\janak\.gemini\antigravity-ide\scratch\resume-builder\`.
-* **Testing / Local Run**: Deployment directory at `C:\Users\janak\Downloads\resume_builder_app\`.
-* **Production**: GitHub Pages deployment at `https://janakirao4701.github.io/Resume_builder/`.
+* **Development / Local Run**: Runs using Express dev server or wrangler local preview:
+  ```bash
+  npm run dev
+  ```
+  or
+  ```bash
+  npx wrangler dev
+  ```
+* **Production**: Cloudflare Workers deployment at `https://professional.cvcraft.workers.dev`.
+
+## Secrets Configuration
+Before deployment, configure the OpenRouter API key inside Cloudflare Workers:
+```bash
+npx wrangler secret put OPENROUTER_API_KEY
+```
 
 ## Publish Steps
-1. Copy updated files (`index.html`, `style.css`, `app.js`) to the deployment folder:
-   ```powershell
-   Copy-Item -Path "C:\Users\janak\.gemini\antigravity-ide\scratch\resume-builder\*" -Destination "C:\Users\janak\Downloads\resume_builder_app\" -Force
-   ```
-2. Navigate to `C:\Users\janak\Downloads\resume_builder_app\`, check git status, stage, commit, and push:
+To deploy the static assets and the worker logic to Cloudflare:
+1. Ensure all local tests pass:
    ```bash
-   git add .
-   git commit -m "feat: <deployment details>"
-   git push origin main
+   python .validation/scripts/test-all.py
    ```
-3. Wait 1-2 minutes for the GitHub Pages build action to complete.
+2. Deploy the Worker using wrangler:
+   ```bash
+   npx wrangler deploy
+   ```
+3. Verify the deployment at `https://professional.cvcraft.workers.dev/builder`.
