@@ -3183,7 +3183,19 @@
   .kw-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 6px;
+    max-height: 160px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .kw-tags::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .kw-tags::-webkit-scrollbar-thumb {
+    background: var(--color-chalk);
+    border-radius: 2px;
   }
   
   .kw-tag {
