@@ -232,23 +232,70 @@ export function renderScoringUI(data) {
       </div>
     `;
 
-    // Weaknesses
+    // Weaknesses grouped by severity
+    const critical = [];
+    const medium = [];
+    const low = [];
+
+    (data.weaknesses || []).forEach(w => {
+      const text = typeof w === 'object' ? w.text : w;
+      const severity = typeof w === 'object' ? (w.severity || 'medium') : 'medium';
+      if (severity === 'critical') {
+        critical.push(text);
+      } else if (severity === 'low') {
+        low.push(text);
+      } else {
+        medium.push(text);
+      }
+    });
+
     html += `
       <div class="suggestion-group" style="margin-top: 14px;">
-        <div class="group-title weaknesses">Weaknesses & Actionable Improvements (${data.weaknesses.length})</div>
-        <ul class="suggestions-list">
-          ${data.weaknesses.length > 0 ? data.weaknesses.map(w => {
-            const text = typeof w === 'object' ? w.text : w;
-            const severity = typeof w === 'object' ? (w.severity || 'medium') : 'medium';
-            const sevLabel = severity === 'critical' ? 'CRITICAL' : severity === 'low' ? 'LOW' : 'MEDIUM';
-            return `
-            <li class="suggestion-fail severity-${severity}">
-              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-              <span class="severity-badge sev-${severity}">${sevLabel}</span>
-              <span>${escHtml(text)}</span>
-            </li>
-          `}).join('') : '<li class="suggestion-pass" style="justify-content:center; width:100%; font-weight:600;">✓ Excellent! Your resume conforms to all guidelines.</li>'}
-        </ul>
+        <div class="group-title weaknesses" style="margin-bottom:10px;">Actionable Improvements</div>
+        
+        <div class="severity-tabs-header" style="display:flex; gap:6px; border-bottom:1px solid var(--color-chalk); padding-bottom:8px; margin-bottom:12px;">
+          <button class="sev-tab-btn active" data-severity="critical" onclick="switchSeverityTab('critical')" type="button" style="padding:6px 12px; border-radius:var(--radius-full); font-size:11px; font-weight:600; border:1px solid var(--color-chalk); background:var(--color-paper); color:var(--color-ink); cursor:pointer; transition:all 0.15s ease;">
+            Critical (${critical.length})
+          </button>
+          <button class="sev-tab-btn" data-severity="medium" onclick="switchSeverityTab('medium')" type="button" style="padding:6px 12px; border-radius:var(--radius-full); font-size:11px; font-weight:600; border:1px solid var(--color-chalk); background:var(--color-paper); color:var(--color-ink); cursor:pointer; transition:all 0.15s ease;">
+            Medium (${medium.length})
+          </button>
+          <button class="sev-tab-btn" data-severity="low" onclick="switchSeverityTab('low')" type="button" style="padding:6px 12px; border-radius:var(--radius-full); font-size:11px; font-weight:600; border:1px solid var(--color-chalk); background:var(--color-paper); color:var(--color-ink); cursor:pointer; transition:all 0.15s ease;">
+            Low (${low.length})
+          </button>
+        </div>
+
+        <div class="severity-tabs-content">
+          <ul class="suggestions-list sev-tab-list" data-severity="critical" style="display: block;">
+            ${critical.length > 0 ? critical.map(text => `
+              <li class="suggestion-fail severity-critical">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <span class="severity-badge sev-critical">CRITICAL</span>
+                <span>${escHtml(text)}</span>
+              </li>
+            `).join('') : '<li class="suggestion-pass" style="justify-content:center; width:100%; font-weight:600; padding:12px;">✓ No critical issues found!</li>'}
+          </ul>
+          
+          <ul class="suggestions-list sev-tab-list" data-severity="medium" style="display: none;">
+            ${medium.length > 0 ? medium.map(text => `
+              <li class="suggestion-fail severity-medium">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <span class="severity-badge sev-medium">MEDIUM</span>
+                <span>${escHtml(text)}</span>
+              </li>
+            `).join('') : '<li class="suggestion-pass" style="justify-content:center; width:100%; font-weight:600; padding:12px;">✓ No medium severity issues!</li>'}
+          </ul>
+          
+          <ul class="suggestions-list sev-tab-list" data-severity="low" style="display: none;">
+            ${low.length > 0 ? low.map(text => `
+              <li class="suggestion-fail severity-low">
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0; margin-top:2px;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                <span class="severity-badge sev-low">LOW</span>
+                <span>${escHtml(text)}</span>
+              </li>
+            `).join('') : '<li class="suggestion-pass" style="justify-content:center; width:100%; font-weight:600; padding:12px;">✓ No low priority suggestions!</li>'}
+          </ul>
+        </div>
       </div>
     `;
     listContainer.innerHTML = html;
@@ -397,3 +444,18 @@ export function scanKeywordsRealtime() {
   activeProfile.ats_results = results;
   updateKeywordTagsUI(results);
 }
+
+window.switchSeverityTab = function(severity) {
+  const tabs = document.querySelectorAll('.sev-tab-btn');
+  tabs.forEach(t => {
+    if (t.getAttribute('data-severity') === severity) {
+      t.classList.add('active');
+    } else {
+      t.classList.remove('active');
+    }
+  });
+  const lists = document.querySelectorAll('.sev-tab-list');
+  lists.forEach(l => {
+    l.style.display = l.getAttribute('data-severity') === severity ? 'block' : 'none';
+  });
+};

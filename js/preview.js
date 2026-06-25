@@ -127,7 +127,26 @@ export function updatePreviewRaw() {
   const subtitle = activeProfile.subtitle;
 
   if (!raw && !name) {
-    mockup.innerHTML = `<div class="empty-state" style="display:flex; flex-direction:column; align-items:center; justify-content:center;"><svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--app-ink-muted); margin-bottom: 8px;"><path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0A2.25 2.25 0 0 1 13.5 4.75h-3a2.25 2.25 0 0 1-2.166-1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.346.102.637.318.806.622L18 7.5V19.5a2.25 2.25 0 0 1-2.25 2.25H8.25A2.25 2.25 0 0 1 6 19.5V7.5l1.112-2.012a1.125 1.125 0 0 1 .806-.622" /></svg><p>Paste your resume content above to see a live preview here</p></div>`;
+    mockup.innerHTML = `
+      <div class="empty-state" style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 40px; text-align: center;">
+        <div class="empty-illustration" style="position: relative; margin-bottom: 20px; width: 140px; height: 180px; background: var(--color-paper); border: 1px dashed var(--color-chalk); border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; padding: 16px; gap: 8px; overflow: hidden; opacity: 0.7;">
+          <!-- Name and title skeleton -->
+          <div style="width: 50%; height: 8px; background: var(--color-chalk); border-radius: 4px;"></div>
+          <div style="width: 30%; height: 6px; background: var(--color-mist); border-radius: 3px; margin-bottom: 8px;"></div>
+          <!-- Sections skeleton -->
+          <div style="width: 25%; height: 6px; background: var(--color-chalk); border-radius: 3px; border-left: 2px solid var(--color-signal-blue);"></div>
+          <div style="width: 100%; height: 4px; background: var(--color-mist); border-radius: 2px;"></div>
+          <div style="width: 90%; height: 4px; background: var(--color-mist); border-radius: 2px;"></div>
+          <div style="width: 95%; height: 4px; background: var(--color-mist); border-radius: 2px; margin-bottom: 8px;"></div>
+          
+          <div style="width: 25%; height: 6px; background: var(--color-chalk); border-radius: 3px; border-left: 2px solid var(--color-signal-blue);"></div>
+          <div style="width: 100%; height: 4px; background: var(--color-mist); border-radius: 2px;"></div>
+          <div style="width: 85%; height: 4px; background: var(--color-mist); border-radius: 2px;"></div>
+        </div>
+        <span style="font-size: 13px; font-weight: 600; color: var(--color-carbon); margin-bottom: 6px; display: block;">Your Resume Preview</span>
+        <p style="font-size: 11px; color: var(--color-pencil); line-height: 1.4; max-width: 200px; margin: 0;">Type or paste your experience in the editor to see a live print-ready preview.</p>
+      </div>
+    `;
     return;
   }
 

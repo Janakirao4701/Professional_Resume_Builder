@@ -1144,6 +1144,65 @@ window.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('click', () => {
     closeAllDropdowns();
   });
+
+  // ── EDITOR SECTION ANCHOR SCROLL LOGIC ──
+  window.scrollToSection = function(className) {
+    const el = document.querySelector('.' + className) || document.getElementById(className);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Manually toggle active class for instant feedback
+      const btns = document.querySelectorAll('.nav-rail-btn');
+      btns.forEach(btn => {
+        const onclickAttr = btn.getAttribute('onclick');
+        if (onclickAttr && onclickAttr.includes(className)) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+  };
+
+  // Setup IntersectionObserver for auto-lighting rail buttons
+  const editorPane = document.querySelector('.editor-pane');
+  const sectionClasses = ['drop-area', 'ai-assistant-container', 'jd-accordion', 'scoring-container'];
+  if (editorPane && 'IntersectionObserver' in window) {
+    const observerOptions = {
+      root: editorPane,
+      rootMargin: '-10% 0px -60% 0px',
+      threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          let targetClass = '';
+          sectionClasses.forEach(cls => {
+            if (entry.target.classList.contains(cls)) {
+              targetClass = cls;
+            }
+          });
+
+          if (targetClass) {
+            const btns = document.querySelectorAll('.nav-rail-btn');
+            btns.forEach(btn => {
+              const onclickAttr = btn.getAttribute('onclick');
+              if (onclickAttr && onclickAttr.includes(targetClass)) {
+                btn.classList.add('active');
+              } else {
+                btn.classList.remove('active');
+              }
+            });
+          }
+        }
+      });
+    }, observerOptions);
+
+    sectionClasses.forEach(cls => {
+      const el = document.querySelector('.' + cls);
+      if (el) observer.observe(el);
+    });
+  }
   
   // 11. Offline clipboard paste
   document.addEventListener('paste', (e) => {

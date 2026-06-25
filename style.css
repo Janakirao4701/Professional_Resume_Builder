@@ -857,6 +857,7 @@
   
   .drawer-header {
     padding: 16px 20px;
+    background: var(--color-mist);
     border-bottom: 1px solid var(--color-chalk);
     display: flex; justify-content: space-between; align-items: center;
   }
@@ -918,7 +919,7 @@
     background: var(--color-paper);
     border: 1px solid var(--color-chalk);
     border-radius: 6px;
-    padding: 10px 14px;
+    padding: 9px 12px;
     color: var(--color-ink);
     font-size: 13px;
     outline: none;
@@ -954,9 +955,9 @@
     background: var(--color-paper);
     border: 1px solid var(--color-chalk);
     border-radius: 6px;
-    padding: 8px 12px;
+    padding: 9px 12px;
     color: var(--color-ink);
-    font-size: 12px;
+    font-size: 13px;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
@@ -990,9 +991,9 @@
     background: var(--color-paper);
     border: 1px solid var(--color-chalk);
     border-radius: 6px;
-    padding: 8px 12px;
+    padding: 9px 12px;
     color: var(--color-ink);
-    font-size: 12px;
+    font-size: 13px;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
@@ -4197,6 +4198,139 @@
     transition: all 0.15s ease;
   }
   .kw-tag:hover {
-    transform: scale(1.03);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(30, 144, 255, 0.15);
+  }
+
+  /* Custom Styled Selects */
+  #profile-select, #mobile-profile-select, #ai-role-select, .custom-select-wrapper select, .drawer-select-wrapper select {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: var(--color-paper);
+    border: 1px solid var(--color-chalk);
+    border-radius: var(--radius-full);
+    padding: 6px 32px 6px 16px;
+    font-family: var(--font-tt-commons);
+    font-size: 13px;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-ink);
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%234b5563' class='w-4 h-4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+    transition: all 0.15s ease;
+  }
+
+  #profile-select:hover, #mobile-profile-select:hover, #ai-role-select:hover, .custom-select-wrapper select:hover, .drawer-select-wrapper select:hover {
+    background-color: var(--color-mist);
+    border-color: var(--color-haze);
+  }
+
+  #profile-select:focus-visible, #mobile-profile-select:focus-visible, #ai-role-select:focus-visible, .custom-select-wrapper select:focus-visible, .drawer-select-wrapper select:focus-visible {
+    outline: 2px solid var(--color-signal-blue);
+    outline-offset: 2px;
+  }
+
+  [data-theme="dark"] #profile-select,
+  [data-theme="dark"] #mobile-profile-select,
+  [data-theme="dark"] #ai-role-select,
+  [data-theme="dark"] .custom-select-wrapper select,
+  [data-theme="dark"] .drawer-select-wrapper select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%23d1d5db' class='w-4 h-4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
+  }
+
+  /* ── EDITOR NAVIGATION RAIL ── */
+  @media (min-width: 1024px) {
+    .editor-pane {
+      padding-left: 68px !important;
+      position: relative;
+    }
+    .editor-nav-rail {
+      display: flex !important;
+    }
+    .company-btns {
+      flex-wrap: nowrap !important;
+      overflow-x: auto !important;
+      padding-bottom: 8px !important;
+      -webkit-overflow-scrolling: touch;
+    }
+    .company-copy-btn {
+      flex-shrink: 0 !important;
+    }
+  }
+  @media (max-width: 1023px) {
+    .editor-nav-rail {
+      display: none !important;
+    }
+  }
+  .editor-nav-rail {
+    position: sticky;
+    top: 24px;
+    left: 0;
+    width: 36px;
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 100;
+    float: left;
+    margin-left: -52px;
+  }
+  .nav-rail-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--color-chalk);
+    background: var(--color-paper);
+    color: var(--color-pencil);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    padding: 0;
+  }
+  .nav-rail-btn:hover {
+    background: var(--color-mist);
+    color: var(--color-signal-blue);
+    border-color: var(--color-haze);
+  }
+  .nav-rail-btn.active {
+    background: var(--color-signal-blue);
+    color: #ffffff;
+    border-color: var(--color-signal-blue);
+    box-shadow: 0 4px 10px rgba(30, 144, 255, 0.2);
+  }
+  .nav-rail-btn:active {
+    transform: scale(0.95);
+  }
+
+  /* ── EDITOR WORD COUNT & SAVE STATUS ROW ── */
+  .editor-word-count-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--color-chalk);
+    background: var(--color-mist);
+    padding: 4px 12px;
+    min-height: 20px;
+  }
+  .editor-save-status {
+    font-size: 10px;
+    color: var(--color-pencil);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0.85;
+  }
+
+  /* ── SCORING SUGGESTIONS SEVERITY TABS ── */
+  .sev-tab-btn.active {
+    background: var(--color-ink) !important;
+    color: var(--color-paper) !important;
+    border-color: var(--color-ink) !important;
+  }
+  .sev-tab-btn:hover {
+    background: var(--color-mist) !important;
   }
