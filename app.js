@@ -1076,6 +1076,74 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     }
   }
+
+  // ── RESIZABLE WORKSPACE SPLITTER ──
+  const splitter = document.getElementById('desktop-splitter');
+  const workspace = document.querySelector('.app-workspace');
+  if (splitter && workspace) {
+    let isDragging = false;
+    
+    splitter.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      splitter.classList.add('dragging');
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const newWidth = Math.max(350, Math.min(window.innerWidth - 350, e.clientX));
+      workspace.style.setProperty('--workspace-split', `${newWidth}px`);
+      adjustPreviewScale();
+    });
+    
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        splitter.classList.remove('dragging');
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    });
+  }
+
+  // ── ESCAPE KEY DRAWER CLOSE ──
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const drawer = document.getElementById('profile-drawer');
+      if (drawer && drawer.classList.contains('active')) {
+        toggleDetailsForm();
+      }
+    }
+  });
+
+  // ── PROFILE DROPDOWN TOGGLER ──
+  window.toggleProfileDropdown = function(e) {
+    e.stopPropagation();
+    const menu = document.getElementById('profile-actions-menu');
+    const button = document.getElementById('profile-actions-toggle');
+    if (menu && button) {
+      const isShown = menu.classList.contains('show');
+      closeAllDropdowns();
+      if (!isShown) {
+        menu.classList.add('show');
+        button.setAttribute('aria-expanded', 'true');
+      }
+    }
+  };
+
+  function closeAllDropdowns() {
+    const menu = document.getElementById('profile-actions-menu');
+    const button = document.getElementById('profile-actions-toggle');
+    if (menu && button) {
+      menu.classList.remove('show');
+      button.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  window.addEventListener('click', () => {
+    closeAllDropdowns();
+  });
   
   // 11. Offline clipboard paste
   document.addEventListener('paste', (e) => {

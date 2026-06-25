@@ -25,16 +25,22 @@ export function setZoomScale(scale) {
   const buttons = document.querySelectorAll('.btn-zoom');
   buttons.forEach(btn => {
     btn.classList.remove('active');
+    btn.setAttribute('aria-pressed', 'false');
     if (scale === 'auto' && btn.id === 'btn-zoom-auto') {
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
     } else if (scale === 'scroll' && btn.id === 'btn-zoom-scroll') {
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
     } else if (scale === 0.75 && btn.id === 'btn-zoom-75') {
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
     } else if (scale === 1.0 && btn.id === 'btn-zoom-100') {
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
     } else if (scale === 1.25 && btn.id === 'btn-zoom-125') {
       btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
     }
   });
   

@@ -35,6 +35,34 @@
     <select id="profile-select" onchange="switchProfile(this.value)" aria-label="Active Profile">
       <!-- Populated dynamically -->
     </select>
+    <div class="profile-actions-dropdown" id="profile-actions-dropdown">
+      <button class="btn-hdr-action dropdown-toggle-btn" id="profile-actions-toggle" onclick="toggleProfileDropdown(event)" type="button" aria-haspopup="menu" aria-expanded="false" title="Profile Actions">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 12.75a.75.75 0 110-1.5.75.75 0 010 1.5zM12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/></svg>
+      </button>
+      <div class="dropdown-menu-list" id="profile-actions-menu" role="menu">
+        <button role="menuitem" class="dropdown-item" onclick="createNewProfile()" type="button">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+          <span>New Profile</span>
+        </button>
+        <button role="menuitem" class="dropdown-item" onclick="renameCurrentProfile()" type="button">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg>
+          <span>Rename</span>
+        </button>
+        <button role="menuitem" class="dropdown-item btn-danger" onclick="deleteCurrentProfileConfirm(event)" type="button">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
+          <span>Delete Profile</span>
+        </button>
+        <div class="dropdown-divider"></div>
+        <button role="menuitem" class="dropdown-item" onclick="triggerImport()" type="button">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
+          <span>Import JSON</span>
+        </button>
+        <button role="menuitem" class="dropdown-item" onclick="exportProfiles()" type="button">
+          <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5" /></svg>
+          <span>Export Backup</span>
+        </button>
+      </div>
+    </div>
     <div id="header-ats-badge" class="header-ats-badge no-score" title="ATS Match Score. Enter a target Job Description below and click 'Analyze ATS Score' to calculate.">
       <span class="badge-label">ATS</span>
       <span class="badge-score-val" id="header-ats-score-val">--</span>
@@ -70,34 +98,7 @@
   </button>
 </header>
 
-<!-- Secondary Profile Management Toolbar Strip -->
-<div class="sub-header-toolbar">
-  <div class="toolbar-left">
-    <button class="btn-hdr-action" onclick="createNewProfile()" title="Create Blank Profile" aria-label="Create Blank Profile" type="button">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-      <span>New Profile</span>
-    </button>
-    <button class="btn-hdr-action" onclick="renameCurrentProfile()" title="Rename Current Profile" aria-label="Rename Current Profile" type="button">
-      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg>
-      <span>Rename</span>
-    </button>
-    <button class="btn-hdr-action btn-hdr-danger" onclick="deleteCurrentProfileConfirm(event)" title="Delete Current Profile" aria-label="Delete Current Profile" id="delete-profile-btn" type="button">
-      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
-      <span>Delete</span>
-    </button>
-  </div>
-  <div class="toolbar-right">
-    <button class="btn-hdr-action" onclick="triggerImport()" title="Import JSON Profiles" type="button">
-      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
-      <span>Import JSON</span>
-    </button>
-    <button class="btn-hdr-action" onclick="exportProfiles()" title="Export JSON Backup" type="button">
-      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5" /></svg>
-      <span>Export Backup</span>
-    </button>
-  </div>
-  <input type="file" id="import-file-input" style="display: none;" accept=".json" onchange="importProfiles(event)">
-</div>
+<input type="file" id="import-file-input" style="display: none;" accept=".json" onchange="importProfiles(event)">
 
 
 <!-- Mobile Drawer and Overlay -->
@@ -417,7 +418,7 @@
       </div>
 
       <!-- Company Experience Copy (appears after paste) -->
-      <div class="company-section" id="company-section">
+              <div class="company-section" id="company-section">
         <div class="company-section-title">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke-linecap="round" stroke-linejoin="round"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copy Experience by Company
         </div>
@@ -427,16 +428,16 @@
   </div>
   
   <div class="divider"><span>Resume Preview</span></div>
+  <div class="desktop-splitter" id="desktop-splitter" title="Drag to resize panels"></div>
   
   <div class="preview-pane">
     <!-- Zoom controls for checking details -->
     <div class="zoom-toolbar" role="toolbar" aria-label="Resume Preview Zoom">
-      <button class="btn-zoom active" id="btn-zoom-auto" onclick="setZoomScale('auto')" type="button">Auto</button>
-      <button class="btn-zoom" id="btn-zoom-scroll" onclick="setZoomScale('scroll')" type="button">Scroll</button>
-      <button class="btn-zoom" id="btn-zoom-75" onclick="setZoomScale(0.75)" type="button">75%</button>
-      <button class="btn-zoom" id="btn-zoom-100" onclick="setZoomScale(1.0)" type="button">100%</button>
-      <button class="btn-zoom" id="btn-zoom-125" onclick="setZoomScale(1.25)" type="button">125%</button>
-
+      <button class="btn-zoom active" id="btn-zoom-auto" onclick="setZoomScale('auto')" type="button" aria-pressed="true">Auto</button>
+      <button class="btn-zoom" id="btn-zoom-scroll" onclick="setZoomScale('scroll')" type="button" aria-pressed="false">Scroll</button>
+      <button class="btn-zoom" id="btn-zoom-75" onclick="setZoomScale(0.75)" type="button" aria-pressed="false">75%</button>
+      <button class="btn-zoom" id="btn-zoom-100" onclick="setZoomScale(1.0)" type="button" aria-pressed="false">100%</button>
+      <button class="btn-zoom" id="btn-zoom-125" onclick="setZoomScale(1.25)" type="button" aria-pressed="false">125%</button>
     </div>
     <div class="preview-wrap">
       <div id="resume-mockup">
