@@ -94,7 +94,7 @@ window.updateEditorWordCount = updateEditorWordCount;
 window.updateSectionTags = updateSectionTags;
 window.insertSectionTemplate = insertSectionTemplate;
 window.pasteRefinedText = pasteRefinedText;
-window.toggleFullscreenPreview = toggleFullscreenPreview;
+
 window.undoEdit = undoEdit;
 window.redoEdit = redoEdit;
 window.toggleTheme = toggleTheme;
@@ -132,10 +132,6 @@ window.addEventListener('keydown', (e) => {
   if (e.key === 'Tab') {
     trapFocusInDrawer(e);
   } else if (e.key === 'Escape') {
-    const pane = document.querySelector('.preview-pane');
-    if (pane && pane.classList.contains('fullscreen-preview')) {
-      toggleFullscreenPreview();
-    }
     const drawer = document.getElementById('profile-drawer');
     if (drawer && drawer.classList.contains('active')) {
       toggleDetailsForm();
@@ -423,10 +419,8 @@ function toggleDetailsForm() {
     btn.setAttribute('aria-expanded', 'false');
     
     const mobileMenu = document.getElementById('mobile-menu-drawer');
-    const pane = document.querySelector('.preview-pane');
     const isMobileMenu = mobileMenu && mobileMenu.classList.contains('active');
-    const isFullscreen = pane && pane.classList.contains('fullscreen-preview');
-    if (!isMobileMenu && !isFullscreen) {
+    if (!isMobileMenu) {
       document.body.classList.remove('fullscreen-lock');
     }
     
@@ -450,10 +444,8 @@ window.addEventListener('popstate', () => {
     drawer.setAttribute('aria-hidden', 'true');
     
     const mobileMenu = document.getElementById('mobile-menu-drawer');
-    const pane = document.querySelector('.preview-pane');
     const isMobileMenu = mobileMenu && mobileMenu.classList.contains('active');
-    const isFullscreen = pane && pane.classList.contains('fullscreen-preview');
-    if (!isMobileMenu && !isFullscreen) {
+    if (!isMobileMenu) {
       document.body.classList.remove('fullscreen-lock');
     }
   }
@@ -760,10 +752,8 @@ function toggleMobileMenu(show) {
     if (btn) btn.setAttribute('aria-expanded', 'false');
     
     const detailsDrawer = document.getElementById('profile-drawer');
-    const pane = document.querySelector('.preview-pane');
     const isDetailsActive = detailsDrawer && detailsDrawer.classList.contains('active');
-    const isFullscreenActive = pane && pane.classList.contains('fullscreen-preview');
-    if (!isDetailsActive && !isFullscreenActive) {
+    if (!isDetailsActive) {
       document.body.classList.remove('fullscreen-lock');
     }
   }
@@ -922,40 +912,7 @@ async function pasteRefinedText() {
   }
 }
 
-function toggleFullscreenPreview() {
-  const pane = document.querySelector('.preview-pane');
-  const btn = document.getElementById('btn-zoom-full');
-  if (!pane) return;
-
-  const isFullscreen = pane.classList.toggle('fullscreen-preview');
-  
-  if (isFullscreen) {
-    document.body.classList.add('fullscreen-lock');
-    if (btn) {
-      btn.classList.add('active');
-      btn.innerHTML = `
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 9V3.75m0 0H3.75m5.25 0l-6.3 6.3M15 9V3.75m0 0h5.25M15 3.75l6.3 6.3M9 15v5.25m0 0H3.75M9 20.25l-6.3-6.3M15 15v5.25m0 0h5.25M15 20.25l6.3-6.3"/></svg>
-        <span>Exit Full</span>
-      `;
-    }
-  } else {
-    const drawer = document.getElementById('profile-drawer');
-    const mobileMenu = document.getElementById('mobile-menu-drawer');
-    const isDrawerOpen = drawer && drawer.classList.contains('active');
-    const isMobileMenuOpen = mobileMenu && mobileMenu.classList.contains('active');
-    if (!isDrawerOpen && !isMobileMenuOpen) {
-      document.body.classList.remove('fullscreen-lock');
-    }
-    if (btn) {
-      btn.classList.remove('active');
-      btn.innerHTML = `
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 9V3.75m0 0h5.25m-5.25 0l6.3 6.3M20.25 9V3.75m0 0h-5.25m5.25 0l-6.3 6.3M3.75 15v5.25m0 0h5.25m-5.25 0l6.3-6.3M20.25 15v5.25m0 0h-5.25m5.25 0l-6.3-6.3"/></svg>
-        <span>Full View</span>
-      `;
-    }
-  }
-  setTimeout(adjustPreviewScale, 50);
-}
+// Fullscreen preview function removed as requested.
 
 // ── DOM CONTENT LOADED EVENT HANDLER ──
 window.addEventListener('DOMContentLoaded', () => {
