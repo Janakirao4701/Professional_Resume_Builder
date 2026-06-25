@@ -1179,7 +1179,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   // Setup IntersectionObserver for auto-lighting rail buttons
   const editorPane = document.querySelector('.editor-pane');
-  const sectionClasses = ['drop-area', 'ai-assistant-container', 'jd-accordion', 'scoring-container'];
+  const sectionClasses = ['ai-assistant-container', 'drop-area', 'jd-accordion', 'scoring-container'];
   if (editorPane && 'IntersectionObserver' in window) {
     const observerOptions = {
       root: editorPane,
