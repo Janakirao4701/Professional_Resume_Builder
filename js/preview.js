@@ -131,24 +131,24 @@ export function updatePreviewRaw() {
         if (parts.length >= 4) {
           elements.push(createEl(`
             <div class="mock-exp-header">
-              <span>${escHtml(parts[2])}</span>
+              <span>${escHtml(parts[0])}</span>
               <span>${escHtml(parts[3])}</span>
             </div>
           `));
           elements.push(createEl(`
             <div class="mock-exp-header" style="font-weight: normal; margin-top: 0; margin-bottom: 4pt;">
-              <span style="font-weight: normal;">${escHtml(parts[0])}</span>
+              <span style="font-weight: normal;">${escHtml(parts[2])}</span>
               <span style="font-weight: normal;">${escHtml(parts[1])}</span>
             </div>
           `));
         } else if (parts.length === 3) {
           elements.push(createEl(`
             <div class="mock-exp-header">
-              <span>${escHtml(parts[1])}</span>
+              <span>${escHtml(parts[0])}</span>
               <span>${escHtml(parts[2])}</span>
             </div>
           `));
-          elements.push(createEl(`<div class="mock-exp-role">${escHtml(parts[0])}</div>`));
+          elements.push(createEl(`<div class="mock-exp-role">${escHtml(parts[1])}</div>`));
         } else {
           elements.push(createEl(`<div class="mock-exp-header"><span>${escHtml(t)}</span></div>`));
         }

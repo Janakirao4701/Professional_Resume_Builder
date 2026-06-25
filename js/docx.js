@@ -118,7 +118,7 @@ export async function downloadDocx() {
               spacing: { before: 180, after: 40 },
               tabStops: [{ type: TabStopType.RIGHT, position: 10800 }],
               children: [
-                new TextRun({ text: parts[2], bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
+                new TextRun({ text: parts[0], bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
                 new TextRun({ text: '\t' }),
                 new TextRun({ text: parts[3], bold: true, font: 'Times New Roman', size: 22, color: '000000' })
               ]
@@ -127,7 +127,7 @@ export async function downloadDocx() {
               spacing: { before: 0, after: 60 },
               tabStops: [{ type: TabStopType.RIGHT, position: 10800 }],
               children: [
-                new TextRun({ text: parts[0], font: 'Times New Roman', size: 22, color: '000000' }),
+                new TextRun({ text: parts[2], font: 'Times New Roman', size: 22, color: '000000' }),
                 new TextRun({ text: '\t' }),
                 new TextRun({ text: parts[1], font: 'Times New Roman', size: 22, color: '000000' })
               ]
@@ -137,14 +137,14 @@ export async function downloadDocx() {
               spacing: { before: 180, after: 40 },
               tabStops: [{ type: TabStopType.RIGHT, position: 10800 }],
               children: [
-                new TextRun({ text: parts[1], bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
+                new TextRun({ text: parts[0], bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
                 new TextRun({ text: '\t' }),
                 new TextRun({ text: parts[2], bold: true, font: 'Times New Roman', size: 22, color: '000000' })
               ]
             }));
             rows.push(new Paragraph({
               spacing: { before: 0, after: 60 },
-              children: [new TextRun({ text: parts[0], font: 'Times New Roman', size: 22, color: '000000' })]
+              children: [new TextRun({ text: parts[1], font: 'Times New Roman', size: 22, color: '000000' })]
             }));
           }
           return rows;
