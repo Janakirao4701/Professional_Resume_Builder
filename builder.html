@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.json">
 </head>
-<body>
+<body class="builder-body">
 
 <header>
   <a href="index.html" class="logo" style="text-decoration: none;">
@@ -450,14 +450,7 @@
   <div class="desktop-splitter" id="desktop-splitter" title="Drag to resize panels"></div>
   
   <div class="preview-pane">
-    <!-- Zoom controls for checking details -->
-    <div class="zoom-toolbar" role="toolbar" aria-label="Resume Preview Zoom">
-      <button class="btn-zoom active" id="btn-zoom-auto" onclick="setZoomScale('auto')" type="button" aria-pressed="true">Auto</button>
-      <button class="btn-zoom" id="btn-zoom-scroll" onclick="setZoomScale('scroll')" type="button" aria-pressed="false">Scroll</button>
-      <button class="btn-zoom" id="btn-zoom-75" onclick="setZoomScale(0.75)" type="button" aria-pressed="false">75%</button>
-      <button class="btn-zoom" id="btn-zoom-100" onclick="setZoomScale(1.0)" type="button" aria-pressed="false">100%</button>
-      <button class="btn-zoom" id="btn-zoom-125" onclick="setZoomScale(1.25)" type="button" aria-pressed="false">125%</button>
-    </div>
+
     <div class="preview-wrap">
       <div id="resume-mockup">
                 <div class="empty-state" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">

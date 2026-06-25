@@ -159,6 +159,12 @@
     overflow-x: visible;
   }
 
+  body.builder-body {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
   .hero-section, .bento-grid-section {
     overflow-x: hidden;
   }
@@ -383,11 +389,13 @@
     }
     .editor-pane {
       height: 100%;
+      min-height: 0;
       overflow-y: auto;
       border-right: 1px solid var(--color-chalk);
     }
     .preview-pane {
       height: 100%;
+      min-height: 0;
       overflow-y: auto;
       border-left: none;
     }

@@ -4,108 +4,21 @@ import { activeProfile } from './state.js';
 import { parseContent } from './parser.js';
 import { escHtml } from './ui.js';
 
-export let currentZoomScale = 'auto';
-let isScaling = false;
-let lastPaneWidth = 0;
-let lastMockupWidth = 0;
-let lastMockupHeight = 0;
+export let currentZoomScale = 1.0;
 
 export function setZoomScale(scale) {
-  currentZoomScale = scale;
-  
-  const pane = document.querySelector('.preview-pane');
-  if (pane) {
-    if (scale === 'scroll') {
-      pane.classList.add('scrollable-mode');
-    } else {
-      pane.classList.remove('scrollable-mode');
-    }
-  }
-  
-  const buttons = document.querySelectorAll('.btn-zoom');
-  buttons.forEach(btn => {
-    btn.classList.remove('active');
-    btn.setAttribute('aria-pressed', 'false');
-    if (scale === 'auto' && btn.id === 'btn-zoom-auto') {
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-    } else if (scale === 'scroll' && btn.id === 'btn-zoom-scroll') {
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-    } else if (scale === 0.75 && btn.id === 'btn-zoom-75') {
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-    } else if (scale === 1.0 && btn.id === 'btn-zoom-100') {
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-    } else if (scale === 1.25 && btn.id === 'btn-zoom-125') {
-      btn.classList.add('active');
-      btn.setAttribute('aria-pressed', 'true');
-    }
-  });
-  
-  adjustPreviewScale();
+  // Keep zoom at 100% scale always as requested
 }
 
 export function adjustPreviewScale() {
-  if (isScaling) return;
-  if (currentZoomScale === 'scroll') {
-    const mockup = document.getElementById('resume-mockup');
-    if (mockup) {
-      mockup.style.transform = 'none';
-      mockup.style.transformOrigin = 'initial';
-      mockup.style.marginBottom = '0';
-    }
-    return;
-  }
-  
-  const pane = document.querySelector('.preview-pane');
   const mockup = document.getElementById('resume-mockup');
-  if (!pane || !mockup) return;
-  
-  const paneWidth = pane.clientWidth - 80;
-  const mockupWidth = mockup.offsetWidth;
-  const mockupHeight = mockup.offsetHeight;
-  
-  isScaling = true;
-  
-  if (paneWidth <= 0 || mockupWidth <= 0) {
-    isScaling = false;
-    return;
-  }
-  
-  lastPaneWidth = paneWidth;
-  lastMockupWidth = mockupWidth;
-  lastMockupHeight = mockupHeight;
-  
-  let scale = 1.0;
-  if (currentZoomScale === 'auto') {
-    if (paneWidth < mockupWidth) {
-      scale = paneWidth / mockupWidth;
-    }
-  } else {
-    scale = currentZoomScale;
-  }
-  
-  if (scale < 1.0 || (currentZoomScale !== 'auto' && scale !== 1.0)) {
-    const heightReduction = mockupHeight * (1 - scale);
-    const widthReduction = mockupWidth * (1 - scale);
-    mockup.style.transform = `scale(${scale})`;
-    mockup.style.transformOrigin = 'top center';
-    mockup.style.marginBottom = `-${heightReduction}px`;
-    mockup.style.marginLeft = `-${widthReduction / 2}px`;
-    mockup.style.marginRight = `-${widthReduction / 2}px`;
-  } else {
+  if (mockup) {
     mockup.style.transform = 'none';
     mockup.style.transformOrigin = 'initial';
     mockup.style.marginBottom = '0';
     mockup.style.marginLeft = '0';
     mockup.style.marginRight = '0';
   }
-  
-  requestAnimationFrame(() => {
-    isScaling = false;
-  });
 }
 
 let cachedWidth = window.innerWidth;
