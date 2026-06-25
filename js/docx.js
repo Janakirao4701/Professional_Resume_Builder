@@ -221,7 +221,7 @@ export async function downloadDocx() {
       if (!/^https?:\/\//i.test(hrefLinkedin)) {
         hrefLinkedin = 'https://' + hrefLinkedin;
       }
-      let displayLinkedin = rawLinkedin.replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/-[a-zA-Z0-9]+(?=\/?$)/, '').replace(/\/+$/, '');
+      let displayLinkedin = rawLinkedin.replace(/^https?:\/\//i, '').replace(/^www\./i, '').replace(/\/+$/, '');
       
       contactChildren.push(new ExternalHyperlink({
         children: [

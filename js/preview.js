@@ -85,7 +85,6 @@ export function updatePreviewRaw() {
     }
     let display = rawUrl.replace(/^https?:\/\//i, '');
     display = display.replace(/^www\./i, '');
-    display = display.replace(/-[a-zA-Z0-9]+(?=\/?$)/, '');
     display = display.replace(/\/+$/, '');
     contactParts.push(`<a href="${escHtml(hrefUrl)}" target="_blank" rel="noopener noreferrer">${escHtml(display)}</a>`);
   }
