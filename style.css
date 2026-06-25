@@ -355,9 +355,8 @@
     background: var(--color-mist);
     padding: 40px 16px;
     width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    display: block !important;
+    text-align: center !important;
     overflow-x: auto;
     border-left: 1px solid var(--color-chalk);
     position: relative;
@@ -615,11 +614,17 @@
   .preview-wrap {
     width: 100%;
     max-width: 100%;
+    display: block !important;
+    text-align: center !important;
+    overflow: visible !important;
   }
   #resume-mockup {
     width: 8.5in;
     margin: 0 auto;
     position: relative;
+    display: inline-block !important;
+    text-align: left !important;
+    vertical-align: top !important;
   }
   .preview-page {
     background: white;
@@ -1126,9 +1131,8 @@
       overflow-y: auto;
       overflow-x: hidden !important;
       border-left: none;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      display: block !important;
+      text-align: center !important;
     }
     .preview-pane.scrollable-mode {
       overflow-x: auto !important;
@@ -1142,9 +1146,9 @@
     .preview-wrap {
       width: 100%;
       max-width: 100%;
-      display: flex;
-      justify-content: center;
-      overflow: hidden;
+      display: block !important;
+      text-align: center !important;
+      overflow: visible !important;
     }
 
     #resume-mockup {
@@ -1152,6 +1156,9 @@
       transform-origin: top center;
       width: 816px !important;
       margin: 0 auto;
+      display: inline-block !important;
+      text-align: left !important;
+      vertical-align: top !important;
     }
 
     /* Mobile hamburger toggle */
@@ -4240,14 +4247,38 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='2.5' stroke='%23d1d5db' class='w-4 h-4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E");
   }
 
+  .editor-content-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
   /* ── EDITOR NAVIGATION RAIL ── */
   @media (min-width: 1024px) {
     .editor-pane {
-      padding-left: 68px !important;
+      display: flex !important;
+      flex-direction: row !important;
+      gap: 20px !important;
+      padding: 24px !important;
       position: relative;
     }
     .editor-nav-rail {
       display: flex !important;
+      position: sticky !important;
+      top: 0 !important;
+      left: auto !important;
+      float: none !important;
+      margin-left: 0 !important;
+      flex-shrink: 0 !important;
+      align-self: flex-start !important;
+    }
+    .editor-content-wrapper {
+      flex: 1 !important;
+      min-width: 0 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 16px !important;
     }
     .company-btns {
       flex-wrap: nowrap !important;
