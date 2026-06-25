@@ -54,7 +54,7 @@ export function parseCompanies(raw) {
 
   section.classList.add('visible');
   btnsContainer.innerHTML = companies.map((c, i) =>
-    `<button class="company-copy-btn" id="company-btn-${i}" onclick="copyCompanyExp(${i})">
+    `<button class="company-copy-btn" id="company-btn-${i}" onclick="copyCompanyExp(${i})" type="button">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-right: 6px; display: inline-block; vertical-align: middle;" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path stroke-linecap="round" stroke-linejoin="round" d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
       <span>${escHtml(c.name)} Experience</span>
       <span class="copy-label">Click to copy</span>

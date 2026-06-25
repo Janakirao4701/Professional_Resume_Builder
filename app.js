@@ -98,6 +98,7 @@ window.toggleFullscreenPreview = toggleFullscreenPreview;
 window.undoEdit = undoEdit;
 window.redoEdit = redoEdit;
 window.toggleTheme = toggleTheme;
+window.triggerMobileRename = triggerMobileRename;
 
 // Focus trapping helper for drawer
 function trapFocusInDrawer(e) {
@@ -403,6 +404,7 @@ function toggleDetailsForm() {
     overlay.classList.add('active');
     btn.classList.add('active');
     drawer.setAttribute('aria-hidden', 'false');
+    btn.setAttribute('aria-expanded', 'true');
     document.body.classList.add('fullscreen-lock');
     
     const drawerTitle = document.getElementById('drawer-title');
@@ -418,6 +420,7 @@ function toggleDetailsForm() {
     overlay.classList.remove('active');
     btn.classList.remove('active');
     drawer.setAttribute('aria-hidden', 'true');
+    btn.setAttribute('aria-expanded', 'false');
     
     const mobileMenu = document.getElementById('mobile-menu-drawer');
     const pane = document.querySelector('.preview-pane');
@@ -440,7 +443,10 @@ window.addEventListener('popstate', () => {
     const overlay = document.getElementById('drawer-overlay');
     if (overlay) overlay.classList.remove('active');
     const btn = document.getElementById('toggle-details-btn');
-    if (btn) btn.classList.remove('active');
+    if (btn) {
+      btn.classList.remove('active');
+      btn.setAttribute('aria-expanded', 'false');
+    }
     drawer.setAttribute('aria-hidden', 'true');
     
     const mobileMenu = document.getElementById('mobile-menu-drawer');
@@ -548,7 +554,7 @@ function renderFormFields() {
       <div class="edu-item-card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
           <span style="font-size:10px; color:var(--app-ink-muted); font-weight:700;">EDUCATION #${index+1}</span>
-          <button class="btn-remove" onclick="removeEducationRow(${index})">✕ Remove</button>
+          <button class="btn-remove" onclick="removeEducationRow(${index})" type="button">✕ Remove</button>
         </div>
         <div class="form-grid-mini">
           <input type="text" placeholder="Degree / Program" value="${escHtml(e.degree || '')}" oninput="updateEduField(${index}, 'degree', this.value)" aria-label="Education Degree ${index+1}">
@@ -565,7 +571,7 @@ function renderFormFields() {
     certsContainer.innerHTML = (p.certs || []).filter(c => c !== null && c !== undefined).map((c, index) => `
       <div class="cert-item-row" style="display:flex; gap:8px; margin-bottom:6px;">
         <input type="text" placeholder="Certification Name" value="${escHtml(c || '')}" oninput="updateCertField(${index}, this.value)" class="cert-input" style="flex:1;" aria-label="Certification Name ${index+1}">
-        <button class="btn-remove-icon" onclick="removeCertRow(${index})">✕</button>
+        <button class="btn-remove-icon" onclick="removeCertRow(${index})" type="button">✕</button>
       </div>
     `).join('');
   }
@@ -739,14 +745,19 @@ function setMobileView(view) {
 function toggleMobileMenu(show) {
   const overlay = document.getElementById('mobile-menu-overlay');
   const drawer = document.getElementById('mobile-menu-drawer');
+  const btn = document.getElementById('mobile-menu-btn');
   if (!overlay || !drawer) return;
   if (show) {
     overlay.classList.add('active');
     drawer.classList.add('active');
+    drawer.setAttribute('aria-hidden', 'false');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
     document.body.classList.add('fullscreen-lock');
   } else {
     overlay.classList.remove('active');
     drawer.classList.remove('active');
+    drawer.setAttribute('aria-hidden', 'true');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
     
     const detailsDrawer = document.getElementById('profile-drawer');
     const pane = document.querySelector('.preview-pane');
@@ -778,20 +789,47 @@ function triggerMobileExport() {
   exportProfiles();
 }
 
+function triggerMobileRename() {
+  toggleMobileMenu(false);
+  renameCurrentProfile();
+}
+
 function toggleAccordion(contentId, btnId) {
   const content = document.getElementById(contentId);
   const btn = document.getElementById(btnId);
   if (!content || !btn) return;
 
-  const isExpanded = content.classList.toggle('expanded');
-  btn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+  const isExpanding = !content.classList.contains('expanded');
+  btn.setAttribute('aria-expanded', isExpanding ? 'true' : 'false');
+
+  if (isExpanding) {
+    content.classList.add('expanded');
+    content.style.maxHeight = content.scrollHeight + 'px';
+    
+    const onTransitionEnd = (e) => {
+      if (e.propertyName === 'max-height') {
+        if (content.classList.contains('expanded')) {
+          content.style.maxHeight = 'none';
+        }
+        content.removeEventListener('transitionend', onTransitionEnd);
+      }
+    };
+    content.addEventListener('transitionend', onTransitionEnd);
+  } else {
+    if (content.style.maxHeight === 'none' || !content.style.maxHeight) {
+      content.style.maxHeight = content.scrollHeight + 'px';
+      content.offsetHeight; // force reflow
+    }
+    content.classList.remove('expanded');
+    content.style.maxHeight = '0';
+  }
 
   if (contentId === 'ai-assistant-content') {
     const container = document.querySelector('.ai-assistant-container');
     if (container) {
-      container.classList.toggle('expanded', isExpanded);
+      container.classList.toggle('expanded', isExpanding);
     }
-    if (isExpanded) {
+    if (isExpanding) {
       const select = document.getElementById('ai-role-select');
       if (select && select.value) {
         loadSelectedPrompt();
@@ -800,7 +838,7 @@ function toggleAccordion(contentId, btnId) {
   } else if (contentId === 'jd-content') {
     const container = document.querySelector('.jd-accordion');
     if (container) {
-      container.classList.toggle('expanded', isExpanded);
+      container.classList.toggle('expanded', isExpanding);
     }
   }
 }
@@ -833,7 +871,7 @@ function updateSectionTags() {
     if (found) {
       html += `<span class="tag-pill found">✓ ${sec.label}</span>`;
     } else {
-      html += `<button class="tag-pill missing" onclick="insertSectionTemplate('${sec.id}')">+ Add ${sec.label}</button>`;
+      html += `<button class="tag-pill missing" onclick="insertSectionTemplate('${sec.id}')" type="button">+ Add ${sec.label}</button>`;
     }
   });
 

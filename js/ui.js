@@ -48,8 +48,8 @@ function ensureCustomDialogInDOM() {
         <span id="modal-input-error" class="error-text" style="display: none; font-size: 11px; color: var(--color-pale-red); margin-top: 4px;"></span>
       </div>
       <div class="modal-actions" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 8px;">
-        <button id="modal-cancel-btn" class="btn-dl" style="padding: 4px 12px; font-size: 12px; background:var(--app-bg); color:var(--app-ink); border:1px solid var(--app-border);">Cancel</button>
-        <button id="modal-confirm-btn" class="btn-dl btn-hdr-primary" style="padding: 4px 12px; font-size: 12px; border:none; background:var(--app-accent); color:#fff;">Confirm</button>
+        <button id="modal-cancel-btn" class="btn-dl" type="button" style="padding: 4px 12px; font-size: 12px; background:var(--app-bg); color:var(--app-ink); border:1px solid var(--app-border);">Cancel</button>
+        <button id="modal-confirm-btn" class="btn-dl btn-hdr-primary" type="button" style="padding: 4px 12px; font-size: 12px; border:none; background:var(--app-accent); color:#fff;">Confirm</button>
       </div>
     `;
     document.body.appendChild(dialog);
@@ -243,11 +243,23 @@ function updateThemeToggleIcon() {
   const moonIconMob = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/></svg>`;
 
   if (currentTheme === 'dark') {
-    if (btn) btn.innerHTML = sunIcon;
-    if (mobBtn) mobBtn.innerHTML = `${sunIconMob}<span>Light Mode</span>`;
+    if (btn) {
+      btn.innerHTML = moonIcon;
+      btn.title = "Switch to Light Mode";
+      btn.setAttribute('aria-label', "Switch to Light Mode");
+    }
+    if (mobBtn) {
+      mobBtn.innerHTML = `${moonIconMob}<span>Switch to Light Mode</span>`;
+    }
   } else {
-    if (btn) btn.innerHTML = moonIcon;
-    if (mobBtn) mobBtn.innerHTML = `${moonIconMob}<span>Dark Mode</span>`;
+    if (btn) {
+      btn.innerHTML = sunIcon;
+      btn.title = "Switch to Dark Mode";
+      btn.setAttribute('aria-label', "Switch to Dark Mode");
+    }
+    if (mobBtn) {
+      mobBtn.innerHTML = `${sunIconMob}<span>Switch to Dark Mode</span>`;
+    }
   }
 }
 
@@ -278,7 +290,7 @@ export function toggleShortcutsModal(show) {
         <tr style="border-bottom:1px solid var(--app-border);"><td style="padding:6px 0; color:var(--app-accent); font-weight:600;">? or Ctrl + /</td><td>Toggle Shortcuts Help</td></tr>
       </table>
       <div style="margin-top:16px; text-align:right;">
-        <button onclick="document.getElementById('shortcuts-modal-dialog').close()" class="btn-dl" style="padding:4px 12px; font-size:12px; background:var(--app-bg); border:1px solid var(--app-border); color:var(--app-ink);">Close</button>
+        <button onclick="document.getElementById('shortcuts-modal-dialog').close()" class="btn-dl" type="button" style="padding:4px 12px; font-size:12px; background:var(--app-bg); border:1px solid var(--app-border); color:var(--app-ink);">Close</button>
       </div>
     `;
     document.body.appendChild(modal);

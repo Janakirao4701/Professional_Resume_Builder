@@ -57,7 +57,7 @@ export function adjustPreviewScale() {
   const mockup = document.getElementById('resume-mockup');
   if (!pane || !mockup) return;
   
-  const paneWidth = pane.clientWidth - 32;
+  const paneWidth = pane.clientWidth - 80;
   const mockupWidth = mockup.offsetWidth;
   const mockupHeight = mockup.offsetHeight;
   
@@ -83,13 +83,18 @@ export function adjustPreviewScale() {
   
   if (scale < 1.0 || (currentZoomScale !== 'auto' && scale !== 1.0)) {
     const heightReduction = mockupHeight * (1 - scale);
+    const widthReduction = mockupWidth * (1 - scale);
     mockup.style.transform = `scale(${scale})`;
     mockup.style.transformOrigin = 'top center';
     mockup.style.marginBottom = `-${heightReduction}px`;
+    mockup.style.marginLeft = `-${widthReduction / 2}px`;
+    mockup.style.marginRight = `-${widthReduction / 2}px`;
   } else {
     mockup.style.transform = 'none';
     mockup.style.transformOrigin = 'initial';
     mockup.style.marginBottom = '0';
+    mockup.style.marginLeft = '0';
+    mockup.style.marginRight = '0';
   }
   
   requestAnimationFrame(() => {

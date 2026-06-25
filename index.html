@@ -56,7 +56,7 @@
     </div>
 
     <!-- Mobile Hamburger Menu Button -->
-    <button class="mobile-menu-toggle" id="landing-mobile-menu-btn" onclick="toggleLandingMenu(true)" title="Menu" aria-label="Open navigation menu">
+    <button class="mobile-menu-toggle" id="landing-mobile-menu-btn" onclick="toggleLandingMenu(true)" title="Menu" aria-label="Open navigation menu" type="button" aria-expanded="false">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
       </svg>
@@ -65,10 +65,10 @@
 
   <!-- Mobile Drawer and Overlay -->
   <div class="mobile-menu-overlay" id="landing-menu-overlay" onclick="toggleLandingMenu(false)"></div>
-  <div class="mobile-menu-drawer" id="landing-menu-drawer">
+  <div class="mobile-menu-drawer" id="landing-menu-drawer" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="landing-drawer-title">
     <div class="drawer-title-row">
-      <h3>Navigation</h3>
-      <button class="drawer-close-btn" onclick="toggleLandingMenu(false)" aria-label="Close navigation menu">✕</button>
+      <h3 id="landing-drawer-title">Navigation</h3>
+      <button class="drawer-close-btn" onclick="toggleLandingMenu(false)" aria-label="Close" type="button">✕</button>
     </div>
     <div class="drawer-card">
       <nav class="mobile-nav-stack" aria-label="Mobile Navigation">
@@ -486,7 +486,7 @@
         <div class="faq-accordion-container">
           
           <div class="faq-item" id="faq-1">
-            <button class="faq-header" onclick="toggleFaq(1)" aria-expanded="false" aria-controls="faq-answer-1">
+            <button class="faq-header" onclick="toggleFaq(1)" aria-expanded="false" aria-controls="faq-answer-1" type="button">
               <span>Is this resume builder completely free?</span>
               <svg class="faq-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
             </button>
@@ -496,7 +496,7 @@
           </div>
 
           <div class="faq-item" id="faq-2">
-            <button class="faq-header" onclick="toggleFaq(2)" aria-expanded="false" aria-controls="faq-answer-2">
+            <button class="faq-header" onclick="toggleFaq(2)" aria-expanded="false" aria-controls="faq-answer-2" type="button">
               <span>How does the AI Tailoring Assistant work?</span>
               <svg class="faq-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
             </button>
@@ -506,7 +506,7 @@
           </div>
 
           <div class="faq-item" id="faq-3">
-            <button class="faq-header" onclick="toggleFaq(3)" aria-expanded="false" aria-controls="faq-answer-3">
+            <button class="faq-header" onclick="toggleFaq(3)" aria-expanded="false" aria-controls="faq-answer-3" type="button">
               <span>Are my resumes saved securely?</span>
               <svg class="faq-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
             </button>
@@ -516,7 +516,7 @@
           </div>
 
           <div class="faq-item" id="faq-4">
-            <button class="faq-header" onclick="toggleFaq(4)" aria-expanded="false" aria-controls="faq-answer-4">
+            <button class="faq-header" onclick="toggleFaq(4)" aria-expanded="false" aria-controls="faq-answer-4" type="button">
               <span>What layout options do you support?</span>
               <svg class="faq-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"/></svg>
             </button>
@@ -592,12 +592,18 @@
     function toggleLandingMenu(open) {
       const drawer = document.getElementById('landing-menu-drawer');
       const overlay = document.getElementById('landing-menu-overlay');
+      const btn = document.getElementById('landing-mobile-menu-btn');
+      if (!drawer || !overlay) return;
       if (open) {
         drawer.classList.add('active');
         overlay.classList.add('active');
+        drawer.setAttribute('aria-hidden', 'false');
+        if (btn) btn.setAttribute('aria-expanded', 'true');
       } else {
         drawer.classList.remove('active');
         overlay.classList.remove('active');
+        drawer.setAttribute('aria-hidden', 'true');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
       }
     }
 

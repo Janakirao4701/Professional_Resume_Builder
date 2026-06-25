@@ -39,7 +39,7 @@
       <span class="badge-label">ATS</span>
       <span class="badge-score-val" id="header-ats-score-val">--</span>
     </div>
-    <button class="btn-hdr-action btn-hdr-primary" onclick="toggleDetailsForm()" id="toggle-details-btn" title="Edit Profile Details" aria-label="Edit Profile Details">
+    <button class="btn-hdr-action btn-hdr-primary" onclick="toggleDetailsForm()" id="toggle-details-btn" title="Edit Profile Details" aria-label="Edit Profile Details" type="button">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Info
     </button>
   </div>
@@ -48,13 +48,13 @@
     <button class="btn-hdr-action theme-toggle-btn-round" onclick="toggleTheme()" id="theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Theme" type="button">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
     </button>
-    <button class="btn-dl" id="pdf-btn">
+    <button class="btn-dl" id="pdf-btn" type="button">
       <span>Download PDF</span>
       <span class="btn-arrow-circle">
         <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 5v14m0 0l4-4m-4 4l-4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </span>
     </button>
-    <button class="btn-dl" id="dl-btn">
+    <button class="btn-dl" id="dl-btn" type="button">
       <span>Download DOCX</span>
       <span class="btn-arrow-circle">
         <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l4-4m-4 4l-4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -63,7 +63,7 @@
   </div>
 
   <!-- Mobile Hamburger Menu Button -->
-  <button class="mobile-menu-toggle" id="mobile-menu-btn" onclick="toggleMobileMenu(true)" title="Menu" aria-label="Open menu">
+  <button class="mobile-menu-toggle" id="mobile-menu-btn" onclick="toggleMobileMenu(true)" title="Menu" aria-label="Open menu" type="button">
     <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
     </svg>
@@ -73,25 +73,25 @@
 <!-- Secondary Profile Management Toolbar Strip -->
 <div class="sub-header-toolbar">
   <div class="toolbar-left">
-    <button class="btn-hdr-action" onclick="createNewProfile()" title="Create Blank Profile" aria-label="Create Blank Profile">
+    <button class="btn-hdr-action" onclick="createNewProfile()" title="Create Blank Profile" aria-label="Create Blank Profile" type="button">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
       <span>New Profile</span>
     </button>
-    <button class="btn-hdr-action" onclick="renameCurrentProfile()" title="Rename Current Profile" aria-label="Rename Current Profile">
+    <button class="btn-hdr-action" onclick="renameCurrentProfile()" title="Rename Current Profile" aria-label="Rename Current Profile" type="button">
       <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg>
       <span>Rename</span>
     </button>
-    <button class="btn-hdr-action btn-hdr-danger" onclick="deleteCurrentProfileConfirm(event)" title="Delete Current Profile" aria-label="Delete Current Profile" id="delete-profile-btn">
+    <button class="btn-hdr-action btn-hdr-danger" onclick="deleteCurrentProfileConfirm(event)" title="Delete Current Profile" aria-label="Delete Current Profile" id="delete-profile-btn" type="button">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
       <span>Delete</span>
     </button>
   </div>
   <div class="toolbar-right">
-    <button class="btn-hdr-action" onclick="triggerImport()" title="Import JSON Profiles">
+    <button class="btn-hdr-action" onclick="triggerImport()" title="Import JSON Profiles" type="button">
       <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>
       <span>Import JSON</span>
     </button>
-    <button class="btn-hdr-action" onclick="exportProfiles()" title="Export JSON Backup">
+    <button class="btn-hdr-action" onclick="exportProfiles()" title="Export JSON Backup" type="button">
       <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5" /></svg>
       <span>Export Backup</span>
     </button>
@@ -105,7 +105,7 @@
 <div class="mobile-menu-drawer" id="mobile-menu-drawer">
   <div class="drawer-title-row">
     <h3>Settings & Actions</h3>
-    <button class="drawer-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close menu">
+    <button class="drawer-close-btn" onclick="toggleMobileMenu(false)" aria-label="Close menu" type="button">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
     </button>
   </div>
@@ -119,18 +119,21 @@
       </select>
     </div>
     
-    <button class="drawer-action-btn" onclick="toggleDetailsForm(); toggleMobileMenu(false);">
+    <button class="drawer-action-btn" onclick="toggleDetailsForm(); toggleMobileMenu(false);" type="button">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg>Edit Profile Info
     </button>
-    <button class="drawer-action-btn" onclick="toggleTheme(); toggleMobileMenu(false);" id="mobile-theme-toggle-btn">
+    <button class="drawer-action-btn" onclick="toggleTheme(); toggleMobileMenu(false);" id="mobile-theme-toggle-btn" type="button">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" /></svg>
       <span>Toggle Theme</span>
     </button>
-    <button class="drawer-action-btn" onclick="createNewProfile(); toggleMobileMenu(false);">
+    <button class="drawer-action-btn" onclick="createNewProfile(); toggleMobileMenu(false);" type="button">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>New Profile
     </button>
-
-    <button class="drawer-action-btn btn-danger" onclick="deleteCurrentProfileConfirm(event, 'mobile-delete-profile-btn')" id="mobile-delete-profile-btn">
+    <button class="drawer-action-btn" onclick="triggerMobileRename();" id="mobile-rename-profile-btn" type="button">
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487Zm0 0L19.5 7.125" /></svg>
+      <span>Rename Profile</span>
+    </button>
+    <button class="drawer-action-btn btn-danger" onclick="deleteCurrentProfileConfirm(event, 'mobile-delete-profile-btn')" id="mobile-delete-profile-btn" type="button">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" /></svg>
       <span>Delete Profile</span>
     </button>
@@ -138,11 +141,11 @@
   
   <div class="drawer-card">
     <div class="drawer-card-title">Export Options</div>
-    <button class="drawer-action-btn" onclick="triggerMobilePDF();">
+    <button class="drawer-action-btn" onclick="triggerMobilePDF();" type="button">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px;"><path d="M12 5v14m0 0l4-4m-4 4l-4-4M5 19h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Download PDF
     </button>
-    <button class="drawer-action-btn" onclick="triggerMobileDOCX();">
+    <button class="drawer-action-btn" onclick="triggerMobileDOCX();" type="button">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 4px;"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m0 0l4-4m-4 4l-4-4"/></svg>
       Download DOCX
     </button>
@@ -150,10 +153,10 @@
 
   <div class="drawer-card">
     <div class="drawer-card-title">Backup & Migration</div>
-    <button class="drawer-action-btn" onclick="triggerMobileImport();" style="background: var(--app-surface); border-color: var(--app-border); color: var(--app-ink);">
+    <button class="drawer-action-btn" onclick="triggerMobileImport();" style="background: var(--app-surface); border-color: var(--app-border); color: var(--app-ink);" type="button">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></svg>Import JSON Profiles
     </button>
-    <button class="drawer-action-btn" onclick="triggerMobileExport();" style="background: var(--app-surface); border-color: var(--app-border); color: var(--app-ink);">
+    <button class="drawer-action-btn" onclick="triggerMobileExport();" style="background: var(--app-surface); border-color: var(--app-border); color: var(--app-ink);" type="button">
       <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 7.5L12 3m0 0L7.5 7.5M12 3v13.5" /></svg>Export JSON Backup
     </button>
   </div>
@@ -161,13 +164,13 @@
 
 <!-- Mobile Floating Navigation Bar -->
 <div class="mobile-floating-nav" id="mobile-floating-nav">
-  <button class="mobile-nav-item active" id="mobile-nav-edit" onclick="setMobileView('edit')">
+  <button class="mobile-nav-item active" id="mobile-nav-edit" onclick="setMobileView('edit')" type="button">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
     </svg>
     <span>Editor</span>
   </button>
-  <button class="mobile-nav-item" id="mobile-nav-preview" onclick="setMobileView('preview')">
+  <button class="mobile-nav-item" id="mobile-nav-preview" onclick="setMobileView('preview')" type="button">
     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.43 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
       <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -187,7 +190,7 @@
       <!-- ✨ AI Tailoring Assistant Accordion Panel -->
       <div class="ai-assistant-container double-bezel-outer">
         <div class="double-bezel-inner" style="padding: 0;">
-          <button class="ai-assistant-header" id="ai-assistant-toggle" onclick="toggleAccordion('ai-assistant-content', 'ai-assistant-toggle')" aria-expanded="false" aria-controls="ai-assistant-content">
+          <button class="ai-assistant-header" id="ai-assistant-toggle" onclick="toggleAccordion('ai-assistant-content', 'ai-assistant-toggle')" aria-expanded="false" aria-controls="ai-assistant-content" type="button">
             <span class="header-title">✨ AI Tailoring Assistant</span>
             <svg class="chevron-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
@@ -229,7 +232,7 @@
               <div class="step-num">Step 3</div>
               <div class="step-label">Copy & Open Preferred AI Tool</div>
               <div class="ai-actions-row">
-                <button class="btn-copy-prompt" id="btn-copy-prompt" onclick="copyAIPrompt()">
+                <button class="btn-copy-prompt" id="btn-copy-prompt" onclick="copyAIPrompt()" type="button">
                   <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="margin-right: 6px; vertical-align: middle; display: inline-block;">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0013.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0A2.25 2.25 0 0113.5 4.75h-3a2.25 2.25 0 01-2.166-1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 01-.75.75H9a.75.75 0 01-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.346.102.637.318.806.622L18 7.5V19.5a2.25 2.25 0 01-2.25 2.25H8.25A2.25 2.25 0 016 19.5V7.5l1.112-2.012a1.125 1.125 0 01.806-.622" />
                   </svg>
@@ -248,7 +251,7 @@
                 <div class="step-num">Step 4</div>
                 <div class="step-label">Paste refined resume text back into editor</div>
               </div>
-              <button class="btn-toolbar" id="step4-paste-btn" onclick="pasteRefinedText()" style="font-family: inherit; font-size: 11px; padding: 4px 10px; background: var(--color-mint-whisper); color: #166534; border: 1px solid #bbf7d0; border-radius: 4px; display: flex; align-items: center; gap: 4px;">
+              <button class="btn-toolbar btn-step4-paste" id="step4-paste-btn" onclick="pasteRefinedText()" type="button">
                 <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                 <span>Paste Refined Text</span>
               </button>
@@ -266,17 +269,17 @@
               <input type="file" id="mobile-text-import" style="display:none;" accept=".txt,.json" onchange="handleMobileFileImport(event)">
             </div>
             <div class="editor-toolbar-actions" style="display: flex; gap: 4px; align-items: center;">
-              <button class="btn-toolbar" id="paste-btn" onclick="pasteFromClipboard()">
+              <button class="btn-toolbar" id="paste-btn" onclick="pasteFromClipboard()" type="button">
                 <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink: 0;" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
                 <span>Paste</span>
               </button>
-              <button class="btn-toolbar" id="undo-btn" onclick="undoEdit()" disabled title="Undo (Ctrl+Z)">
+              <button class="btn-toolbar" id="undo-btn" onclick="undoEdit()" disabled title="Undo (Ctrl+Z)" type="button">
                 <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/></svg>
                 <span>Undo</span>
               </button>
-              <button class="btn-toolbar" id="redo-btn" onclick="redoEdit()" disabled title="Redo (Ctrl+Y)">
+              <button class="btn-toolbar" id="redo-btn" onclick="redoEdit()" disabled title="Redo (Ctrl+Y)" type="button">
                 <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l6-6m0 0l-6-6m6 6H9a6 6 0 000 12h3"/></svg>
                 <span>Redo</span>
               </button>
@@ -284,7 +287,7 @@
           </div>
           <textarea id="resume-text" spellcheck="false" placeholder="Company | Location | Role | Dates&#10;- Bullet point 1&#10;- Bullet point 2" aria-label="Resume experience and details editor"></textarea>
           <div class="tag-hint" id="section-tags-container"></div>
-          <div class="editor-word-count" id="editor-word-count" style="font-size: 10px; color: var(--color-fog); text-align: right; padding: 4px 12px; border-top: 1px solid var(--color-chalk); background: var(--color-mist);">0 words | 0 chars</div>
+          <div class="editor-word-count" id="editor-word-count">0 words | 0 chars</div>
         </div>
       </div>
 
@@ -300,8 +303,8 @@
           </button>
           <div class="jd-content-pane accordion-content" id="jd-content">
             <div style="padding: 12px 16px;">
-              <textarea id="jd-text" placeholder="Paste the target job description here to analyze keyword match rate..." aria-label="Job description for keyword matching" style="min-height: 120px; width: 100%; border: 1px solid var(--color-chalk); border-radius: 6px; padding: 10px; font-size: 12px; font-family: var(--font-tt-commons); background: var(--color-paper); resize: vertical; outline: none;"></textarea>
-              <div class="jd-word-count" id="jd-word-count" style="font-size: 10px; color: var(--color-fog); text-align: right; margin-top: 4px;">0 words</div>
+              <textarea id="jd-text" placeholder="Paste the target job description here to analyze keyword match rate..." aria-label="Job description for keyword matching"></textarea>
+              <div class="jd-word-count" id="jd-word-count">0 words</div>
             </div>
           </div>
         </div>
@@ -309,10 +312,10 @@
 
       <!-- Always Visible Analyze Button -->
       <div style="margin-top: 16px;">
-        <button class="btn-dl analyze-btn-full" id="analyze-btn" type="button" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border-radius: 8px; background: var(--color-signal-blue); color: var(--color-paper); border: none; font-weight: 600; cursor: pointer; transition: background 0.15s;">
+        <button class="btn-dl analyze-btn-full" id="analyze-btn" type="button">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5" /></svg>
           <span>Analyze ATS Score</span>
-          <span class="btn-arrow-circle" style="background: rgba(255, 255, 255, 0.25); display: flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%;">
+          <span class="btn-arrow-circle">
             <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </span>
         </button>
@@ -454,7 +457,7 @@
 <div class="profile-drawer" id="profile-drawer" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
   <div class="drawer-header">
     <div class="drawer-title" id="drawer-title" style="display:flex; align-items:center; gap:6px;"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="flex-shrink:0;" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.828c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 0 1 0-.255c.007-.378-.138-.75-.43-.991l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg> Edit Profile Details</div>
-    <button class="btn-drawer-close" onclick="toggleDetailsForm()" aria-label="Close details drawer">
+    <button class="btn-drawer-close" onclick="toggleDetailsForm()" aria-label="Close" type="button">
       <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
     </button>
   </div>
@@ -497,7 +500,7 @@
     
     <div class="form-section-title" style="display:flex; justify-content:space-between; align-items:center;">
       <span>Education</span>
-      <button class="btn-small" onclick="addEducationRow()">+ Add Education</button>
+      <button class="btn-small" onclick="addEducationRow()" type="button">+ Add Education</button>
     </div>
     <div id="education-fields-container" class="fields-list">
       <!-- Populated dynamically -->
@@ -507,14 +510,14 @@
     
     <div class="form-section-title" style="display:flex; justify-content:space-between; align-items:center;">
       <span>Certifications</span>
-      <button class="btn-small" onclick="addCertRow()">+ Add Certification</button>
+      <button class="btn-small" onclick="addCertRow()" type="button">+ Add Certification</button>
     </div>
     <div id="certs-fields-container" class="fields-list">
       <!-- Populated dynamically -->
     </div>
   </div>
   <div class="drawer-footer">
-    <button class="btn-hdr-action" onclick="toggleDetailsForm()">Close Drawer</button>
+    <button class="btn-hdr-action" onclick="toggleDetailsForm()" type="button">Close Drawer</button>
   </div>
 </div>
 

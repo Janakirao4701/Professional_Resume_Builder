@@ -147,7 +147,7 @@
     align-items: center;
     gap: 16px;
     padding: 12px 24px;
-    flex-wrap: wrap; /* Safe wrapping for smaller screens */
+    flex-wrap: nowrap; /* Safe wrapping for smaller screens */
     border-bottom: 1px solid var(--color-chalk);
     position: sticky;
     top: 0;
@@ -172,7 +172,7 @@
     border: 1px solid var(--color-chalk);
     border-radius: 36px;
     padding: 4px 12px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
   
   .hdr-label {
@@ -292,12 +292,12 @@
   }
   .btn-dl:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  #pdf-btn {
+  #pdf-btn, #dl-btn {
     background: var(--color-signal-blue);
     color: var(--color-paper);
     border: 1px solid var(--color-signal-blue);
   }
-  #pdf-btn:hover {
+  #pdf-btn:hover, #dl-btn:hover {
     background: var(--color-deep-signal);
     border-color: var(--color-deep-signal);
     color: var(--color-paper);
@@ -332,7 +332,7 @@
   @media (min-width: 1024px) {
     .app-workspace {
       display: grid;
-      grid-template-columns: 460px 1fr;
+      grid-template-columns: 500px 1fr;
       height: calc(100vh - 57px);
       overflow: hidden;
     }
@@ -447,7 +447,6 @@
     color: var(--color-ink);
     background: var(--color-paper);
     resize: vertical;
-    outline: none;
   }
 
   .tag-hint {
@@ -1412,7 +1411,6 @@
     padding: 0 16px;
   }
   .ai-assistant-container.expanded .ai-assistant-content {
-    max-height: 1000px; /* Large enough to display contents */
     padding-bottom: 16px;
     border-top: 1px solid var(--color-chalk);
     padding-top: 16px;
@@ -1425,7 +1423,7 @@
     margin-bottom: 0;
   }
   .ai-step .step-num {
-    font-size: 9px;
+    font-size: 10px;
     font-weight: 800;
     color: var(--color-signal-blue);
     text-transform: uppercase;
@@ -1434,7 +1432,7 @@
     font-family: var(--font-tt-commons);
   }
   .ai-step .step-label {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--color-pencil);
     margin-bottom: 8px;
   }
@@ -1470,7 +1468,7 @@
     border: none;
     outline: none;
     color: var(--color-ink);
-    font-family: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', Consolas, monospace;
+    font-family: 'SFMono-Regular', Consolas, "Liberation Mono", Menlo, monospace;
     font-size: 11px;
     line-height: 1.5;
     resize: none;
@@ -2880,7 +2878,7 @@
     background: var(--color-mist);
     border-radius: 16px;
     box-sizing: border-box;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
+    transition: border-color 0.3s ease;
   }
   .double-bezel-outer:hover {
     border-color: var(--color-haze);
@@ -3051,7 +3049,6 @@
   }
   
   .jd-content-pane.expanded {
-    max-height: 500px;
     margin-top: 8px;
   }
   
@@ -3064,7 +3061,6 @@
     padding: 8px 12px;
     font-size: 12px;
     line-height: 1.5;
-    outline: none;
     resize: vertical;
     font-family: inherit;
     color: var(--color-ink);
@@ -3430,7 +3426,7 @@
     background: var(--color-signal-blue) !important;
     color: white !important;
     border-color: var(--color-signal-blue) !important;
-    border-radius: 8px;
+    border-radius: var(--radius-buttons);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     transition: all 0.2s ease;
@@ -3507,7 +3503,7 @@
     gap: 2px;
     background: var(--color-paper);
     border: 1px solid var(--color-chalk);
-    border-radius: 6px;
+    border-radius: var(--radius-buttons);
     padding: 3px;
     z-index: 150;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -3520,7 +3516,7 @@
     padding: 4px 8px;
     font-size: 11px;
     font-weight: 500;
-    border-radius: 4px;
+    border-radius: var(--radius-buttons);
     cursor: pointer;
     transition: all 0.15s ease;
     font-family: var(--font-tt-commons);
@@ -3991,4 +3987,47 @@
   .tag-pill.missing:hover {
     background: #fecaca;
     color: #7f1d1d;
+  }
+
+  /* ── AUDIT REMEDIATION CLASSES ── */
+  .btn-step4-paste {
+    color: #166534 !important;
+    border: 1px solid #bbf7d0 !important;
+    background: #f0fdf4 !important;
+  }
+  .btn-step4-paste:hover {
+    background: #dcfce7 !important;
+  }
+  
+  [data-theme="dark"] .btn-step4-paste {
+    color: #a7f3d0 !important;
+    border-color: #047857 !important;
+    background: #064e3b !important;
+  }
+  [data-theme="dark"] .btn-step4-paste:hover {
+    background: #022c22 !important;
+  }
+
+  .editor-word-count {
+    font-size: 10px;
+    color: var(--color-fog);
+    text-align: right;
+    padding: 4px 12px;
+    border-top: 1px solid var(--color-chalk);
+    background: var(--color-mist);
+    min-height: 20px;
+  }
+  
+  .jd-word-count {
+    font-size: 10px;
+    color: var(--color-fog);
+    text-align: right;
+    margin-top: 4px;
+    min-height: 16px;
+  }
+
+  /* Dark mode contrast overrides for small label/subtitle texts */
+  [data-theme="dark"] .zone-sub,
+  [data-theme="dark"] .ai-step .step-label {
+    color: #d1d5db !important;
   }
