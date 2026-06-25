@@ -938,10 +938,13 @@ window.addEventListener('DOMContentLoaded', () => {
   detectSectionsAndCompanies();
   updatePreviewImmediate();
 
-  // 5. Render ATS results if stored
-  if (activeProfile.ats_results) {
+  // 5. Render ATS results if stored and JD is present
+  const savedJD = localStorage.getItem('resume_builder_saved_jd');
+  const hasJD = savedJD && savedJD.trim();
+
+  if (hasJD && activeProfile.ats_results) {
     renderScoringUI(activeProfile.ats_results);
-  } else {
+  } else if (hasJD) {
     const savedResults = localStorage.getItem('resume_builder_ats_results');
     if (savedResults) {
       try {
@@ -951,10 +954,14 @@ window.addEventListener('DOMContentLoaded', () => {
         renderScoringUI(data);
       } catch (e) {
         console.warn('Could not restore saved ATS results:', e);
+        clearScoringUI();
       }
     } else {
       clearScoringUI();
     }
+  } else {
+    clearScoringUI();
+    activeProfile.ats_results = null;
   }
   
   // Record first state for undo history
@@ -963,15 +970,22 @@ window.addEventListener('DOMContentLoaded', () => {
   // 6. Bind Job Description events
   const jdTextarea = document.getElementById('jd-text');
   if (jdTextarea) {
-    const savedJD = localStorage.getItem('resume_builder_saved_jd');
-    if (savedJD) {
-      jdTextarea.value = savedJD;
+    const savedJDVal = localStorage.getItem('resume_builder_saved_jd');
+    if (savedJDVal) {
+      jdTextarea.value = savedJDVal;
     }
     
     function updateJDWordCount() {
       const words = jdTextarea.value.trim() ? jdTextarea.value.trim().split(/\s+/).length : 0;
       const wcEl = document.getElementById('jd-word-count');
       if (wcEl) wcEl.textContent = `${words} word${words !== 1 ? 's' : ''}`;
+      
+      // Auto clear ATS results if JD is cleared
+      if (!jdTextarea.value.trim()) {
+        clearScoringUI();
+        activeProfile.ats_results = null;
+        saveToStorage();
+      }
     }
     
     updateJDWordCount();
