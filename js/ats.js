@@ -12,8 +12,7 @@ export async function analyzeATSScore() {
     return;
   }
   if (!jdText || !jdText.trim()) {
-    showToast("Please paste a target Job Description first to analyze the ATS match score.");
-    return;
+    showToast("Analyzing general resume quality and formatting...");
   }
 
   const loadingOverlay = document.getElementById('scoring-loading');
