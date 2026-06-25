@@ -13,6 +13,14 @@ export function parseContent(raw) {
   const kMatch = raw.match(skillsRx);
   const eMatch = raw.match(experienceRx);
 
+  if (!sMatch && !kMatch && !eMatch) {
+    return {
+      summary: '',
+      skills: '',
+      experience: raw.trim()
+    };
+  }
+
   return {
     summary: sMatch ? sMatch[1].trim() : '',
     skills: kMatch ? kMatch[1].trim() : '',
