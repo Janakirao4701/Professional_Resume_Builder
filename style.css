@@ -1652,7 +1652,7 @@
     align-items: center;
     justify-content: center;
     line-height: 1.2;
-    height: 48px;
+    min-height: 48px;
     box-sizing: border-box;
     transition: background-color 0.15s ease, transform 0.1s ease;
   }
@@ -1679,7 +1679,7 @@
     align-items: center;
     justify-content: center;
     line-height: 1.2;
-    height: 48px;
+    min-height: 48px;
     box-sizing: border-box;
     transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
   }
@@ -2726,6 +2726,15 @@
     .grid-2-col {
       grid-template-columns: 1fr;
       gap: var(--spacing-40);
+    }
+    
+    .hero-actions-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .hero-actions-row a {
+      width: 100%;
     }
     
     .grid-3-col {
