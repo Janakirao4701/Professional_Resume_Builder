@@ -244,17 +244,7 @@ export async function downloadDocx() {
         properties:{
           page:{
             size:{width:12240,height:15840},
-            margin:{top:720,right:720,bottom:720,left:720},
-            borders: {
-              pageBorders: {
-                display: 'allPages',
-                offsetFrom: 'page'
-              },
-              pageBorderTop: { style: 'single', size: 4, space: 24, color: '000000' },
-              pageBorderLeft: { style: 'single', size: 4, space: 24, color: '000000' },
-              pageBorderBottom: { style: 'single', size: 4, space: 24, color: '000000' },
-              pageBorderRight: { style: 'single', size: 4, space: 24, color: '000000' }
-            }
+            margin:{top:720,right:720,bottom:720,left:720}
           }
         },
         children:[

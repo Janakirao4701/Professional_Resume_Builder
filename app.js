@@ -314,7 +314,7 @@ let deleteConfirmTimeout = null;
 function deleteCurrentProfileConfirm(event, btnId = 'delete-profile-btn') {
   if (event) event.stopPropagation();
   
-  const btn = document.getElementById(btnId);
+  const btn = document.getElementById(btnId) || (event ? event.currentTarget : null);
   if (!btn) return;
   
   const span = btn.querySelector('span');
@@ -605,6 +605,7 @@ async function importProfiles(event) {
       const merged = { ...profiles, ...cleanData };
       setProfiles(merged);
       upgradeAllProfiles();
+      updateProfileSelectDropdown();
       
       switchProfile(Object.keys(cleanData)[0]);
       showToast("Profiles imported successfully!");

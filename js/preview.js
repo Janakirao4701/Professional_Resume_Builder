@@ -211,16 +211,7 @@ export function updatePreviewRaw() {
     }
   });
 
-  // Dynamically inject non-printable Page X of Y indicators
-  const pages = mockup.querySelectorAll('.preview-page');
-  const totalPages = pages.length;
-  pages.forEach((page, index) => {
-    const pNum = index + 1;
-    const indicator = document.createElement('div');
-    indicator.className = 'page-indicator';
-    indicator.textContent = `Page ${pNum} of ${totalPages}`;
-    page.parentNode.insertBefore(indicator, page);
-  });
+
 
   if (typeof window.updateCombinedPromptPreview === 'function') {
     window.updateCombinedPromptPreview();

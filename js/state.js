@@ -189,6 +189,77 @@ export function initProfiles() {
   if (!profiles || typeof profiles !== 'object' || Object.keys(profiles).length === 0) {
     profiles = { default: JSON.parse(JSON.stringify(DEFAULT_PROFILE_DATA)) };
   }
+
+  // Seed the Hardhik profile if it doesn't exist
+  if (!profiles.hardhik) {
+    profiles.hardhik = {
+      profile: {
+        name: "Hardhik Rao Chidura",
+        subtitle: "PLC Controls & Automation | HMI/SCADA Engineer",
+        email: "hardhikraochidura@gmail.com",
+        phone: "+1 (845) 484-9588",
+        location: "Wyoming, USA",
+        linkedin: "linkedin.com/in/hardhik-rao-chidura-9882a9248",
+        education: [
+          {
+            degree: "Master of Science in Information Systems",
+            dates: "08/2022 - 05/2024",
+            school: "Marist University",
+            location: "New York, USA"
+          },
+          {
+            degree: "Bachelor of Science in Computer Science and Engineering",
+            dates: "07/2017 - 04/2020",
+            school: "Nishitha Degree College",
+            location: "India"
+          }
+        ],
+        certs: []
+      },
+      text: `[PROFESSIONAL SUMMARY]
+Controls Engineer with 4+ years of experience in PLC programming, HMI/SCADA development, commissioning, and industrial automation. Expertise in Allen-Bradley, Siemens, and Delta control systems, with hands-on experience in FactoryTalk View, Ignition Perspective, WinCC, OPC UA, and Modbus TCP/IP. Skilled in FAT/SAT, industrial networking, Python automation, and control system integration. Proven ability to improve system reliability, reduce downtime, and support manufacturing operations across automotive, defense, and industrial environments.
+
+[TECHNICAL SKILLS]
+- PLC & Industrial Controls: Allen-Bradley Logix 5000, CompactLogix, Studio 5000, Siemens S7-1200/1500, Siemens TIA Portal, Delta DVP Series, WPLSoft, Beckhoff TwinCAT, IEC 61131-3 (Ladder Logic, Structured Text, Function Block Diagram).
+- HMI & SCADA: FactoryTalk View, Siemens WinCC, AVEVA InTouch, Indusoft Web Studio, Ignition Vision, Ignition Perspective, Alarm Management, Historian Integration, Dashboard Development.
+- Vision & Inspection Systems: Cognex D905, Cognex ViDi Suite, Keyence Vision Systems, Keyence Barcode Scanners, OCR Validation, VIN Verification, Conveyor Inspection Systems.
+- Industrial Communication: OPC UA, Modbus TCP/IP, Ethernet/IP, TCP/IP, DeviceNet, Profibus, CAN Bus, PLC-HMI Integration, SCADA Networking.
+- Programming & Databases: Python, C#, SQL, OSIsoft PI System, Historian Integration, Data Logging, Automation Scripting, Operational Reporting.
+- Electrical Design & Commissioning: AutoCAD Electrical, Electrical Panel Testing, Wiring Diagrams, I/O Validation, FAT, SAT, CAT, System-Level Troubleshooting, Onsite Commissioning.
+- Compliance & Cybersecurity: SIL, IEC 61131-3, OSHA Standards, NERC-CIP, 21 CFR Part 11, GAMP 5, ServiceNow Change Management.
+- Other: Material Handling Systems, Automotive Fixture Automation, Defense Systems Integration, Switchgear & Power Distribution Systems, Industrial Engineering Automation, Process Optimization, Industrial Networking.
+
+[PROFESSIONAL EXPERIENCE]
+BW Design Group | USA | HMI/SCADA Engineer | 04/2025 - Present
+- Engineered FactoryTalk View and Ignition Perspective HMIs integrated with Allen-Bradley PLCs, improving production visibility and operator efficiency by 15%.
+- Configured Siemens TIA Portal, Beckhoff TwinCAT, and Studio 5000 PLC logic for robotic manufacturing and automated assembly systems.
+- Implemented Cognex D905 OCR validation for VIN inspection systems, improving traceability and reducing manual verification efforts.
+- Migrated legacy SCADA applications to AVEVA InTouch and Indusoft Web Studio, improving alarm management and system maintainability.
+- Optimized OPC UA, TCP/IP, and Modbus networks connecting PLCs and SCADA systems, improving communication reliability.
+- Established NERC-CIP compliant security controls and ServiceNow workflows, strengthening industrial cybersecurity compliance.
+- Developed Ignition Perspective dashboards with centralized alarms, increasing manufacturing system uptime by 17%.
+- Reduced barcode validation failures by 29% through Cognex OCR optimization and PLC-based verification logic.
+- Accelerated FAT, SAT, and commissioning activities by 26% using standardized HMI templates and PLC modules.
+- Created reusable PLC function blocks and programming templates, reducing development effort by 30%.
+- Partnered with engineering and operations teams to resolve production issues, reducing downtime and improving overall equipment effectiveness (OEE).
+
+BAE Systems | USA | PLC & Automation Engineer | 06/2024 – 03/2025
+- Developed Siemens S7-1200/1500 and Delta DVP PLC automation systems using TIA Portal and WPLSoft, improving process sequencing accuracy and operational consistency across defense automation projects.
+- Developed Siemens WinCC HMI applications for process visualization and alarm management, improving operator response efficiency by 18%.
+- Produced AutoCAD Electrical schematics and panel layouts, increasing electrical design accuracy by 28% and reducing deployment errors.
+- Performed FAT, SAT, I/O validation, and commissioning for PLC-based control systems, improving commissioning efficiency by 22% and ensuring successful production startup.
+- Integrated analog and digital instrumentation signals into distributed PLC architectures, enhancing process stability and minimizing communication interruptions across automation environments.
+- Collaborated with electrical, mechanical, and instrumentation teams to deliver standards-compliant automation solutions and successful project deployments.
+
+TATA Motors | India | Automation & Control Systems Engineer | 11/2019 – 06/2021
+- Programmed Modicon PLCs and Wonderware InTouch SCADA applications for switchgear monitoring and power distribution systems, improving operational visibility and control reliability by 20%.
+- Integrated OSIsoft PI System historian infrastructure with SCADA platforms, improving historian reporting accuracy by 32% and enabling centralized asset monitoring.
+- Developed Python automation scripts for SCADA synchronization and Modbus TCP/IP data acquisition, reducing manual engineering validation efforts by 33%.
+- Developed C# utilities for sensor validation, operational reporting, and audit readiness processes, improving engineering productivity by 25%.
+- Configured Wonderware InTouch alarm management and monitoring dashboards, reducing switchgear alarm response times by 27%.
+- Supported commissioning and optimization of industrial control systems, improving system reliability by 22% and minimizing operational disruptions.`
+    };
+  }
   
   upgradeAllProfiles();
   
