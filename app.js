@@ -96,6 +96,7 @@ window.setZoomScale = setZoomScale;
 window.updateEditorWordCount = updateEditorWordCount;
 window.updateSectionTags = updateSectionTags;
 window.insertSectionTemplate = insertSectionTemplate;
+window.moveSection = moveSection;
 window.pasteRefinedText = pasteRefinedText;
 
 window.undoEdit = undoEdit;
@@ -931,19 +932,36 @@ function updateSectionTags() {
   if (!container || !textarea) return;
 
   const text = textarea.value;
-  const sections = [
-    { id: 'summary', label: 'Summary', pattern: /(?:^|\n)\s*\[?(?:SUMMARY|PROFESSIONAL SUMMARY)\]?:?/i },
-    { id: 'skills', label: 'Skills', pattern: /(?:^|\n)\s*\[?(?:SKILLS|TECHNICAL SKILLS)\]?:?/i },
-    { id: 'experience', label: 'Experience', pattern: /(?:^|\n)\s*\[?(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]?:?/i }
+  const sections = parseSections(text);
+
+  const defaultSections = [
+    { id: 'summary', label: 'Summary', type: 'summary', template: '\n\n[PROFESSIONAL SUMMARY]\nRecent graduate with hands-on experience...' },
+    { id: 'skills', label: 'Skills', type: 'skills', template: '\n\n[TECHNICAL SKILLS]\nData Analysis: Python, SQL' },
+    { id: 'experience', label: 'Experience', type: 'experience', template: '\n\n[PROFESSIONAL EXPERIENCE]\nCompany | Location | Role | Dates\n- Bullet point 1' },
+    { id: 'education', label: 'Education', type: 'education', template: '\n\n[EDUCATION]\nDegree / Program | School / University | Dates (e.g. 06/2021 – 05/2023) | Location (e.g. Houston, TX)' },
+    { id: 'certs', label: 'Certifications', type: 'certs', template: '\n\n[CERTIFICATIONS]\nCertification Name – Issuer (2025)' }
   ];
 
   let html = '';
-  sections.forEach(sec => {
-    const found = sec.pattern.test(text);
-    if (found) {
-      html += `<span class="tag-pill found">✓ ${sec.label}</span>`;
-    } else {
-      html += `<button class="tag-pill missing" onclick="insertSectionTemplate('${sec.id}')" type="button">+ Add ${sec.label}</button>`;
+
+  // Render current sections with ordering controls
+  sections.forEach((sec, index) => {
+    if (sec.title || sec.content.trim()) {
+      html += `<span class="tag-pill found" style="gap: 8px;">
+        <span>${escHtml(sec.title || 'Headerless')}</span>
+        <span style="display: inline-flex; gap: 3px;">
+          ${index > 0 ? `<button class="arrow-btn" onclick="moveSection(${index}, -1)" title="Move Up" type="button">▲</button>` : ''}
+          ${index < sections.length - 1 ? `<button class="arrow-btn" onclick="moveSection(${index}, 1)" title="Move Down" type="button">▼</button>` : ''}
+        </span>
+      </span>`;
+    }
+  });
+
+  // Render missing sections
+  const renderedTypes = new Set(sections.map(s => s.type));
+  defaultSections.forEach(def => {
+    if (!renderedTypes.has(def.type)) {
+      html += `<button class="tag-pill missing" onclick="insertSectionTemplate('${def.id}')" type="button">+ Add ${def.label}</button>`;
     }
   });
 
@@ -955,9 +973,11 @@ function insertSectionTemplate(id) {
   if (!textarea) return;
 
   const sections = {
-    summary: '\n\n[SUMMARY]\nA results-driven professional with expertise in...',
-    skills: '\n\n[SKILLS]\n- Skill 1\n- Skill 2\n- Skill 3',
-    experience: '\n\n[EXPERIENCE]\nCompany | Location | Role | Dates\n- Bullet point 1\n- Bullet point 2'
+    summary: '\n\n[PROFESSIONAL SUMMARY]\nA results-driven professional with expertise in...',
+    skills: '\n\n[TECHNICAL SKILLS]\nData Analysis: Python, SQL\nDatabase: MySQL, MongoDB',
+    experience: '\n\n[PROFESSIONAL EXPERIENCE]\nCompany | Location | Role | Dates\n- Bullet point 1\n- Bullet point 2',
+    education: '\n\n[EDUCATION]\nDegree / Program | School / University | Dates (e.g. 06/2021 – 05/2023) | Location (e.g. Houston, TX)',
+    certs: '\n\n[CERTIFICATIONS]\nCertification Name – Issuer (2025)'
   };
 
   const template = sections[id];
@@ -968,6 +988,27 @@ function insertSectionTemplate(id) {
   
   textarea.dispatchEvent(new Event('input'));
   textarea.focus();
+}
+
+function moveSection(index, direction) {
+  const textarea = document.getElementById('resume-text');
+  if (!textarea) return;
+  
+  const text = textarea.value;
+  const sections = parseSections(text);
+  
+  const targetIndex = index + direction;
+  if (targetIndex < 0 || targetIndex >= sections.length) return;
+  
+  const temp = sections[index];
+  sections[index] = sections[targetIndex];
+  sections[targetIndex] = temp;
+  
+  const newText = rebuildTextFromSections(sections);
+  textarea.value = newText;
+  
+  textarea.dispatchEvent(new Event('input'));
+  showToast(`Moved "${temp.title || 'Untitled'}" section ${direction < 0 ? 'up' : 'down'}`);
 }
 
 async function pasteRefinedText() {

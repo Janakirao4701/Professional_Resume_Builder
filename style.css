@@ -524,6 +524,27 @@
     border: 1px solid var(--color-red-border);
   }
 
+  .arrow-btn {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    padding: 0 2px;
+    font-size: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .arrow-btn:hover {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  .arrow-btn:active {
+    transform: scale(0.9);
+  }
+
   .paste-btn {
     margin-top: 12px;
     width: 100%;
