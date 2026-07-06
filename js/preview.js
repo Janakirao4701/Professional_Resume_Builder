@@ -1,7 +1,7 @@
 // ── RESUME PREVIEW RENDERER MODULE ──
 
 import { activeProfile } from './state.js';
-import { parseContent } from './parser.js';
+import { parseContent, parseEducationLine } from './parser.js';
 import { escHtml } from './ui.js';
 
 export let currentZoomScale = 1.0;
@@ -63,7 +63,7 @@ export function updatePreviewRaw() {
     return;
   }
 
-  const { summary, skills, experience } = parseContent(raw);
+  const { sections } = parseContent(raw);
   const elements = [];
 
   function createEl(htmlStr) {
@@ -98,87 +98,130 @@ export function updatePreviewRaw() {
     </div>
   `));
 
-  // 2. Summary
-  if (summary) {
-    elements.push(createEl(`<div class="mock-section-head">PROFESSIONAL SUMMARY:</div>`));
-    elements.push(createEl(`<div class="mock-text">${escHtml(summary)}</div>`));
-  }
+  const renderedTypes = new Set();
 
-  // 3. Technical Skills
-  if (skills) {
-    elements.push(createEl(`<div class="mock-section-head">TECHNICAL SKILLS:</div>`));
-    skills.split('\n').filter(l => l.trim()).forEach(line => {
-      const cleanLine = line.trim().replace(/^[-•*]\s*/, '');
-      const idx = cleanLine.indexOf(':');
-      if (idx > -1) {
-        elements.push(createEl(`<div class="mock-text" style="text-align: left; margin-bottom: 4pt;"><strong>${escHtml(cleanLine.substring(0, idx+1))}</strong>${escHtml(cleanLine.substring(idx+1))}</div>`));
-      } else {
-        elements.push(createEl(`<div class="mock-text" style="text-align: left; margin-bottom: 4pt;">${escHtml(cleanLine)}</div>`));
-      }
-    });
-  }
+  sections.forEach(sec => {
+    renderedTypes.add(sec.type);
 
-  // 4. Professional Experience
-  if (experience) {
-    elements.push(createEl(`<div class="mock-section-head">PROFESSIONAL EXPERIENCE:</div>`));
-    experience.split('\n').filter(l => l.trim()).forEach(line => {
-      const t = line.trim();
-      if (/^[-•*]/.test(t)) {
-        elements.push(createEl(`<div class="mock-bullet">${escHtml(t.replace(/^[-•*]\s*/, ''))}</div>`));
-      } else if (t.includes('|')) {
-        const parts = t.split('|').map(p => p.trim());
-        if (parts.length >= 4) {
-          elements.push(createEl(`
-            <div class="mock-exp-header">
-              <span>${escHtml(parts[0])}</span>
-              <span>${escHtml(parts[3])}</span>
-            </div>
-          `));
-          elements.push(createEl(`
-            <div class="mock-exp-header" style="font-weight: normal; margin-top: 0; margin-bottom: 4pt;">
-              <span style="font-weight: normal;">${escHtml(parts[2])}</span>
-              <span style="font-weight: normal;">${escHtml(parts[1])}</span>
-            </div>
-          `));
-        } else if (parts.length === 3) {
-          elements.push(createEl(`
-            <div class="mock-exp-header">
-              <span>${escHtml(parts[0])}</span>
-              <span>${escHtml(parts[2])}</span>
-            </div>
-          `));
-          elements.push(createEl(`<div class="mock-exp-role">${escHtml(parts[1])}</div>`));
+    if (sec.type === 'summary' && sec.content) {
+      elements.push(createEl(`<div class="mock-section-head">${escHtml(sec.title.toUpperCase())}:</div>`));
+      elements.push(createEl(`<div class="mock-text">${escHtml(sec.content)}</div>`));
+    }
+
+    else if (sec.type === 'skills' && sec.content) {
+      elements.push(createEl(`<div class="mock-section-head">${escHtml(sec.title.toUpperCase())}:</div>`));
+      sec.content.split('\n').filter(l => l.trim()).forEach(line => {
+        const cleanLine = line.trim().replace(/^[-•*]\s*/, '');
+        const idx = cleanLine.indexOf(':');
+        if (idx > -1) {
+          elements.push(createEl(`<div class="mock-text" style="text-align: left; margin-bottom: 4pt;"><strong>${escHtml(cleanLine.substring(0, idx+1))}</strong>${escHtml(cleanLine.substring(idx+1))}</div>`));
         } else {
-          elements.push(createEl(`<div class="mock-exp-header"><span>${escHtml(t)}</span></div>`));
+          elements.push(createEl(`<div class="mock-text" style="text-align: left; margin-bottom: 4pt;">${escHtml(cleanLine)}</div>`));
         }
-      } else {
-        elements.push(createEl(`<div class="mock-text" style="margin-top:4px">${escHtml(t)}</div>`));
-      }
-    });
+      });
+    }
+
+    else if (sec.type === 'experience' && sec.content) {
+      elements.push(createEl(`<div class="mock-section-head">${escHtml(sec.title.toUpperCase())}:</div>`));
+      sec.content.split('\n').filter(l => l.trim()).forEach(line => {
+        const t = line.trim();
+        if (/^[-•*]/.test(t)) {
+          elements.push(createEl(`<div class="mock-bullet">${escHtml(t.replace(/^[-•*]\s*/, ''))}</div>`));
+        } else if (t.includes('|')) {
+          const parts = t.split('|').map(p => p.trim());
+          if (parts.length >= 4) {
+            elements.push(createEl(`
+              <div class="mock-exp-header">
+                <span>${escHtml(parts[0])}</span>
+                <span>${escHtml(parts[3])}</span>
+              </div>
+            `));
+            elements.push(createEl(`
+              <div class="mock-exp-header" style="font-weight: normal; margin-top: 0; margin-bottom: 4pt;">
+                <span style="font-weight: normal;">${escHtml(parts[2])}</span>
+                <span style="font-weight: normal;">${escHtml(parts[1])}</span>
+              </div>
+            `));
+          } else if (parts.length === 3) {
+            elements.push(createEl(`
+              <div class="mock-exp-header">
+                <span>${escHtml(parts[0])}</span>
+                <span>${escHtml(parts[2])}</span>
+              </div>
+            `));
+            elements.push(createEl(`<div class="mock-exp-role">${escHtml(parts[1])}</div>`));
+          } else {
+            elements.push(createEl(`<div class="mock-exp-header"><span>${escHtml(t)}</span></div>`));
+          }
+        } else {
+          elements.push(createEl(`<div class="mock-text" style="margin-top:4px">${escHtml(t)}</div>`));
+        }
+      });
+    }
+
+    else if (sec.type === 'education' && sec.content) {
+      elements.push(createEl(`<div class="mock-section-head">${escHtml(sec.title.toUpperCase())}:</div>`));
+      sec.content.split('\n').filter(l => l.trim()).forEach(line => {
+        const edu = parseEducationLine(line);
+        if (edu) {
+          elements.push(createEl(`
+            <div class="mock-edu-row">
+              <span>${escHtml(edu.degree || '')}</span>
+              <span>${escHtml(edu.dates || '')}</span>
+            </div>
+          `));
+          elements.push(createEl(`<div class="mock-edu-school">${escHtml(edu.school || '')}${edu.location ? ', ' + escHtml(edu.location) : ''}</div>`));
+        }
+      });
+    }
+
+    else if (sec.type === 'certs' && sec.content) {
+      elements.push(createEl(`<div class="mock-section-head">${escHtml(sec.title.toUpperCase())}:</div>`));
+      sec.content.split('\n').filter(l => l.trim()).forEach(line => {
+        const clean = line.trim().replace(/^[-•*]\s*/, '');
+        elements.push(createEl(`<div class="mock-bullet">${escHtml(clean)}</div>`));
+      });
+    }
+
+    else if (sec.content) {
+      elements.push(createEl(`<div class="mock-section-head">${escHtml(sec.title.toUpperCase())}:</div>`));
+      sec.content.split('\n').filter(l => l.trim()).forEach(line => {
+        const t = line.trim();
+        if (/^[-•*]/.test(t)) {
+          elements.push(createEl(`<div class="mock-bullet">${escHtml(t.replace(/^[-•*]\s*/, ''))}</div>`));
+        } else {
+          elements.push(createEl(`<div class="mock-text">${escHtml(t)}</div>`));
+        }
+      });
+    }
+  });
+
+  // Fallback to activeProfile education if not explicitly present in textarea
+  if (!renderedTypes.has('education')) {
+    const education = activeProfile.education || [];
+    if (education.length) {
+      elements.push(createEl(`<div class="mock-section-head">EDUCATION:</div>`));
+      education.forEach(e => {
+        elements.push(createEl(`
+          <div class="mock-edu-row">
+            <span>${escHtml(e.degree || '')}</span>
+            <span>${escHtml(e.dates || '')}</span>
+          </div>
+        `));
+        elements.push(createEl(`<div class="mock-edu-school">${escHtml(e.school || '')}${e.location ? ', ' + escHtml(e.location) : ''}</div>`));
+      });
+    }
   }
 
-  // 5. Education
-  const education = activeProfile.education || [];
-  if (education.length) {
-    elements.push(createEl(`<div class="mock-section-head">EDUCATION:</div>`));
-    education.forEach(e => {
-      elements.push(createEl(`
-        <div class="mock-edu-row">
-          <span>${escHtml(e.degree || '')}</span>
-          <span>${escHtml(e.dates || '')}</span>
-        </div>
-      `));
-      elements.push(createEl(`<div class="mock-edu-school">${escHtml(e.school || '')}${e.location ? ', ' + escHtml(e.location) : ''}</div>`));
-    });
-  }
-
-  // 6. Certifications
-  const certs = activeProfile.certs || [];
-  if (certs.length) {
-    elements.push(createEl(`<div class="mock-section-head">CERTIFICATIONS:</div>`));
-    certs.forEach(c => {
-      elements.push(createEl(`<div class="mock-bullet">${escHtml(c)}</div>`));
-    });
+  // Fallback to activeProfile certs if not explicitly present in textarea
+  if (!renderedTypes.has('certs')) {
+    const certs = activeProfile.certs || [];
+    if (certs.length) {
+      elements.push(createEl(`<div class="mock-section-head">CERTIFICATIONS:</div>`));
+      certs.forEach(c => {
+        elements.push(createEl(`<div class="mock-bullet">${escHtml(c)}</div>`));
+      });
+    }
   }
 
   // Paginate elements dynamically

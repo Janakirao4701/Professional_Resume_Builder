@@ -16,7 +16,10 @@ import {
 
 import { 
   parseContent, 
-  parseCompanies 
+  parseCompanies,
+  parseSections,
+  parseEducationLine,
+  rebuildTextFromSections
 } from './js/parser.js';
 
 import { 
@@ -474,6 +477,7 @@ function updateEduField(index, field, value) {
   if (!education[index]) return;
   education[index][field] = value;
   activeProfile.education = education;
+  syncStateToTextarea();
   updatePreview();
 }
 
@@ -481,6 +485,7 @@ function updateCertField(index, value) {
   const certs = [...(activeProfile.certs || [])];
   certs[index] = value;
   activeProfile.certs = certs;
+  syncStateToTextarea();
   updatePreview();
 }
 
@@ -488,6 +493,7 @@ function addEducationRow() {
   const education = [...(activeProfile.education || [])];
   education.push({ degree: '', school: '', dates: '', location: '' });
   activeProfile.education = education;
+  syncStateToTextarea();
   renderFormFields();
   updatePreviewImmediate();
 }
@@ -496,6 +502,7 @@ function removeEducationRow(index) {
   const education = [...(activeProfile.education || [])];
   education.splice(index, 1);
   activeProfile.education = education;
+  syncStateToTextarea();
   renderFormFields();
   updatePreviewImmediate();
 }
@@ -504,6 +511,7 @@ function addCertRow() {
   const certs = [...(activeProfile.certs || [])];
   certs.push('');
   activeProfile.certs = certs;
+  syncStateToTextarea();
   renderFormFields();
   updatePreviewImmediate();
 }
@@ -512,6 +520,7 @@ function removeCertRow(index) {
   const certs = [...(activeProfile.certs || [])];
   certs.splice(index, 1);
   activeProfile.certs = certs;
+  syncStateToTextarea();
   renderFormFields();
   updatePreviewImmediate();
 }
@@ -700,9 +709,81 @@ function copyCompanyExp(index) {
   }, 2000);
 }
 
+function syncStateToTextarea() {
+  let text = activeProfile.text || '';
+  const sections = parseSections(text);
+  
+  let modified = false;
+  
+  const eduSec = sections.find(s => s.type === 'education');
+  if (eduSec) {
+    const newEduContent = (activeProfile.education || []).map(e => {
+      return `${e.degree || ''} | ${e.school || ''} | ${e.location || ''} | ${e.dates || ''}`;
+    }).join('\n');
+    if (eduSec.content !== newEduContent) {
+      eduSec.content = newEduContent;
+      modified = true;
+    }
+  }
+  
+  const certsSec = sections.find(s => s.type === 'certs');
+  if (certsSec) {
+    const newCertsContent = (activeProfile.certs || []).map(c => `- ${c || ''}`).join('\n');
+    if (certsSec.content !== newCertsContent) {
+      certsSec.content = newCertsContent;
+      modified = true;
+    }
+  }
+  
+  if (modified) {
+    const newText = rebuildTextFromSections(sections);
+    activeProfile.text = newText;
+    const textarea = document.getElementById('resume-text');
+    if (textarea) {
+      const isFocused = document.activeElement === textarea;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      
+      textarea.value = newText;
+      
+      if (isFocused) {
+        textarea.setSelectionRange(start, end);
+      }
+    }
+    updateEditorWordCount();
+    updateSectionTags();
+  }
+}
+
 function detectSectionsAndCompanies() {
   const raw = document.getElementById('resume-text').value;
   parseCompanies(raw);
+  
+  const sections = parseSections(raw);
+  
+  const eduSec = sections.find(s => s.type === 'education');
+  if (eduSec) {
+    const parsedEdu = eduSec.content.split('\n')
+      .filter(l => l.trim())
+      .map(line => parseEducationLine(line))
+      .filter(Boolean);
+    if (JSON.stringify(activeProfile.education || []) !== JSON.stringify(parsedEdu)) {
+      activeProfile.education = parsedEdu;
+      renderFormFields();
+    }
+  }
+  
+  const certsSec = sections.find(s => s.type === 'certs');
+  if (certsSec) {
+    const parsedCerts = certsSec.content.split('\n')
+      .filter(l => l.trim())
+      .map(line => line.trim().replace(/^[-•*]\s*/, ''))
+      .filter(Boolean);
+    if (JSON.stringify(activeProfile.certs || []) !== JSON.stringify(parsedCerts)) {
+      activeProfile.certs = parsedCerts;
+      renderFormFields();
+    }
+  }
 }
 
 function setMobileView(view) {

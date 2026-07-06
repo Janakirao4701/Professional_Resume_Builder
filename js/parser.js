@@ -2,29 +2,148 @@
 
 import { escHtml } from './ui.js';
 
-export function parseContent(raw) {
-  if (!raw) return { summary: '', skills: '', experience: '' };
+export function parseSections(raw) {
+  if (!raw) return [];
   
-  const summaryRx   = /(?:^|\n)\s*\[?(?:SUMMARY|PROFESSIONAL SUMMARY)\]?:?\s*([\s\S]*?)(?=(?:\n\s*\[?(?:SKILLS|TECHNICAL SKILLS|EXPERIENCE|PROFESSIONAL EXPERIENCE|EDUCATION|CERTIFICATIONS)\]?:?)|$)/i;
-  const skillsRx    = /(?:^|\n)\s*\[?(?:SKILLS|TECHNICAL SKILLS)\]?:?\s*([\s\S]*?)(?=(?:\n\s*\[?(?:SUMMARY|PROFESSIONAL SUMMARY|EXPERIENCE|PROFESSIONAL EXPERIENCE|EDUCATION|CERTIFICATIONS)\]?:?)|$)/i;
-  const experienceRx= /(?:^|\n)\s*\[?(?:EXPERIENCE|PROFESSIONAL EXPERIENCE)\]?:?\s*([\s\S]*?)(?=(?:\n\s*\[?(?:SUMMARY|PROFESSIONAL SUMMARY|SKILLS|TECHNICAL SKILLS|EDUCATION|CERTIFICATIONS)\]?:?)|$)/i;
-
-  const sMatch = raw.match(summaryRx);
-  const kMatch = raw.match(skillsRx);
-  const eMatch = raw.match(experienceRx);
-
-  if (!sMatch && !kMatch && !eMatch) {
-    return {
-      summary: '',
-      skills: '',
-      experience: raw.trim()
-    };
+  // Match bracketed sections [SECTION TITLE] or SECTION TITLE: on a separate line
+  const headerRx = /(?:^|\n)\s*(?:\[([^\]]+)\]:?|([A-Z\s&_]{2,40}):)\s*(?:\n|$)/g;
+  
+  const sections = [];
+  let match;
+  
+  const matches = [];
+  while ((match = headerRx.exec(raw)) !== null) {
+    matches.push({
+      index: match.index,
+      length: match[0].length,
+      title: (match[1] || match[2]).trim()
+    });
   }
+  
+  if (matches.length === 0) {
+    return [{
+      title: 'EXPERIENCE',
+      type: 'experience',
+      content: raw.trim()
+    }];
+  }
+  
+  const firstMatch = matches[0];
+  if (firstMatch.index > 0) {
+    const content = raw.substring(0, firstMatch.index).trim();
+    if (content) {
+      sections.push({
+        title: '',
+        type: 'custom',
+        content: content
+      });
+    }
+  }
+  
+  for (let i = 0; i < matches.length; i++) {
+    const current = matches[i];
+    const next = matches[i + 1];
+    const start = current.index + current.length;
+    const end = next ? next.index : raw.length;
+    const content = raw.substring(start, end).trim();
+    
+    let type = 'custom';
+    const titleUpper = current.title.toUpperCase();
+    if (/SUMMARY|ABOUT|PROFILE/i.test(titleUpper)) {
+      type = 'summary';
+    } else if (/SKILLS|TECHNICAL/i.test(titleUpper)) {
+      type = 'skills';
+    } else if (/EXPERIENCE|PROJECT|WORK|EMPLOYMENT|INTERNSHIP|HISTORY/i.test(titleUpper)) {
+      type = 'experience';
+    } else if (/EDUCATION|ACADEMIC/i.test(titleUpper)) {
+      type = 'education';
+    } else if (/CERTIFICATION|CERT|AWARD/i.test(titleUpper)) {
+      type = 'certs';
+    }
+    
+    sections.push({
+      title: current.title,
+      type: type,
+      content: content
+    });
+  }
+  
+  return sections;
+}
 
+export function parseEducationLine(line) {
+  const parts = line.split('|').map(p => p.trim());
+  if (parts.length === 0 || !parts[0]) return null;
+  
+  const degree = parts[0] || '';
+  const school = parts[1] || '';
+  
+  let dates = '';
+  let location = '';
+  
+  if (parts.length === 3) {
+    if (/\b\d{4}\b|\b(?:Present|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/i.test(parts[2])) {
+      dates = parts[2];
+    } else {
+      location = parts[2];
+    }
+  } else if (parts.length >= 4) {
+    const isPart2Date = /\b\d{4}\b|\b(?:Present|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/i.test(parts[2]);
+    const isPart3Date = /\b\d{4}\b|\b(?:Present|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/i.test(parts[3]);
+    
+    if (isPart3Date && !isPart2Date) {
+      location = parts[2];
+      dates = parts[3];
+      if (parts.length > 4) {
+        location += ' | ' + parts.slice(4).join(' | ');
+      }
+    } else {
+      dates = parts[2];
+      location = parts[3];
+      if (parts.length > 4) {
+        location += ' | ' + parts.slice(4).join(' | ');
+      }
+    }
+  }
+  
+  return { degree, school, dates, location };
+}
+
+export function rebuildTextFromSections(sections) {
+  return sections.map(s => {
+    if (s.title) {
+      return `[${s.title}]\n${s.content}`;
+    }
+    return s.content;
+  }).join('\n\n');
+}
+
+export function parseContent(raw) {
+  if (!raw) return { summary: '', skills: '', experience: '', education: '', certs: '', sections: [] };
+  
+  const sections = parseSections(raw);
+  
+  const summarySec = sections.find(s => s.type === 'summary');
+  const skillsSec = sections.find(s => s.type === 'skills');
+  const experienceSecs = sections.filter(s => s.type === 'experience');
+  
+  const experience = experienceSecs.map(s => {
+    if (s.title && s.title.toUpperCase() !== 'EXPERIENCE' && s.title.toUpperCase() !== 'PROFESSIONAL EXPERIENCE') {
+      return `[${s.title}]\n${s.content}`;
+    }
+    return s.content;
+  }).join('\n\n');
+  
+  const eduSec = sections.find(s => s.type === 'education');
+  const certsSec = sections.find(s => s.type === 'certs');
+  
   return {
-    summary: sMatch ? sMatch[1].trim() : '',
-    skills: kMatch ? kMatch[1].trim() : '',
-    experience: eMatch ? eMatch[1].trim() : ''
+    summary: summarySec ? summarySec.content : '',
+    skills: skillsSec ? skillsSec.content : '',
+    experience: experience,
+    education: eduSec ? eduSec.content : '',
+    certs: certsSec ? certsSec.content : '',
+    sections: sections
   };
 }
 

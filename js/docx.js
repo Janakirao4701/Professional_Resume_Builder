@@ -1,7 +1,7 @@
 // ── DOCX RESUME GENERATOR MODULE ──
 
 import { activeProfile } from './state.js';
-import { parseContent } from './parser.js';
+import { parseContent, parseEducationLine } from './parser.js';
 import { showToast } from './ui.js';
 
 function loadScript(url) {
@@ -58,7 +58,7 @@ export async function downloadDocx() {
     const { Document, Packer, Paragraph, TextRun, ExternalHyperlink,
             AlignmentType, BorderStyle, LevelFormat, TabStopType } = docxLib;
 
-    const { summary, skills, experience } = parseContent(raw);
+    const { sections } = parseContent(raw);
 
     // Headings format
     function sectionHead(text) {
@@ -156,44 +156,6 @@ export async function downloadDocx() {
       }).flat();
     }
 
-    const summaryParagraphs = [];
-    if (summary) {
-      summaryParagraphs.push(sectionHead('Professional Summary'));
-      summaryParagraphs.push(new Paragraph({
-        alignment: AlignmentType.JUSTIFIED,
-        spacing: { before: 0, after: 80 },
-        children: [new TextRun({ text: summary, font: 'Times New Roman', size: 22, color: '000000' })]
-      }));
-    }
-
-    const eduParagraphs = [sectionHead('Education')];
-    const education = activeProfile.education || [];
-    education.forEach(e => {
-      eduParagraphs.push(new Paragraph({
-        spacing: { before: 180, after: 40 },
-        tabStops: [{ type: TabStopType.RIGHT, position: 10800 }],
-        children: [
-          new TextRun({ text: e.degree, bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
-          new TextRun({ text: '\t' }),
-          new TextRun({ text: e.dates, bold: true, font: 'Times New Roman', size: 22, color: '000000' })
-        ]
-      }));
-      eduParagraphs.push(new Paragraph({
-        spacing: { before: 0, after: 60 },
-        children: [new TextRun({ text: `${e.school}${e.location ? ', ' + e.location : ''}`, font: 'Times New Roman', size: 22, color: '000000' })]
-      }));
-    });
-
-    const certParagraphs = [];
-    const certs = activeProfile.certs || [];
-    const activeCerts = certs.map(c => c.trim()).filter(Boolean);
-    if (activeCerts.length) {
-      certParagraphs.push(sectionHead('Certifications'));
-      activeCerts.forEach(c => {
-        certParagraphs.push(bullet(c));
-      });
-    }
-
     const contactChildren = [];
     const textSeparator = () => new TextRun({ text: '  |  ', font: 'Times New Roman', size: 22, color: '000000' });
     
@@ -237,6 +199,116 @@ export async function downloadDocx() {
       children: contactChildren
     });
 
+    const docChildren = [
+      new Paragraph({ alignment:AlignmentType.CENTER, spacing:{before:0,after:80}, children:[new TextRun({text:activeProfile.name || '', bold:true, font:'Times New Roman', size:28, color:'000000'})] }),
+      new Paragraph({ alignment:AlignmentType.CENTER, spacing:{before:0,after:120}, children:[new TextRun({text:activeProfile.subtitle || '', bold:true, font:'Times New Roman', size:22, color:'000000'})] }),
+      contactParagraph
+    ];
+
+    const renderedTypes = new Set();
+
+    sections.forEach(sec => {
+      renderedTypes.add(sec.type);
+
+      if (sec.type === 'summary' && sec.content) {
+        docChildren.push(sectionHead(sec.title));
+        docChildren.push(new Paragraph({
+          alignment: AlignmentType.JUSTIFIED,
+          spacing: { before: 0, after: 80 },
+          children: [new TextRun({ text: sec.content, font: 'Times New Roman', size: 22, color: '000000' })]
+        }));
+      }
+
+      else if (sec.type === 'skills' && sec.content) {
+        docChildren.push(sectionHead(sec.title));
+        docChildren.push(...skillsDocx(sec.content));
+      }
+
+      else if (sec.type === 'experience' && sec.content) {
+        docChildren.push(sectionHead(sec.title));
+        docChildren.push(...expDocx(sec.content));
+      }
+
+      else if (sec.type === 'education' && sec.content) {
+        docChildren.push(sectionHead(sec.title));
+        sec.content.split('\n').filter(l => l.trim()).forEach(line => {
+          const e = parseEducationLine(line);
+          if (e) {
+            docChildren.push(new Paragraph({
+              spacing: { before: 180, after: 40 },
+              tabStops: [{ type: TabStopType.RIGHT, position: 10800 }],
+              children: [
+                new TextRun({ text: e.degree, bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
+                new TextRun({ text: '\t' }),
+                new TextRun({ text: e.dates, bold: true, font: 'Times New Roman', size: 22, color: '000000' })
+              ]
+            }));
+            docChildren.push(new Paragraph({
+              spacing: { before: 0, after: 60 },
+              children: [new TextRun({ text: `${e.school}${e.location ? ', ' + e.location : ''}`, font: 'Times New Roman', size: 22, color: '000000' })]
+            }));
+          }
+        });
+      }
+
+      else if (sec.type === 'certs' && sec.content) {
+        docChildren.push(sectionHead(sec.title));
+        sec.content.split('\n').filter(l => l.trim()).forEach(line => {
+          const clean = line.trim().replace(/^[-•*]\s*/, '');
+          docChildren.push(bullet(clean));
+        });
+      }
+
+      else if (sec.content) {
+        docChildren.push(sectionHead(sec.title));
+        sec.content.split('\n').filter(l => l.trim()).forEach(line => {
+          const t = line.trim();
+          if (/^[-•*]/.test(t)) {
+            docChildren.push(bullet(t.replace(/^[-•*]\s*/, '')));
+          } else {
+            docChildren.push(new Paragraph({
+              spacing: { before: 60, after: 60 },
+              children: [new TextRun({ text: t, font: 'Times New Roman', size: 22, color: '000000' })]
+            }));
+          }
+        });
+      }
+    });
+
+    // Fallbacks if not in text
+    if (!renderedTypes.has('education')) {
+      const education = activeProfile.education || [];
+      if (education.length) {
+        docChildren.push(sectionHead('Education'));
+        education.forEach(e => {
+          docChildren.push(new Paragraph({
+            spacing: { before: 180, after: 40 },
+            tabStops: [{ type: TabStopType.RIGHT, position: 10800 }],
+            children: [
+              new TextRun({ text: e.degree, bold: true, font: 'Times New Roman', size: 22, color: '000000' }),
+              new TextRun({ text: '\t' }),
+              new TextRun({ text: e.dates, bold: true, font: 'Times New Roman', size: 22, color: '000000' })
+            ]
+          }));
+          docChildren.push(new Paragraph({
+            spacing: { before: 0, after: 60 },
+            children: [new TextRun({ text: `${e.school}${e.location ? ', ' + e.location : ''}`, font: 'Times New Roman', size: 22, color: '000000' })]
+          }));
+        });
+      }
+    }
+
+    if (!renderedTypes.has('certs')) {
+      const certs = activeProfile.certs || [];
+      const activeCerts = certs.map(c => c.trim()).filter(Boolean);
+      if (activeCerts.length) {
+        docChildren.push(sectionHead('Certifications'));
+        activeCerts.forEach(c => {
+          docChildren.push(bullet(c));
+        });
+      }
+    }
+
     const doc = new Document({
       numbering: { config:[{ reference:'bullets', levels:[{ level:0, format:LevelFormat.BULLET, text:'•', alignment:AlignmentType.LEFT, style:{ paragraph:{ indent: { left: 360, hanging: 360 } } } }] }] },
       styles: { default: { document: { run:{ font:'Times New Roman', size:22, color:'000000' } } } },
@@ -247,18 +319,7 @@ export async function downloadDocx() {
             margin:{top:720,right:720,bottom:720,left:720}
           }
         },
-        children:[
-          new Paragraph({ alignment:AlignmentType.CENTER, spacing:{before:0,after:80}, children:[new TextRun({text:activeProfile.name || '', bold:true, font:'Times New Roman', size:28, color:'000000'})] }),
-          new Paragraph({ alignment:AlignmentType.CENTER, spacing:{before:0,after:120}, children:[new TextRun({text:activeProfile.subtitle || '', bold:true, font:'Times New Roman', size:22, color:'000000'})] }),
-          contactParagraph,
-          ...summaryParagraphs,
-          sectionHead('Technical Skills'),
-          ...skillsDocx(skills),
-          sectionHead('Professional Experience'),
-          ...expDocx(experience),
-          ...eduParagraphs,
-          ...certParagraphs
-        ]
+        children: docChildren
       }]
     });
 
