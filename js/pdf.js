@@ -84,18 +84,13 @@ export async function downloadPdf() {
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
-    const blob = await html2pdfLib().set(opt).from(element).output('blob');
-    const url = URL.createObjectURL(blob);
+    const dataUri = await html2pdfLib().set(opt).from(element).output('datauristring');
     const a = document.createElement('a');
-    a.href = url;
+    a.href = dataUri;
     a.download = `${activeProfile.id}_Resume.pdf`;
     document.body.appendChild(a);
     a.click();
-    
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 60000);
+    document.body.removeChild(a);
 
     showToast('PDF Resume downloaded successfully!');
   } catch (err) {

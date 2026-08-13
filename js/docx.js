@@ -25,13 +25,16 @@ async function loadDocxLib() {
 }
 
 function saveAs(blob, filename) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 60000);
+  const reader = new FileReader();
+  reader.onload = function() {
+    const a = document.createElement('a');
+    a.href = reader.result;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+  reader.readAsDataURL(blob);
 }
 
 export async function downloadDocx() {

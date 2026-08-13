@@ -640,16 +640,17 @@ function exportProfiles() {
   const dataStr = JSON.stringify(activeProfileData, null, 2);
   const blob = new Blob([dataStr], { type: 'application/json' });
   
-  // Custom safe saveAs download helper
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${currentProfileId}_backup.json`;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 60000);
-  
-  showToast(`Exported "${currentProfileId}" backup successfully!`);
+  const reader = new FileReader();
+  reader.onload = function() {
+    const a = document.createElement('a');
+    a.href = reader.result;
+    a.download = `${currentProfileId}_backup.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    showToast(`Exported "${currentProfileId}" backup successfully!`);
+  };
+  reader.readAsDataURL(blob);
 }
 
 async function pasteFromClipboard() {
