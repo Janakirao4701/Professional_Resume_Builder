@@ -31,7 +31,7 @@ function saveAs(blob, filename) {
   a.download = filename;
   document.body.appendChild(a);
   a.click();
-  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 60000);
 }
 
 export async function downloadDocx() {

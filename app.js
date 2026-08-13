@@ -647,7 +647,7 @@ function exportProfiles() {
   a.download = `${currentProfileId}_backup.json`;
   document.body.appendChild(a);
   a.click();
-  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 60000);
   
   showToast(`Exported "${currentProfileId}" backup successfully!`);
 }

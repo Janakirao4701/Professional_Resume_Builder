@@ -84,7 +84,19 @@ export async function downloadPdf() {
       jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
-    await html2pdfLib().set(opt).from(element).save();
+    const blob = await html2pdfLib().set(opt).from(element).output('blob');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${activeProfile.id}_Resume.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 60000);
+
     showToast('PDF Resume downloaded successfully!');
   } catch (err) {
     console.error('[PDF Generation Error]', err);
